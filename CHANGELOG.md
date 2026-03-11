@@ -1,5 +1,90 @@
 # 更新日志
 
+## 2026-03-11
+
+### 重大更新
+
+#### 安全研究多 Agent 团队架构
+全新重构 Claude Code 配置体系，采用双模式调度架构，专为安全研究和复杂项目设计。
+
+**核心架构：**
+
+1. **双模式调度系统**
+   - **Analysis Mode（默认）**：意图识别驱动，默认进入分析模式
+   - **Coding Mode（执行模式）**：明确条件触发，每次编写代码都调用执行层 agent
+
+2. **分析层 Agents（5 个）**
+   - `product-manager`：需求与业务目标分析
+   - `backend-engineer`：系统结构与状态机分析
+   - `frontend-engineer`：输入面与攻击面分析
+   - `qa-engineer`：失败路径与边界场景分析
+   - `security-tester`：攻击路径与漏洞分析
+
+3. **执行层 Coder Agents（4 个）**
+   - `backend-coder`：后端代码（API、模型、服务、迁移）
+   - `frontend-coder`：前端代码（页面、组件、状态管理）
+   - `fullstack-coder`：全栈代码（从 0 到 1 搭建小系统）
+   - `script-coder`：安全脚本（PoC、Exploit、Fuzzer、扫描工具）
+
+4. **Orchestrator（编排器）**
+   - 意图识别优先于关键词匹配
+   - 任务复杂度判断（多模块、设计决策、风险评估）
+   - 自动模式切换（Analysis ↔ Coding）
+
+**关键特性：**
+
+- ✅ **意图识别**：从关键词触发升级为智能意图识别
+- ✅ **默认分析**：复杂任务默认进入 Analysis Mode
+- ✅ **持续调用**：Coding Mode 每次编写/修改代码都调用相应 agent
+- ✅ **上下文感知修复**：修复代码时检查整个文件，发现并修复所有类似问题
+- ✅ **结构化输出**：Research Ledger 格式（Goal、System Model、Verified Facts 等）
+
+**Knowledge 共享知识库：**
+
+1. **patterns.md** - 系统性失败模式（13KB）
+   - 状态类失败：死锁、活锁、状态不一致
+   - 边界类失败：溢出、越界、空值、未定义
+   - 信任类失败：认证、授权、会话、加密
+   - 时间类失败：竞态、超时、时钟漂移
+   - 资源类失败：泄漏、耗尽、限流
+   - 组合类失败：分布式、级联、 Byzantine
+
+2. **domains.md** - 统一安全问题空间（8KB）
+   - 入侵链阶段：Kill Chain → ATT&CK
+   - 漏洞分类：CWE → CVE
+   - 控制基线：安全框架映射
+
+3. **tools.md** - 工具视角认知（11KB）
+   - 工具选用决策树
+   - 能力边界识别
+   - 组合工作流
+
+4. **corrections.md** - 错误学习库（11KB）
+   - 15 个预填充错误模式
+   - 避免重复错误
+
+**双层记忆架构：**
+
+- **Knowledge 文件夹**：项目级共享知识，所有 agent 共享
+- **Agent Memory**：每个 agent 独立记忆目录（`.claude/agent-memory/{agent}/MEMORY.md`）
+
+**适用场景：**
+
+- ✅ 各类安全项目（不限于攻防演练）
+- ✅ 复杂系统开发与分析
+- ✅ 需要多视角评估的设计评审
+- ✅ 漏洞分析与 PoC 开发
+- ✅ 安全工具开发
+
+**适用版本：**
+
+- `claudeCode-none/claude_arm64` ✅
+- `claudeCode-none/claude_x64` ✅
+- `claudeCode-lsp/claude_arm64` ✅
+- `claudeCode-lsp/claude_x64` ✅
+
+---
+
 ## 2026-03-09
 
 ### 新增功能
