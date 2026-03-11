@@ -1,0 +1,43 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: key -k <token> | key -u <url> | key -m <model> | key -k <token> -u <url> -m <model>"
+    echo "  -k <token>  Modify ANTHROPIC_AUTH_TOKEN"
+    echo "  -u <url>    Modify ANTHROPIC_BASE_URL"
+    echo "  -m <model>  Modify ANTHROPIC_MODEL"
+    exit 1
+}
+
+TOKEN=""
+BASE_URL=""
+MODEL=""
+
+while getopts "k:u:m:" opt; do
+    case $opt in
+        k) TOKEN="$OPTARG" ;;
+        u) BASE_URL="$OPTARG" ;;
+        m) MODEL="$OPTARG" ;;
+        *) usage ;;
+    esac
+done
+
+if [ -z "$TOKEN" ] && [ -z "$BASE_URL" ] && [ -z "$MODEL" ]; then
+    usage
+fi
+
+if [ -n "$TOKEN" ]; then
+    jq --arg token "$TOKEN" '.env.ANTHROPIC_AUTH_TOKEN = $token' /root/.claude/settings.json > /tmp/settings.json
+    mv /tmp/settings.json /root/.claude/settings.json
+fi
+
+if [ -n "$BASE_URL" ]; then
+    jq --arg url "$BASE_URL" '.env.ANTHROPIC_BASE_URL = $url' /root/.claude/settings.json > /tmp/settings.json
+    mv /tmp/settings.json /root/.claude/settings.json
+fi
+
+if [ -n "$MODEL" ]; then
+    jq --arg model "$MODEL" '.env.ANTHROPIC_MODEL = $model' /root/.claude/settings.json > /tmp/settings.json
+    mv /tmp/settings.json /root/.claude/settings.json
+fi
+
+echo "Settings updated successfully"

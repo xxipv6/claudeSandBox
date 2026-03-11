@@ -1,0 +1,77 @@
+#!/bin/bash
+
+echo "==================================="
+echo "     Claude Code 配置信息"
+echo "==================================="
+echo ""
+
+# 检查配置文件是否存在
+if [ ! -f /root/.claude/settings.json ]; then
+    echo "❌ 配置文件不存在: /root/.claude/settings.json"
+    exit 1
+fi
+
+# 获取配置
+TOKEN=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // "未设置"' /root/.claude/settings.json)
+BASE_URL=$(jq -r '.env.ANTHROPIC_BASE_URL // "未设置"' /root/.claude/settings.json)
+MODEL=$(jq -r '.env.ANTHROPIC_MODEL // "未设置"' /root/.claude/settings.json)
+
+# 显示 Token（只显示前 8 位和后 4 位）
+if [ "$TOKEN" != "未设置" ] && [ -n "$TOKEN" ] && [ "${#TOKEN}" -gt 12 ]; then
+    TOKEN_MASKED="${TOKEN:0:8}...${TOKEN: -4}"
+else
+    TOKEN_MASKED="$TOKEN"
+fi
+
+echo "📝 API Token:"
+echo "   $TOKEN_MASKED"
+echo ""
+
+echo "🌐 Base URL:"
+echo "   $BASE_URL"
+echo ""
+
+echo "🤖 Model:"
+echo "   $MODEL"
+echo ""
+
+# 显示 Git 代理配置
+HTTP_PROXY=$(git config --global --get http.proxy)
+HTTPS_PROXY=$(git config --global --get https.proxy)
+
+if [ -n "$HTTP_PROXY" ] || [ -n "$HTTPS_PROXY" ]; then
+    echo "🔧 Git 代理配置:"
+    [ -n "$HTTP_PROXY" ] && echo "   HTTP:  $HTTP_PROXY"
+    [ -n "$HTTPS_PROXY" ] && echo "   HTTPS: $HTTPS_PROXY"
+    echo ""
+fi
+
+# 显示环境变量
+echo "📊 环境变量:"
+echo "   CLAUDE_CONFIG_DIR: $CLAUDE_CONFIG_DIR"
+echo "   ARVINENV_PATH:     $ARVINENV_PATH"
+echo "   GOPATH:            $GOPATH"
+echo "   GO111MODULE:       $GO111MODULE"
+echo ""
+
+# 显示 Claude CLI 版本（如果已安装）
+if command -v claude &> /dev/null; then
+    VERSION=$(claude --version 2>/dev/null || echo "未知版本")
+    echo "⚡ Claude CLI 版本:"
+    echo "   $VERSION"
+    echo ""
+fi
+
+# 显示配置文件路径
+echo "📁 配置文件位置:"
+echo "   Settings:  /root/.claude/settings.json"
+echo "   Config:    /root/.claude/.claude.json"
+echo ""
+
+echo "==================================="
+echo "💡 快捷命令:"
+echo "   key -k <token>    修改 API Token"
+echo "   key -u <url>      修改 Base URL"
+echo "   key -m <model>    修改 Model"
+echo "   rms               清理配置和缓存"
+echo "==================================="

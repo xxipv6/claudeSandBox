@@ -1,0 +1,18 @@
+services:
+  claude-code:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: claude-code-dev:latest
+    container_name: claude-code-dev
+
+    stdin_open: true
+    tty: true
+
+    volumes:
+      - ./workspace:/workspace
+
+    environment:
+      - TZ=Asia/Shanghai
+
+    network_mode: bridge

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+find /root/.claude/ -mindepth 1 \( -name 'plugins' -prune \) -o \( ! -name 'settings.json' ! -name '.claude.json' -exec rm -rf {} + \)
+find /workspace -mindepth 1 \( -name '.claude' -prune \) -o \( -name 'knowledge' -prune \) -o \( ! -name 'CLAUDE.md' ! -name 'README.MD' -exec rm -rf {} + \)
