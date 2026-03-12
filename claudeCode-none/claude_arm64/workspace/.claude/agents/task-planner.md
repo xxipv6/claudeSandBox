@@ -307,14 +307,14 @@ T4: 前端页面开发
 - 输入：API 接口定义
 - 输出：前端代码
 - 复杂度：中等
-- Agent：frontend-coder, fullstack-coder
+- Agent：dev-coder
 - 依赖：T3
 
 T5: 后端实现
 - 输入：API 接口定义、数据库模型
 - 输出：后端代码
 - 复杂度：复杂
-- Agent：backend-coder, fullstack-coder
+- Agent：dev-coder
 - 依赖：T2, T3
 ```
 
