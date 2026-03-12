@@ -18,18 +18,20 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 
 ### 🤖 多 Agent 团队
 
-#### 分析层（5 个 Agents）
-- 📋 **product-manager**：需求与业务目标分析
+#### 分析层（6 个 Agents）
+- 📋 **task-planner**：任务拆解、优先级排序、依赖识别、资源规划
+- 📊 **product-manager**：需求与业务目标分析
 - 🔧 **backend-engineer**：系统结构与状态机分析
 - 🎨 **frontend-engineer**：输入面与攻击面分析
 - 🧪 **qa-engineer**：失败路径与边界场景分析
 - 🛡️ **security-tester**：攻击路径与漏洞分析
 
-#### 执行层（4 个 Coder Agents）
-- 💻 **backend-coder**：后端代码（API、模型、服务、迁移）
-- 🌐 **frontend-coder**：前端代码（页面、组件、状态管理）
-- 🚀 **fullstack-coder**：全栈代码（从 0 到 1 搭建小系统）
+#### 执行层（2 个 Coder Agents）
+- 💻 **dev-coder**：所有代码开发（前端、后端、全栈、API、组件、数据库）
 - 🔓 **script-coder**：安全脚本（PoC、Exploit、Fuzzer、扫描工具）
+
+#### 支持层（1 个 Agent）
+- ⚙️ **ops-engineer**：环境配置、工具安装、系统调试、依赖管理
 
 ### 🧠 Knowledge 共享知识库
 
@@ -183,7 +185,7 @@ claudeSandBox/
 │   │   ├── Dockerfile
 │   │   └── workspace/
 │   │       ├── .claude/
-│   │       │   ├── agents/          # 10 个 agent 定义
+│   │       │   ├── agents/          # 9 个 agent 定义
 │   │       │   └── agent-memory/    # Agent 记忆目录
 │   │       ├── knowledge/           # 共享知识库
 │   │       │   ├── patterns.md
@@ -224,12 +226,14 @@ docker run -it --rm \
 
 查看 [CHANGELOG.md](CHANGELOG.md) 了解详细更新历史。
 
-### 最新更新（2026-03-11）
+### 最新更新（2026-03-12）
 
-- ✨ 全新多 Agent 团队架构
-- 🎯 意图识别决策系统
-- 📚 Knowledge 共享知识库
-- 🧠 双层记忆架构
+- ✨ Agent 架构优化：6 分析层 + 2 执行层 + 1 支持层
+- 🎯 分级调度：根据任务复杂度动态分配 2-6 个 agent
+- 📋 行动决策：分析完成后提供可执行的下一步选项
+- 🔍 轻量分析：Coding Mode 下 30 秒快速上下文理解
+- ✅ 证据有效性：Research Ledger 验证机制
+- 🎨 通用化：适用于所有类型的安全研究和复杂项目
 - 🔧 上下文感知修复
 
 ## 🤝 贡献
