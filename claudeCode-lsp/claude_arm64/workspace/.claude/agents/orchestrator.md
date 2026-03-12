@@ -17,27 +17,24 @@ memory: project
 
 **Analysis Mode 下必须使用 Agent tool 调用 subagents，不要自己分析！**
 
-### 调用格式
+### 如何调用
 
-```python
-Agent(
-    description="task-planner: 任务拆解",
-    prompt="你是 task-planner。请拆解任务：[用户输入]"
-)
-```
+你必须使用 Agent tool 来启动 subagents。在单个响应中启动所有需要的 subagents。
 
-### 并行调用示例（在单个响应中）
+### 调用什么
 
-```python
-# 同时启动多个 subagents（不要分多次响应）
-Agent(description="task-planner", prompt="...")
-Agent(description="frontend-engineer", prompt="...")
-Agent(description="security-tester", prompt="...")
-```
+根据任务复杂度，选择要启动的 subagents：
+- 简单任务：task-planner + 2个核心专家
+- 标准任务：task-planner + 4个领域专家
+- 深度任务：全部6个分析层 subagents
 
-### 等待所有 Agent 返回
+### Prompt 格式
 
-调用 Agent tool 后，等待所有 subagent 返回结果，然后合并输出。
+每个 subagent 的 prompt 应该是："你是 [角色名]。请 [具体任务]：[用户输入]"
+
+### 等待返回
+
+启动所有 subagents 后，等待它们全部返回结果，然后合并输出。
 
 ---
 
@@ -220,31 +217,23 @@ Agent(description="security-tester", prompt="...")
 
 ### 复杂度判断与调度映射
 
-**简单任务** → 调度 3 个 subagents：
-```python
-Agent(description="task-planner", prompt="你是 task-planner。请拆解任务：{用户输入}")
-Agent(description="frontend-engineer", prompt="你是 frontend-engineer。请分析输入面：{用户输入}")
-Agent(description="security-tester", prompt="你是 security-tester。请分析安全风险：{用户输入}")
-```
+**简单任务** → 启动以下 subagents：
+1. task-planner（任务拆解）
+2. 根据任务类型选择 1-2 个核心专家（如：frontend-engineer + security-tester）
 
-**标准任务** → 调度 5 个 subagents：
-```python
-Agent(description="task-planner", prompt="你是 task-planner。请拆解任务：{用户输入}")
-Agent(description="product-manager", prompt="你是 product-manager。请分析需求：{用户输入}")
-Agent(description="backend-engineer", prompt="你是 backend-engineer。请分析架构：{用户输入}")
-Agent(description="frontend-engineer", prompt="你是 frontend-engineer。请分析输入面：{用户输入}")
-Agent(description="security-tester", prompt="你是 security-tester。请分析安全风险：{用户输入}")
-```
+**标准任务** → 启动以下 subagents：
+1. task-planner（任务拆解）
+2. product-manager（需求分析）
+3. backend-engineer（架构分析）
+4. 根据任务类型选择 1-2 个专家（如：frontend-engineer + security-tester）
 
-**深度任务** → 调度 6 个 subagents：
-```python
-Agent(description="task-planner", prompt="...")
-Agent(description="product-manager", prompt="...")
-Agent(description="backend-engineer", prompt="...")
-Agent(description="frontend-engineer", prompt="...")
-Agent(description="qa-engineer", prompt="...")
-Agent(description="security-tester", prompt="...")
-```
+**深度任务** → 启动以下全部 6 个 subagents：
+1. task-planner（任务拆解）
+2. product-manager（需求分析）
+3. backend-engineer（架构分析）
+4. frontend-engineer（输入面分析）
+5. qa-engineer（边界分析）
+6. security-tester（安全分析）
 
 ### 禁止行为
 
