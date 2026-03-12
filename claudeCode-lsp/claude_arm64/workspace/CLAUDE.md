@@ -84,6 +84,7 @@
 - **输出系统级分析结果**
 
 **并行调度的分析层 agents**（必须全部调度）：
+- **task-planner**：任务拆解、优先级排序、依赖识别、资源规划
 - **product-manager**：需求与业务目标分析
 - **backend-engineer**：系统结构与状态机分析
 - **frontend-engineer**：输入面与攻击面分析
@@ -133,7 +134,7 @@
 **行为规则**：
 - **禁止调用分析层 subagent**（product-manager, backend-engineer, frontend-engineer, qa-engineer, security-tester）
 - **禁止输出分析、方案、评审**
-- **必须调用执行层 coder agents**（backend-coder, frontend-coder, fullstack-coder, script-coder）
+- **必须调用执行层 coder agents**（dev-coder, script-coder）
 - **每次代码编写都要调用相应的 coder agent**，包括：
   - 首次编写代码
   - 修改现有代码
@@ -142,10 +143,11 @@
   - 重构代码
 
 **执行层 coder agents**：
-- **backend-coder**：后端代码（API、模型、服务、迁移）
-- **frontend-coder**：前端代码（页面、组件、状态管理）
-- **fullstack-coder**：全栈代码（从 0 到 1 搭建小系统）
+- **dev-coder**：所有代码开发（前端、后端、全栈、API、组件、数据库）
 - **script-coder**：安全脚本（PoC、Exploit、Fuzzer、扫描工具）
+
+**支持层 agent**（按需调用）：
+- **ops-engineer**：环境配置、工具安装、系统调试、依赖管理
 
 **重要**：Coding Mode 下**每次**编写/修改代码都必须调用相应的 coder agent，不能直接写代码。
 
