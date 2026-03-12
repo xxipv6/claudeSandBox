@@ -1,78 +1,76 @@
-## 🔧 Claude Code 配置与插件安装指南（优化排版版）
+# Claude Code Multi-Agent System
 
----
+安全研究多 Agent 团队系统，基于意图识别的双模式调度架构（分析层 + 执行层）。
 
-### 一、API 配置修改
+## 🏗️ 架构概览
 
-📂 **配置文件路径**
+### 双模式调度
+
+- **Analysis Mode（默认）**：并发启动 2-6 个分析层 subagents 进行深度分析
+- **Coding Mode（执行）**：启动执行层 coder agents 进行代码开发
+
+### Agent 团队
+
+**分析层 (6 个)**：
+- `task-planner` - 任务拆解与优先级排序
+- `product-manager` - 需求与业务目标分析
+- `backend-engineer` - 系统结构与状态机分析
+- `frontend-engineer` - 输入面与攻击面分析
+- `qa-engineer` - 失败路径与边界场景分析
+- `security-tester` - 攻击路径与漏洞分析
+
+**执行层 (2 个)**：
+- `dev-coder` - 所有代码开发
+- `script-coder` - 安全脚本（PoC、Exploit、Fuzzer）
+
+**支持层 (1 个)**：
+- `ops-engineer` - 环境配置与系统调试
+
+## 🚀 快速开始
+
+### 1. API 配置
+
+📂 **配置文件路径**：`/root/.claude/`
+
+修改 API Token、Base URL 和 Model 配置。
+
+### 2. 环境变量
+
 ```bash
-/root/.claude/
+export CLAUDE_CONFIG_DIR=/root/.claude
+export ARVINENV_PATH=/root/ArvinENV
 ```
 
-🛠 **操作说明**
-- 进入上述目录  
-- 根据实际需求修改 API 相关参数  
-- 保存配置文件即可生效  
+### 3. 快捷命令
 
----
+| 命令 | 说明 |
+|------|------|
+| `key -k <token>` | 修改 API Token |
+| `key -u <url>` | 修改 Base URL |
+| `key -m <model>` | 修改 Model |
+| `rms` | 清理配置和缓存 |
+| `config` | 查看所有配置信息 |
 
-### 二、插件安装流程
+## 📚 文档
 
-#### 1️⃣ 进入 Claude Code 插件管理
-在 Claude Code 命令行中输入：
-```bash
-/plugin
+- [CHANGELOG.md](./CHANGELOG.md) - 版本更新记录
+- [CLAUDE.md](./CLAUDE.md) - 系统完整配置文档
+- [knowledge/](./knowledge/) - 外置知识与记忆系统
+
+## 🔧 插件安装
+
+进入 Claude Code 命令行输入 `/plugin`，添加官方插件市场：
 ```
-
-#### 2️⃣ 添加官方插件市场
-按以下路径操作：
-```text
-Marketplaces → Add Marketplace
-```
-
-输入官方插件仓库地址：
-```text
 anthropics/claude-plugins-official
 ```
 
-#### 3️⃣ 安装所需插件
-- 切换至 **Discover** 标签页  
-- 搜索目标插件  
-- 点击安装完成部署  
+## ⚙️ 权限配置
 
-#### 4️⃣ 重启 Claude Code
-🔄 插件安装完成后，**必须重启 Claude Code** 才能生效  
+**沙箱环境**建议开启 Bypass 模式：
+- `Claude Code: Allow Dangerously Skip Permissions` - 启用
+- `Claude Code: Initial Permission Mode` - 设置为 `acceptEdits`
 
----
+## 📄 许可证
 
-### 三、开启 Bypass 模式（防止插件崩溃）
+本项目用于安全研究和教育目的。
 
-⚠️ **仅建议在无公网访问的沙箱环境中启用**
-
-进入 **插件设置（Plugin Settings）**，进行如下配置：
-
-#### ✅ 启用权限跳过模式
-```text
-Claude Code: Allow Dangerously Skip Permissions
-```
-
-说明：
-> Allow bypass permissions mode. Recommended only for sandboxes with no internet access.
-
-#### ✏️ 修改初始权限模式
-```text
-Claude Code: Initial Permission Mode
-```
-
-设置为：
-```text
-acceptEdits
-```
-
----
-
-📌 **注意事项**
-- Bypass 模式可有效避免插件因权限校验导致的异常或崩溃  
-- 不建议在生产环境或联网环境中启用  
-
----
