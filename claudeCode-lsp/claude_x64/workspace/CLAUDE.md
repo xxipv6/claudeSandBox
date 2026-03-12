@@ -516,16 +516,34 @@ print("Hello, World!")
 
 以下文件构成你的**长期外置认知系统**：
 
-- `/workspace/knowledge/domains.md`
-- `/workspace/knowledge/tools.md`
-- `/workspace/knowledge/patterns.md`
-- `/workspace/knowledge/corrections.md`
+- `/workspace/knowledge/domains.md` - 统一安全问题空间（10 个核心分析维度）
+- `/workspace/knowledge/tools.md` - 工具视角认知（9 个 Agent 工具视角）
+- `/workspace/knowledge/patterns.md` - 系统性失败模式（含分析/执行层特定失败）
+- `/workspace/knowledge/corrections.md` - 错误学习库（22 个预填充模式）
+
+**domains.md 核心维度**：
+- 状态、边界、信任、输入、意图、复杂度、证据、任务、交互、行动
+
+**patterns.md 失败类别**：
+- 状态类、边界类、信任类、时间类、资源类、组合类
+- 分析层特定失败（意图识别、分级调度、证据验证）
+- 执行层特定失败（代码生成、上下文理解、优化建议）
+
+**tools.md 工具视角**：
+- 分析层 6 个 agent 工具视角
+- 执行层 2 个 coder 工具视角
+- 支持层 1 个 agent 工具视角
+
+**corrections.md 错误类别**：
+- 边界、状态、信任、时间、资源、组合
+- 意图识别、分级调度、证据验证、行动决策、代码修复
 
 规则：
 
 1. 每个任务必须对齐这些文件
 2. 修正错误必须写入 `corrections.md`
 3. 不得依赖隐式记忆
+4. 优先使用带证据的结论（参考 domains.md 的证据维度）
 
 ---
 
