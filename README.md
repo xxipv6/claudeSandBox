@@ -111,7 +111,8 @@ docker run -it --rm \
 config              # 查看所有配置信息
 key -k <token>      # 修改 API Token
 key -u <url>        # 修改 Base URL
-key -k <token> -u <url>  # 同时修改
+key -m <model>      # 修改 Model
+key -k <token> -u <url> -m <model>  # 同时修改
 rms                 # 清理配置和缓存
 ```
 
