@@ -41,6 +41,7 @@ memory: project
 - **输出系统级分析结果**
 
 **并行调用的分析层 agents**（必须全部调度）：
+- **task-planner**：任务拆解、优先级排序、依赖识别、资源规划
 - **product-manager**：需求与业务目标分析
 - **backend-engineer**：系统结构与状态机分析
 - **frontend-engineer**：输入面与攻击面分析
@@ -63,7 +64,7 @@ memory: project
 **行为规则**：
 - **禁止调用分析层 subagent**（product-manager, backend-engineer, frontend-engineer, qa-engineer, security-tester）
 - **禁止输出分析、方案、评审**
-- **必须调用执行层 coder agents**（backend-coder, frontend-coder, fullstack-coder, script-coder）
+- **必须调用执行层 coder agents**（dev-coder, script-coder）
 - **每次代码编写都要调用相应的 coder agent**，包括：
   - 首次编写代码
   - 修改现有代码
@@ -72,10 +73,11 @@ memory: project
   - 重构代码
 
 **执行层 coder agents**：
-- **backend-coder**：后端代码（API、模型、服务、迁移）
-- **frontend-coder**：前端代码（页面、组件、状态管理）
-- **fullstack-coder**：全栈代码（从 0 到 1 搭建小系统）
+- **dev-coder**：所有代码开发（前端、后端、全栈、API、组件、数据库）
 - **script-coder**：安全脚本（PoC、Exploit、Fuzzer、扫描工具）
+
+**支持层 agent**（按需调用）：
+- **ops-engineer**：环境配置、工具安装、系统调试、依赖管理
 
 **重要**：Coding Mode 下**每次**编写/修改代码都必须调用相应的 coder agent，不能直接写代码。
 
@@ -162,11 +164,25 @@ memory: project
 
 ## 并行执行流程（Analysis Mode 强制）
 
-1. **明确研究目标与系统边界**
-2. **并行调度 5 个分析层 subagents**
-3. **收集所有输出**（成功/失败/报错）
-4. **合并结果并消解冲突**
-5. **输出结构化分析结果**
+1. **任务拆解**（task-planner）
+   - 将复杂任务拆解成可执行的子任务
+   - 识别依赖关系
+   - 排定执行优先级
+   - 规划每个子任务需要的 agent 资源
+
+2. **明确研究目标与系统边界**
+3. **并行调度 6 个分析层 subagents**（包含 task-planner）
+   - **task-planner**：任务拆解、优先级排序、依赖识别、资源规划
+   - **product-manager**：需求与业务目标分析
+   - **backend-engineer**：系统结构与状态机分析
+   - **frontend-engineer**：输入面与攻击面分析
+   - **qa-engineer**：失败路径与边界场景分析
+   - **security-tester**：攻击路径与漏洞分析
+
+4. **收集所有输出**（成功/失败/报错）
+5. **合并结果并消解冲突**
+6. **输出结构化分析结果**
+7. **行动决策**（根据分析结果给出下一步建议）
 
 ---
 
