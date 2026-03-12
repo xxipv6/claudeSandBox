@@ -209,60 +209,34 @@ Agent(description="security-tester", prompt="...")
 
 ---
 
-## 并行执行流程（Analysis Mode 强制）
+## 并行执行流程（Analysis Mode 强制执行）
 
-### 0. 任务复杂度判断（智能分级）
+### 执行步骤（不要跳过任何一步）
 
-在开始分析前，先判断任务复杂度，决定调度多少个 agent：
+**第 1 步**：判断任务复杂度
+**第 2 步**：立即开始并行调度（不要自己分析）
+**第 3 步**：等待所有 subagent 返回
+**第 4 步**：合并结果并输出
 
-| 复杂度 | 判断标准 | Agent 数量 | 调度策略 |
-|-------|---------|-----------|---------|
-| **简单** | 单一问题、明确边界 | 2-3 个 | task-planner + 核心专家 |
-| **标准** | 多个问题、需要设计 | 4-5 个 | task-planner + 多领域专家 |
-| **深度** | 复杂系统、高风险 | 6 个 | 全部分析层 agent |
+### 复杂度判断与调度映射
 
-**判断维度**：
-- **问题数量**：单一关注点 vs 多个关联问题
-- **设计需求**：是否需要架构/流程设计决策
-- **风险等级**：是否有安全风险、数据丢失风险
-- **领域覆盖**：是否涉及多个领域（前后端、安全、业务）
-- **影响范围**：单个功能 vs 整个系统
-
-**判断示例**：
-- **简单**："这个登录接口有没有越权？" → 2 个（task-planner + security-tester）
-  - 单一关注点（越权检查）、明确边界、无需设计决策
-- **标准**："帮我设计一个用户系统" → 4 个（task-planner + product-manager + backend-engineer + security-tester）
-  - 多个关联问题（注册、登录、权限）、需要架构设计、涉及安全风险
-- **深度**："分析这个无人机系统的安全性" → 6 个（全部）
-  - 复杂系统（固件+通信+Web+物理）、高风险（设备控制）、多领域覆盖
-
-### 1. 任务拆解（task-planner）
-   - 将复杂任务拆解成可执行的子任务
-   - 识别依赖关系
-   - 排定执行优先级
-   - 规划每个子任务需要的 agent 资源
-
-### 2. 明确研究目标与系统边界
-
-### 3. 使用 Agent tool 调用 Subagents（根据复杂度动态调整）
-
-**⚠️ 重要**：你必须**使用 Agent tool 调用真正的 subagents**，不要自己分析！
-
-**简单任务（2-3 个 subagents）**：
+**简单任务** → 调度 3 个 subagents：
 ```python
-Agent(description="task-planner: 任务拆解", prompt="请拆解任务：...")
-Agent(description="security-tester: 安全分析", prompt="请分析安全风险：...")
+Agent(description="task-planner", prompt="你是 task-planner。请拆解任务：{用户输入}")
+Agent(description="frontend-engineer", prompt="你是 frontend-engineer。请分析输入面：{用户输入}")
+Agent(description="security-tester", prompt="你是 security-tester。请分析安全风险：{用户输入}")
 ```
 
-**标准任务（4-5 个 subagents）**：
+**标准任务** → 调度 5 个 subagents：
 ```python
-Agent(description="task-planner: 任务拆解", prompt="...")
-Agent(description="product-manager: 需求分析", prompt="...")
-Agent(description="backend-engineer: 架构分析", prompt="...")
-Agent(description="security-tester: 安全分析", prompt="...")
+Agent(description="task-planner", prompt="你是 task-planner。请拆解任务：{用户输入}")
+Agent(description="product-manager", prompt="你是 product-manager。请分析需求：{用户输入}")
+Agent(description="backend-engineer", prompt="你是 backend-engineer。请分析架构：{用户输入}")
+Agent(description="frontend-engineer", prompt="你是 frontend-engineer。请分析输入面：{用户输入}")
+Agent(description="security-tester", prompt="你是 security-tester。请分析安全风险：{用户输入}")
 ```
 
-**深度任务（6 个 subagents）**：
+**深度任务** → 调度 6 个 subagents：
 ```python
 Agent(description="task-planner", prompt="...")
 Agent(description="product-manager", prompt="...")
@@ -272,35 +246,11 @@ Agent(description="qa-engineer", prompt="...")
 Agent(description="security-tester", prompt="...")
 ```
 
-### 4. 收集所有角色输出
+### 禁止行为
 
-**输出要求**：
-- 每个角色的分析必须单独输出，使用上面定义的格式
-- 不要遗漏任何角色的视角
-- 每个角色的发现必须有明确的证据或推理
-
-### 5. 合并结果并消解冲突
-
-**合并模板**：
-```markdown
-## 综合分析结果
-
-### 各角色观点汇总
-[列出各角色的重要观点]
-
-### 冲突点分析
-[指出不同角色之间的观点冲突]
-
-### 冲突解决
-[说明如何解决冲突，采用哪个观点及原因]
-
-### 最终结论
-[综合各角色视角的最终结论]
-```
-
-### 6. 输出结构化分析结果
-
-### 7. 行动决策（根据分析结果给出明确的下一步建议）
+- ❌ 不要自己分析，必须调用 subagents
+- ❌ 不要合并步骤，必须并行调用
+- ❌ 不要跳过任何角色
 
 ---
 
