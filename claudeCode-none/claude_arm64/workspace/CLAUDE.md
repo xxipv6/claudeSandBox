@@ -113,7 +113,7 @@
 - **product-manager**：需求与业务目标分析
 - **backend-engineer**：系统结构与状态机分析
 - **frontend-engineer**：输入面与攻击面分析
-- **qa-engineer**：失败路径与边界场景分析
+
 - **security-tester**：攻击路径与漏洞分析
 
 **输出格式模板**（Research Ledger）：
@@ -380,7 +380,6 @@
    - backend-engineer：分析接口契约、状态机
    - frontend-engineer：输入面与攻击面分析
 - **security-tester**：攻击路径与漏洞分析
-   - qa-engineer：枚举失败路径（无token、过期token、伪造token）
    - security-tester：构建攻击路径（token伪造、会话劫持）
 4. 合并冲突，输出 Research Ledger
 
@@ -484,11 +483,11 @@
 - 存在 3 个关键检查点（qa-engineer）
 
 ### Active Hypotheses
-- 第 3 阶段可能存在状态死锁（backend-engineer, qa-engineer）
+- 第 3 阶段可能存在状态死锁（backend-engineer）
 - 检查点 2 的权限判断不完整（security-tester）
 
 ### Rejected Hypotheses
-- 不存在流程断点（qa-engineer，已枚举所有路径）
+- 不存在流程断点
 
 ### Key Decisions
 - 需要增加状态恢复机制

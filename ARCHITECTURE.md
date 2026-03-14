@@ -32,7 +32,7 @@ flowchart TD
 
         Complexity -->|简单任务<br/>单一问题/明确边界| Simple[3 个 Agent]
         Complexity -->|标准任务<br/>多问题/需设计| Standard[5 个 Agent]
-        Complexity -->|深度任务<br/>复杂系统/高风险| Deep[6 个 Agent]
+        Complexity -->|深度任务<br/>复杂系统/高风险| Deep[5 个 Agent]
 
         Simple --> ScheduleSimple
         Standard --> ScheduleStandard
@@ -52,12 +52,11 @@ flowchart TD
         MultiExpert[专家<br/>2个<br/>根据任务类型]
     end
 
-    subgraph ScheduleDeep["深度任务调度：6 个 Agent"]
+    subgraph ScheduleDeep["深度任务调度：5 个 Agent"]
         TP3[task-planner<br/>任务拆解]
         PM2[product-manager<br/>需求分析]
         BE2[backend-engineer<br/>架构分析]
         FE[frontend-engineer<br/>输入面分析]
-        QE[qa-engineer<br/>边界分析]
         ST[security-tester<br/>安全分析]
     end
 
@@ -120,7 +119,7 @@ flowchart LR
 
     subgraph SimpleAgents["简单任务：3 个 Agent"]
         S1[task-planner<br/>任务拆解]
-        S2[核心专家 ×2<br/>例: security-tester<br/>+ qa-engineer]
+        S2[核心专家 ×2<br/>例: security-tester<br/>+ backend-engineer]
     end
 
     subgraph StandardAgents["标准任务：5 个 Agent"]
@@ -130,13 +129,12 @@ flowchart LR
         ST4[专家 ×2<br/>例: frontend-engineer<br/>+ security-tester]
     end
 
-    subgraph DeepAgents["深度任务：6 个 Agent"]
+    subgraph DeepAgents["深度任务：5 个 Agent"]
         D1[task-planner<br/>任务拆解]
         D2[product-manager<br/>需求分析]
         D3[backend-engineer<br/>架构分析]
         D4[frontend-engineer<br/>输入面分析]
-        D5[qa-engineer<br/>边界分析]
-        D6[security-tester<br/>安全分析]
+        D5[security-tester<br/>安全分析]
     end
 
     SimpleLevel --> SimpleAgents
@@ -158,7 +156,7 @@ flowchart LR
 |------|-----------|------|---------|
 | **简单任务** | 3 个 | task-planner + 2个核心专家 | 单一问题、边界明确 |
 | **标准任务** | 5 个 | task-planner + product-manager + backend-engineer + 2个专家 | 多个问题、需要设计 |
-| **深度任务** | 6 个 | 全部分析层 agents | 复杂系统、高风险 |
+| **深度任务** | 5 个 | 全部分析层 agents | 复杂系统、高风险 |
 
 ---
 
@@ -224,12 +222,11 @@ graph TB
         Decision[行动决策]
     end
 
-    subgraph Analysis["🔵 分析层 - 6 个 Agents"]
+    subgraph Analysis["🔵 分析层 - 5 个 Agents"]
         TP[task-planner<br/>📋 任务拆解]
         PM[product-manager<br/>📊 需求分析]
         BE[backend-engineer<br/>🔧 架构分析]
         FE[frontend-engineer<br/>🎨 输入面分析]
-        QE[qa-engineer<br/>🧪 边界分析]
         ST[security-tester<br/>🛡️ 安全分析]
     end
 
@@ -256,12 +253,11 @@ graph TB
 
 **Agent 职责详解**：
 
-**分析层（6 个）**：
+**分析层（5 个）**：
 - `task-planner`：任务拆解、优先级排序、依赖识别、资源规划
 - `product-manager`：需求与业务目标分析
 - `backend-engineer`：系统结构与状态机分析
 - `frontend-engineer`：输入面与攻击面分析
-- `qa-engineer`：失败路径与边界场景分析
 - `security-tester`：攻击路径与漏洞分析
 
 **执行层（2 个）**：
@@ -527,7 +523,7 @@ Coding Mode 完成代码输出后，进入迭代循环：
 - ✅ 将 "并行调度" 改为 "同时启动"（更清晰的命令式语言）
 - ✅ 将 "调用" 统一改为 "启动"
 - ✅ 强调并发/并行执行，而非机制细节
-- ✅ 明确分级调度：简单（3个）/ 标准（5个）/ 深度（6个）
+- ✅ 明确分级调度：简单（3个）/ 标准（4个）/ 深度（5个）
 - ✅ 添加行动决策框架
 - ✅ 添加迭代循环流程
 
@@ -540,6 +536,6 @@ Coding Mode 完成代码输出后，进入迭代循环：
 **初始版本**：
 - 多 Agent 编排系统
 - 双模式架构（Analysis Mode / Coding Mode）
-- 6 个分析层 agents
+- 5 个分析层 agents
 - 2 个执行层 coder agents
 - 1 个支持层 agent
