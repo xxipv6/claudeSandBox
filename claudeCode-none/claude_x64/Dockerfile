@@ -83,9 +83,11 @@ RUN mkdir -p /root/ENV/go && \
 COPY ArvinENV/key /root/ENV/ArvinENV/key
 COPY ArvinENV/rms /root/ENV/ArvinENV/rms
 COPY ArvinENV/config /root/ENV/ArvinENV/config
+COPY ArvinENV/mode /root/ENV/ArvinENV/mode
 RUN chmod +x /root/ENV/ArvinENV/key && \
     chmod +x /root/ENV/ArvinENV/rms && \
-    chmod +x /root/ENV/ArvinENV/config
+    chmod +x /root/ENV/ArvinENV/config && \
+    chmod +x /root/ENV/ArvinENV/mode
 
 # tmux 配置 - 启用鼠标滚动和复制
 RUN printf 'set -g mouse on\nsetw -g mode-keys emacs\n' > /root/.tmux.conf
