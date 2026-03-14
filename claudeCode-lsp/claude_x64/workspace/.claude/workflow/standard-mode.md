@@ -135,7 +135,7 @@ Prompt: [用户输入]
 echo "[$(date)] [ERROR] Agent {name} failed" >> .claude/task_logs/standard.log
 ```
 - 如果 agent 执行失败：记录错误，询问用户是否继续或重试
-- 如果 agent 超时（120 秒）：记录超时，停止并询问用户
+- 如果 agent 超时（600 秒）：记录超时，停止并询问用户
 
 ### 第八步：合并结果，输出简洁报告
 输出 ≤ 500 行的简洁报告

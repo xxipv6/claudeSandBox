@@ -164,7 +164,7 @@ echo "[$(date -Iseconds)] [ERROR] {stage_name}: {error_message}" >> .claude/task
 1. 读取所有 agent 定义（.claude/agents/{agent-name}.md）
 2. 记录到日志：echo "[$(date)] [STAGE] {stage_name}: Starting" >> .claude/task_logs/task-{id}.log
 3. 并发启动该阶段的所有 agents（使用 Agent tool）
-4. 等待所有 agents 完成（每个 agent 最多 120 秒）
+4. 等待所有 agents 完成（每个 agent 最多 600 秒）
 5. 记录结果到状态文件和日志
 6. 更新状态文件
 7. 然后进入下一阶段（如果有）
@@ -215,7 +215,7 @@ echo "[$(date)] [ERROR] Agent {name} failed: {error_reason}" >> .claude/task_log
 }
 ```
 - 如果 agent 执行失败：记录错误，询问用户是否继续或重试（单次重试）
-- 如果 agent 超时（120 秒）：记录超时到日志和状态文件，询问用户是否继续
+- 如果 agent 超时（600 秒）：记录超时到日志和状态文件，询问用户是否继续
 
 ### 第八步：执行 Quality Gate
 - 静态分析（语法检查、代码风格）
