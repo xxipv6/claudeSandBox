@@ -17,87 +17,56 @@ MODE DECISION:
 
 ## 一、任务判断逻辑（保守策略）
 
-**快速模式**（明确信号）：单文件操作 OR 明确的 bug 修复 OR 用户说"快速/简单/直接" → 快速模式
+**快速模式**：单文件操作 OR 明确的 bug 修复 OR 用户说"快速/简单/直接"
 
-**标准模式**（默认模式，安全缓冲区）：多文件操作（2-10 个文件）OR 需要分析/理解代码 OR 用户说"分析/实现/帮我看看" OR 任何不确定的情况 → 标准模式
+**标准模式**：多文件操作（2-10 个文件）OR 需要分析/理解代码 OR 用户说"分析/实现/帮我看看" OR 任何不确定的情况
 
-**完整模式**（明确授权，默认拒绝）：
-- IF 用户请求"完整分析/完整编排"
-- AND 环境变量 `CLAUDE_FULL_MODE=1` 已设置
-- AND 架构级任务
-- → 完整模式
-- **ELSE**：必须回复"当前未启用完整模式，将以标准模式执行。如需完整模式，请设置环境变量 CLAUDE_FULL_MODE=1"
+**完整模式**：架构级任务 AND 用户明确说"完整分析/完整编排" AND 环境变量 `CLAUDE_FULL_MODE=1` 已设置
 
 **核心原则**：任何不确定 → 标准模式
 
 ---
 
-## 二、三种工作模式（含执行步骤）
+## 二、模式执行（读取对应文件）
 
 ### 快速模式
-
-**执行步骤**：
-1. 读取用户指定的文件
-2. 修改代码
-3. 输出结果
-
-**禁止**：
-- ❌ 启动任何 agent
-- ❌ 读取 workflow/ 文件
-- ❌ 创建状态文件
-
----
+**第一步**：**现在读取** `.claude/workflow/quick-mode.md`
+**后续**：按照 quick-mode.md 的步骤执行
 
 ### 标准模式
-
-**执行步骤**：
-1. 制定简要计划（2-3 个步骤）
-2. **询问用户确认**
-3. 按需读取 agent 定义：`.claude/agents/{agent-name}.md`
-4. 启动 1-2 个 agents（顺序执行）
-5. 合并结果，输出简洁报告
-
-**可选**：创建状态文件 `.claude/task_states/task-{id}.json`
-
----
+**第一步**：**现在读取** `.claude/workflow/standard-mode.md`
+**后续**：按照 standard-mode.md 的步骤执行
 
 ### 完整模式
+**拒绝条件**：如果环境变量未设置，必须回复"当前未启用完整模式，将以标准模式执行。如需完整模式，请设置环境变量 CLAUDE_FULL_MODE=1"
 
-**第一步**：**现在读取** `.claude/workflow/full-workflow.md`
-
-**后续步骤**：按照 full-workflow.md 的定义执行完整流程
-
-**触发条件**（必须同时满足）：
-- 架构级任务
-- 用户明确说"完整分析/完整编排"
-- 环境变量 `CLAUDE_FULL_MODE=1` 已设置
+**第一步**：**现在读取** `.claude/workflow/full-mode.md`
+**后续**：按照 full-mode.md 的步骤执行
 
 ---
 
-## 三、Agent 执行原则
+## 三、可用的 Agents
 
-**顺序执行，不并发**（Claude 的并发是叙事级的，不是系统级的）
+**分析类**：product-manager、backend-engineer、frontend-engineer
+**执行类**：dev-coder
+**质量类**：security-tester
 
-**可用的 Agents**：
-- 分析类（选 1-2 个）：product-manager、backend-engineer、frontend-engineer
-- 执行类（选 1 个）：dev-coder
-- 质量类（可选）：security-tester
+**Agent 定义**：`.claude/agents/{agent-name}.md`
 
-**Agent 定义位置**：`.claude/agents/{agent-name}.md`
+**执行原则**：顺序执行，不并发
 
 ---
 
-## 四、全局禁止（≤5 条）
+## 四、全局禁止
 
 1. ❌ 跳过用户确认就执行大规模修改
-2. ❌ 在快速/标准模式读取 workflow/
-3. ❌ 并发启动 agents（顺序执行）
-4. ❌ 在完整模式未启用时执行复杂的多阶段流程
-5. ❌ **自动使用任何调试 skill 或系统能力**，除非用户明确要求
+2. ❌ 并发启动 agents（顺序执行）
+3. ❌ **自动使用任何调试 skill 或系统能力**，除非用户明确要求
+4. ❌ 过度形式化（输出 500 行的 Research Ledger）
 
 ---
 
-## 五、全局要求（≤5 条）
+## 五、全局要求
 
 1. ✅ 先理解用户意图，再行动
 2. ✅ 复杂任务先给计划，等确认
