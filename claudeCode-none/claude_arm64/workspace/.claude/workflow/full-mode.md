@@ -52,11 +52,11 @@
 - [ ] 用户已明确确认
 
 ### 第四步：读取知识库（必须）
-**现在读取** knowledge 目录下的文件：
-- `knowledge/domains.md` - 10 个核心分析维度
-- `knowledge/patterns.md` - 系统性失败模式
-- `knowledge/tools.md` - Agent 工具视角
-- `knowledge/corrections.md` - 错误学习库
+**现在读取** .claude/knowledge 目录下的文件：
+- `.claude/knowledge/domains.md` - 10 个核心分析维度
+- `.claude/knowledge/patterns.md` - 系统性失败模式
+- `.claude/knowledge/tools.md` - Agent 工具视角
+- `.claude/knowledge/corrections.md` - 错误学习库
 
 **检查点**：
 - [ ] 已读取 domains.md

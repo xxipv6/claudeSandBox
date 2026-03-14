@@ -60,7 +60,7 @@ MODE DECISION:
 
 ## 三、知识库（Knowledge Base）
 
-**knowledge/** 目录包含安全研究的核心知识：
+**.claude/knowledge/** 目录包含安全研究的核心知识：
 
 - `domains.md` - 10 个核心分析维度（状态、边界、信任、输入等）
 - `tools.md` - Agent 工具视角认知

@@ -36,9 +36,9 @@
 
 ### 第三步：读取知识库（建议，如不读需说明原因）
 根据任务类型读取相关的 knowledge 文件：
-- 安全分析 → `knowledge/domains.md`、`knowledge/patterns.md`
-- 系统分析 → `knowledge/tools.md`
-- 问题排查 → `knowledge/corrections.md`
+- 安全分析 → `.claude/knowledge/domains.md`、`.claude/knowledge/patterns.md`
+- 系统分析 → `.claude/knowledge/tools.md`
+- 问题排查 → `.claude/knowledge/corrections.md`
 
 **检查点**：
 - [ ] 已读取 relevant knowledge 文件
