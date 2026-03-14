@@ -85,6 +85,10 @@
 - ❌ **禁止**跳过任何阶段
 - ❌ **禁止**修改执行计划
 - ❌ **禁止**偏离 task-planner 的计划
+- ❌ **禁止**自己进行分析或编码（必须通过 subagents）
+- ❌ **禁止**在 Analysis Mode 下不启动所有 4 个分析层 agents
+- ❌ **禁止**在 Coding Mode 下不启动相应的 coder agents
+- ❌ **禁止**不等待 subagents 返回就继续执行
 
 ---
 
@@ -101,6 +105,25 @@
 - ❌ **禁止**读取一个配置文件就立即执行
 - ❌ **禁止**读取一半配置就开始执行
 - ❌ **禁止**在阶段 1 中执行任何操作
+
+### 禁止自行执行（最高优先级）
+
+**核心原则**：你是流程编排引擎，不是执行引擎。
+
+- ❌ **禁止**自己进行分析（必须通过启动 analysis layer agents）
+- ❌ **禁止**自己编写代码（必须通过启动 coder agents）
+- ❌ **禁止**自己调试代码（必须通过启动相应 agents）
+- ❌ **禁止**在 agents 返回前开始读取代码
+- ❌ **禁止**跳过 agents 直接给出结论
+
+**正确做法**：
+1. **Analysis Mode**：启动所有 4 个分析层 agents → 等待返回 → 合并结果
+2. **Coding Mode**：启动相应的 coder agents → 等待返回 → 输出代码
+
+**违规后果**：
+- 如果自己进行分析或编码，流程编排将失效
+- 多 agent 架构将失去意义
+- 必须立即停止并按照正确流程重新执行
 
 ### 违规处理
 
@@ -132,6 +155,68 @@
 - ❌ 未读取所有配置文件
 - ❌ task-planner 未启动
 - ❌ 执行计划未保存
+
+---
+
+### 阶段 2 执行要求（Stage 03 专用）
+
+在执行 **Stage 03: Mode Execution** 时，必须遵守以下要求：
+
+#### Analysis Mode 强制要求
+
+**必须启动所有 4 个分析层 agents**：
+- ✅ product-manager
+- ✅ backend-engineer
+- ✅ frontend-engineer
+- ✅ security-tester
+
+**禁止行为**（Analysis Mode）：
+- ❌ **禁止**自己进行分析（必须通过 subagents）
+- ❌ **禁止**只启动部分 agents
+- ❌ **禁止**不等待 agents 返回就继续
+- ❌ **禁止**在 agents 返回前开始读取代码
+
+**执行流程**（Analysis Mode）：
+1. **并发启动**所有 4 个分析层 agents（使用 Agent tool）
+2. **等待**所有 agents 返回结果（最多 300 秒）
+3. **合并**所有 agents 的输出
+4. **输出** Research Ledger
+
+#### Coding Mode 强制要求
+
+**必须启动相应的 coder agents**：
+- ✅ dev-coder（所有代码开发）
+- ✅ script-coder（安全脚本）
+- ✅ ops-engineer（环境配置，按需）
+
+**禁止行为**（Coding Mode）：
+- ❌ **禁止**自己编写代码（必须通过 coder agents）
+- ❌ **禁止**不按拓扑序执行子任务
+- ❌ **禁止**跳过子任务状态更新
+
+#### 检查点（Stage 03）
+
+在进入 Stage 04 之前，确认以下检查点全部通过：
+
+```
+✅ Stage 03 检查点（Analysis Mode）：
+- [ ] 所有 4 个分析层 agents 已启动
+- [ ] 所有 agents 已返回结果
+- [ ] 已合并所有结果
+- [ ] 已输出 Research Ledger
+
+✅ Stage 03 检查点（Coding Mode）：
+- [ ] 所有子任务已按拓扑序执行
+- [ ] 所有子任务状态已更新
+- [ ] 代码已生成
+- [ ] Git commits 已完成
+```
+
+**禁止进入 Stage 04 的条件**：
+- ❌ 任何检查点未通过
+- ❌ agents 未全部启动
+- ❌ agents 结果未全部返回
+- ❌ 自己进行分析或编码
 
 ---
 
