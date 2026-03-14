@@ -24,8 +24,8 @@
 ### 复杂度判断
 
 - **简单任务**：同时启动 3 个 subagents（task-planner + 2个核心专家）
-- **标准任务**：同时启动 5 个 subagents（task-planner + 4个领域专家）
-- **深度任务**：同时启动全部 6 个分析层 subagents
+- **标准任务：同时启动 4 个 subagents（task-planner + 3个领域专家） subagents（task-planner + 4个领域专家）
+- **深度任务**：同时启动全部 4 个分析层 subagents
 
 ### 禁止行为
 
@@ -157,7 +157,7 @@
 3. 用户明确跳过分析（"不用分析了"、"别分析"）
 
 **行为规则**：
-- **禁止启动分析层 subagent**（product-manager, backend-engineer, frontend-engineer, qa-engineer, security-tester）
+- **禁止启动分析层 subagent**（product-manager, backend-engineer, frontend-engineer, security-tester）
 - **禁止输出分析、方案、评审**
 - **必须启动执行层 coder agents**（dev-coder, script-coder）
 - **每次代码编写都要启动相应的 coder agent**，包括：
@@ -278,12 +278,12 @@
 3. backend-engineer（架构分析）
 4. 根据任务类型选择 1-2 个专家（如：frontend-engineer + security-tester）
 
-**深度任务** → 同时启动全部 6 个 subagents：
+**深度任务** → 同时启动全部 5 个 subagents：
 1. task-planner（任务拆解）
 2. product-manager（需求分析）
 3. backend-engineer（架构分析）
 4. frontend-engineer（输入面分析）
-5. qa-engineer（边界分析）
+
 6. security-tester（安全分析）
 
 ### 禁止行为
@@ -374,11 +374,12 @@
 
 **执行流程**：
 1. 意图识别：需要分析 → **Analysis Mode**
-2. 同时启动 5 个分析层 subagents
+2. 同时启动 4 个分析层 subagents
 3. 收集输出：
    - product-manager：识别登录场景、角色定义
    - backend-engineer：分析接口契约、状态机
-   - frontend-engineer：分析输入面、攻击面
+   - frontend-engineer：输入面与攻击面分析
+- **security-tester**：攻击路径与漏洞分析
    - qa-engineer：枚举失败路径（无token、过期token、伪造token）
    - security-tester：构建攻击路径（token伪造、会话劫持）
 4. 合并冲突，输出 Research Ledger
@@ -464,7 +465,7 @@
 
 **执行流程**：
 1. 意图识别：需要评估设计 → **Analysis Mode**
-2. 同时启动 5 个分析层 subagents
+2. 同时启动 4 个分析层 subagents
 3. 收集多视角输出并合并
 
 **输出示例**：
