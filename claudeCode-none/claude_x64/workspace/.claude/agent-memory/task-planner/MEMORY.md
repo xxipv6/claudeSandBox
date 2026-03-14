@@ -65,7 +65,7 @@
 
 **Agent 分配**：
 - 固件/协议分析：backend-engineer + security-tester
-- Web 测试：security-tester + qa-engineer
+- Web 测试：security-tester + frontend-engineer
 - 物理接口：backend-engineer
 - PoC 开发：script-coder
 
@@ -96,7 +96,7 @@
 **Agent 分配**：
 - 漏洞定位：security-tester + backend-engineer
 - 原理分析：security-tester + backend-engineer
-- 影响评估：qa-engineer + security-tester
+- 影响评估：security-tester + backend-engineer
 - PoC 编写：script-coder
 - 修复建议：backend-engineer + security-tester
 
@@ -176,7 +176,6 @@ T2 ─┘     T4 ─┘
 | product-manager | 需求分析、业务逻辑 |
 | backend-engineer | 架构分析、状态机、接口 |
 | frontend-engineer | 输入面、攻击面、UI |
-| qa-engineer | 失败路径、边界条件 |
 | security-tester | 安全分析、漏洞、攻击路径 |
 
 ### 执行层 Agent

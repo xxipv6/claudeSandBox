@@ -258,7 +258,7 @@ T3: Web 接口测试
 - 输入：Web 应用 URL
 - 输出：漏洞列表
 - 复杂度：中等
-- Agent：security-tester, qa-engineer
+- Agent：security-tester, frontend-engineer
 
 T4: 物理接口分析
 - 输入：硬件设备
