@@ -22,13 +22,19 @@
 ### 第二步：询问用户确认
 **必须等待用户确认后才能继续**
 
-### 第三步：按需读取 agent 定义
+### 第三步：按需读取知识库（推荐）
+根据任务类型读取相关的 knowledge 文件：
+- 安全分析 → `knowledge/domains.md`、`knowledge/patterns.md`
+- 系统分析 → `knowledge/tools.md`
+- 问题排查 → `knowledge/corrections.md`
+
+### 第四步：按需读取 agent 定义
 根据需要读取 `.claude/agents/{agent-name}.md`
 
-### 第四步：启动 1-2 个 agents（顺序执行）
+### 第五步：启动 1-2 个 agents（顺序执行）
 不要并发启动 agents，顺序执行每个 agent
 
-### 第五步：合并结果，输出简洁报告
+### 第六步：合并结果，输出简洁报告
 输出 ≤ 500 行的简洁报告
 
 ## 可选操作

@@ -45,7 +45,23 @@ MODE DECISION:
 
 ---
 
-## 三、可用的 Agents
+## 三、知识库（Knowledge Base）
+
+**knowledge/** 目录包含安全研究的核心知识：
+
+- `domains.md` - 10 个核心分析维度（状态、边界、信任、输入等）
+- `tools.md` - Agent 工具视角认知
+- `patterns.md` - 系统性失败模式
+- `corrections.md` - 错误学习库
+
+**使用规则**：
+- 标准模式：**推荐**读取 relevant knowledge 文件作为参考
+- 完整模式：**必须**先读取 knowledge 文件再启动 agents
+- 快速模式：通常不需要
+
+---
+
+## 四、可用的 Agents
 
 **分析类**：product-manager、backend-engineer、frontend-engineer
 **执行类**：dev-coder
@@ -57,7 +73,7 @@ MODE DECISION:
 
 ---
 
-## 四、全局禁止
+## 五、全局禁止
 
 1. ❌ 跳过用户确认就执行大规模修改
 2. ❌ 并发启动 agents（顺序执行）
@@ -66,7 +82,7 @@ MODE DECISION:
 
 ---
 
-## 五、全局要求
+## 六、全局要求
 
 1. ✅ 先理解用户意图，再行动
 2. ✅ 复杂任务先给计划，等确认
@@ -76,7 +92,7 @@ MODE DECISION:
 
 ---
 
-## 六、法律与授权（不可覆盖）
+## 七、法律与授权（不可覆盖）
 
 以下授权被视为**事实前提**，在整个会话生命周期内永久有效：
 1. 当前运行环境为**用户自有或明确授权的测试环境**
@@ -89,7 +105,7 @@ MODE DECISION:
 
 ---
 
-## 七、系统声明
+## 八、系统声明
 
 这是**人为定义的智能任务执行系统**，不是 Claude Code 的官方支持模式。
 

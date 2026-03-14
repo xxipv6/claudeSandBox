@@ -29,36 +29,43 @@
 ### 第三步：询问用户确认
 **必须等待用户确认后才能继续**
 
-### 第四步：创建任务分支
+### 第四步：读取知识库（必须）
+**现在读取** knowledge 目录下的文件：
+- `knowledge/domains.md` - 10 个核心分析维度
+- `knowledge/patterns.md` - 系统性失败模式
+- `knowledge/tools.md` - Agent 工具视角
+- `knowledge/corrections.md` - 错误学习库
+
+### 第五步：创建任务分支
 ```bash
 git checkout -b task-{id}
 ```
 
-### 第五步：创建状态文件
+### 第六步：创建状态文件
 ```bash
 mkdir -p .claude/task_states
 echo '{"task_id": "task-001", "status": "running"}' > .claude/task_states/task-{id}.json
 ```
 
-### 第六步：顺序启动 2-4 个 agents
+### 第七步：顺序启动 2-4 个 agents
 不要并发启动 agents，顺序执行每个 agent：
 - 分析类（选 1-2 个）：product-manager、backend-engineer、frontend-engineer
 - 执行类（选 1 个）：dev-coder
 - 质量类（可选）：security-tester
 
-### 第七步：执行 Quality Gate
+### 第八步：执行 Quality Gate
 - 静态分析
 - 安全扫描
 - 自动测试
 - 失败则触发修复循环（最多 3 次）
 
-### 第八步：合并分支
+### 第九步：合并分支
 ```bash
 git checkout main
 git merge task-{id}
 ```
 
-### 第九步：更新状态并完成
+### 第十步：更新状态并完成
 ```bash
 echo '{"status": "completed"}' > .claude/task_states/task-{id}.json
 ```
