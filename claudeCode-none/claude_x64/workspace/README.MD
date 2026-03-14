@@ -1,67 +1,86 @@
-# Claude Code Multi-Agent System
+# Claude Code · 智能任务执行系统
 
-安全研究多 Agent 团队系统，基于意图识别的双模式调度架构（分析层 + 执行层）。
+AI 编程助手，根据任务复杂度自动调整工作方式。
 
-## 🏗️ 架构概览
+## 🏗️ 系统架构
 
-### 双模式调度
+### 三种执行模式
 
-- **Analysis Mode（默认）**：并发启动 2-6 个分析层 subagents 进行深度分析
-- **Coding Mode（执行）**：启动执行层 coder agents 进行代码开发
+**快速模式**：
+- 0 个 agents
+- 直接执行
+- 无状态文件
+- 适用：单文件修改、明确 bug 修复
+
+**标准模式**（默认）：
+- 1-2 个 agents（顺序执行）
+- 简要计划 + 用户确认
+- 可选状态文件
+- 适用：项目分析、功能实现
+
+**完整模式**：
+- 2-4 个 agents（顺序执行）
+- 详细计划 + Git 分支
+- 完整状态文件
+- 触发：环境变量 `CLAUDE_FULL_MODE=1` + 用户明确要求
 
 ### Agent 团队
 
-**分析层 (6 个)**：
-- `task-planner` - 任务拆解与优先级排序
-- `product-manager` - 需求与业务目标分析
-- `backend-engineer` - 系统结构与状态机分析
-- `frontend-engineer` - 输入面与攻击面分析
-- `qa-engineer` - 失败路径与边界场景分析
-- `security-tester` - 攻击路径与漏洞分析
+**分析类**：
+- `product-manager` - 需求与架构评估
+- `backend-engineer` - 后端代码分析
+- `frontend-engineer` - 前端代码分析
 
-**执行层 (2 个)**：
-- `dev-coder` - 所有代码开发
-- `script-coder` - 安全脚本（PoC、Exploit、Fuzzer）
+**执行类**：
+- `dev-coder` - 代码实现
 
-**支持层 (1 个)**：
-- `ops-engineer` - 环境配置与系统调试
+**质量类**：
+- `security-tester` - 安全检查
 
-## 🚀 快速开始
+## 🚀 核心特性
 
-### 1. API 配置
+### 1. 意图驱动
+不是配置驱动，Claude 理解用户意图后自动选择合适的工作方式。
 
-📂 **配置文件路径**：`/root/.claude/`
+### 2. 保守判断
+任何不确定的情况 → 自动降级到标准模式（安全缓冲区）。
 
-修改 API Token、Base URL 和 Model 配置。
+### 3. 强制入口
+执行任何操作前必须先输出 MODE DECISION，禁止"先做再说"。
 
-### 2. 环境变量
+### 4. 默认拒绝
+完整模式需要明确授权（环境变量），否则拒绝执行。
 
-```bash
-export CLAUDE_CONFIG_DIR=/root/.claude
-export ARVINENV_PATH=/root/ArvinENV
-```
-
-### 3. 快捷命令
-
-| 命令 | 说明 |
-|------|------|
-| `key -k <token>` | 修改 API Token |
-| `key -u <url>` | 修改 Base URL |
-| `key -m <model>` | 修改 Model |
-| `rms` | 清理配置和缓存 |
-| `config` | 查看所有配置信息 |
+### 5. 顺序执行
+Agents 顺序执行，不并发（Claude 的并发是叙事级的）。
 
 ## 📚 文档
 
+- [CLAUDE.md](./CLAUDE.md) - 系统核心配置（96 行）
+- [.claude/workflow/quick-mode.md](./.claude/workflow/quick-mode.md) - 快速模式执行
+- [.claude/workflow/standard-mode.md](./.claude/workflow/standard-mode.md) - 标准模式执行
+- [.claude/workflow/full-mode.md](./.claude/workflow/full-mode.md) - 完整模式执行
+- [.claude/workflow/ARCHITECTURE.md](./.claude/workflow/ARCHITECTURE.md) - 系统架构说明
+- [.claude/workflow/TESTING.md](./.claude/workflow/TESTING.md) - 测试指南
 - [CHANGELOG.md](./CHANGELOG.md) - 版本更新记录
-- [CLAUDE.md](./CLAUDE.md) - 系统完整配置文档
-- [knowledge/](./knowledge/) - 外置知识与记忆系统
 
-## 🔧 插件安装
+## 🔧 配置
 
-进入 Claude Code 命令行输入 `/plugin`，添加官方插件市场：
+### 文件结构
 ```
-anthropics/claude-plugins-official
+/workspace/
+├── CLAUDE.md                    # 核心配置（96 行）
+└── .claude/
+    ├── agents/                  # 5 个 agent 定义
+    ├── workflow/                # 执行模式文件
+    └── task_states/             # 按需创建
+```
+
+### 环境变量
+
+```bash
+# 启用完整模式（可选）
+export CLAUDE_FULL_MODE=1
 ```
 
 ## ⚙️ 权限配置
@@ -73,4 +92,3 @@ anthropics/claude-plugins-official
 ## 📄 许可证
 
 本项目用于安全研究和教育目的。
-
