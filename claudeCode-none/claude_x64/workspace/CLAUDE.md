@@ -19,13 +19,14 @@
 **第 1 步（强制）**：读取所有配置文件（只读，禁止执行任何操作）
 
 **现在读取以下文件**（只读，禁止执行）：
-1. `.claude/workflow/config.yaml`
-2. `.claude/workflow/stages/00-planning.md`
-3. `.claude/workflow/stages/01-task-init.md`
-4. `.claude/workflow/stages/02-git-prepare.md`
-5. `.claude/workflow/stages/03-mode-execution.md`
-6. `.claude/workflow/stages/04-quality-gate.md`
-7. `.claude/workflow/stages/05-completion.md`
+1. `.claude/PROTOCOL.md`
+2. `.claude/workflow/config.yaml`
+3. `.claude/workflow/stages/00-planning.md`
+4. `.claude/workflow/stages/01-task-init.md`
+5. `.claude/workflow/stages/02-git-prepare.md`
+6. `.claude/workflow/stages/03-mode-execution.md`
+7. `.claude/workflow/stages/04-quality-gate.md`
+8. `.claude/workflow/stages/05-completion.md`
 
 **禁止行为**（阶段 1）：
 - ❌ **禁止**执行任何操作（读取、分析、修改代码）
@@ -34,6 +35,7 @@
 - ❌ **禁止**跳到阶段 2
 
 **检查点**：
+- [ ] 已读取 PROTOCOL.md
 - [ ] 已读取 config.yaml
 - [ ] 已读取 00-planning.md
 - [ ] 已读取 01-task-init.md
@@ -116,7 +118,7 @@
 
 ```
 ✅ 阶段 1 检查点：
-- [ ] 所有配置文件已读取（7 个文件）
+- [ ] 所有配置文件已读取（8 个文件）
 - [ ] task-planner 已启动
 - [ ] task-planner 已返回执行计划
 - [ ] 执行计划已保存到 task_plans.json
