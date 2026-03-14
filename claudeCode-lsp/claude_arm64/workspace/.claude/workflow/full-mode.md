@@ -142,25 +142,38 @@ echo "[$(date -Iseconds)] [ERROR] {stage_name}: {error_message}" >> .claude/task
 - [ ] 日志文件已创建
 - [ ] 已记录开始时间
 
-### 第七步：顺序启动 2-4 个 agents
-不要并发启动 agents，顺序执行每个 agent：
+### 第七步：按阶段并发启动 agents
 
-**执行流程**：
+**执行策略**：支持并发执行，但必须遵循依赖顺序
+
+**Stage 1: 前置规划**（如有）
+- 启动 task-planner
+- 等待完成
+
+**Stage 2: 分析类 agents 并发**
+- 同时启动：product-manager、backend-engineer、frontend-engineer、security-tester
+- 等待所有分析 agents 完成
+
+**Stage 3: 执行类 agent**
+- 启动 dev-coder
+- 等待完成
+
+**并发执行流程**：
 ```
-对于每个 agent：
-1. 读取 agent 定义（.claude/agents/{agent-name}.md）
-2. 记录到日志：echo "[$(date)] [AGENT] {name}: Starting" >> .claude/task_logs/task-{id}.log
-3. 启动 agent（使用 Agent tool）
-4. 等待 agent 完成（最多 120 秒）
+对于每个阶段：
+1. 读取所有 agent 定义（.claude/agents/{agent-name}.md）
+2. 记录到日志：echo "[$(date)] [STAGE] {stage_name}: Starting" >> .claude/task_logs/task-{id}.log
+3. 并发启动该阶段的所有 agents（使用 Agent tool）
+4. 等待所有 agents 完成（每个 agent 最多 120 秒）
 5. 记录结果到状态文件和日志
 6. 更新状态文件
-7. 然后启动下一个 agent（如果有）
+7. 然后进入下一阶段（如果有）
 ```
 
 **可用的 agents**：
-- 分析类（选 1-2 个）：product-manager、backend-engineer、frontend-engineer
-- 执行类（选 1 个）：dev-coder
-- 质量类（可选）：security-tester
+- 前置规划（可选）：task-planner
+- 分析类（可并发）：product-manager、backend-engineer、frontend-engineer、security-tester
+- 执行类：dev-coder
 
 **Agent 执行结果记录**（添加到状态文件的 `agents` 数组）：
 ```json
@@ -364,11 +377,11 @@ echo '{"status": "completed", "end_time": "<timestamp>"}' > .claude/task_states/
 
 ## 禁止行为
 - ❌ 在环境变量未设置时执行
-- ❌ 并发启动 agents（必须顺序执行）
+- ❌ 违反依赖顺序并发（task-planner 后、dev-coder 前才能并发分析类）
 - ❌ 跳过任何阶段
 - ❌ 跳过用户确认
 - ❌ 跳过检查点
-- ❌ 不等前一个 agent 完成就启动下一个
+- ❌ 不等前置阶段完成就启动下一阶段
 - ❌ 不读取 knowledge 就启动 agents
 - ❌ 不更新状态文件
 - ❌ 不记录日志

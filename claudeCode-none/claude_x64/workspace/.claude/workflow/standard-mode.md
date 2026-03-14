@@ -96,25 +96,38 @@ Prompt: [用户输入]
   - 分析类：backend-engineer + frontend-engineer
   - 分析类 + 执行类：product-manager + dev-coder
 
-### 第七步：启动 agents（顺序执行）
-不要并发启动 agents，顺序执行每个 agent
+### 第七步：启动 agents（支持并发）
+
+**执行策略**：支持并发执行，但必须遵循依赖顺序
+
+**Stage 1: 前置规划**（可选）
+- 启动 task-planner（如使用）
+- 等待完成
+
+**Stage 2: 分析类 agents 并发**
+- 同时启动选定的分析 agents（product-manager、backend-engineer、frontend-engineer、security-tester）
+- 等待所有分析 agents 完成
+
+**Stage 3: 执行类 agent**
+- 启动 dev-coder（如需要）
+- 等待完成
 
 **执行流程**：
 ```
-对于每个 agent：
-1. 读取 agent 定义
-2. 记录到日志（可选）：echo "[$(date)] [AGENT] {name}: Starting" >> .claude/task_logs/standard.log
-3. 启动 agent（使用 Agent tool）
-4. 等待 agent 完成
+对于每个阶段：
+1. 读取所有 agent 定义
+2. 记录到日志（可选）：echo "[$(date)] [STAGE] {stage}: Starting" >> .claude/task_logs/standard.log
+3. 并发启动该阶段的所有 agents
+4. 等待所有 agents 完成
 5. 记录结果
-6. 然后启动下一个 agent（如果有）
+6. 然后进入下一阶段（如果有）
 ```
 
 **检查点**：
-- [ ] 前一个 agent 已完成
-- [ ] 已读取当前 agent 定义
-- [ ] 已启动当前 agent
-- [ ] 等待当前 agent 完成
+- [ ] 前置阶段已完成（如有）
+- [ ] 已读取当前阶段所有 agent 定义
+- [ ] 已并发启动当前阶段的所有 agents
+- [ ] 等待所有 agents 完成
 
 **失败处理**（记录错误）：
 ```bash
@@ -194,11 +207,11 @@ echo "[$(date)] [ERROR] {stage}: {error_message}" >> .claude/task_logs/standard.
 
 ## 禁止行为
 - ❌ 跳过用户确认就执行
-- ❌ 并发启动 agents
+- ❌ 违反依赖顺序并发（task-planner 后、dev-coder 前才能并发分析类）
 - ❌ 读取 workflow/ 下的其他文件
 - ❌ 输出 500+ 行的过度形式化报告
 - ❌ 跳过检查点
-- ❌ 不等前一个 agent 完成就启动下一个
+- ❌ 不等前置阶段完成就启动下一阶段
 - ❌ 不记录错误到日志（如果启用了日志）
 
 ## 与完整模式的区别

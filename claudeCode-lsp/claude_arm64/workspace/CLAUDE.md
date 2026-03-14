@@ -69,25 +69,31 @@ MODE DECISION:
 
 ## 四、可用的 Agents
 
+**前置规划**：task-planner
 **分析类**：product-manager、backend-engineer、frontend-engineer
 **执行类**：dev-coder
 **质量类**：security-tester
 
 **Agent 定义**：`.claude/agents/{agent-name}.md`
 
-**执行原则**：顺序执行，不并发
+**执行原则**：支持并发执行
+
+**并发策略**：
+- **Stage 1**: task-planner（必须最先执行）
+- **Stage 2**: 分析类 agents 并发（product-manager + backend-engineer + frontend-engineer + security-tester）
+- **Stage 3**: 执行类 agent（dev-coder，等分析完成）
 
 **检查点**（启动 agent 前必须确认）：
 - [ ] 已读取 agent 定义文件
-- [ ] 前一个 agent 已完成（如果不是第一个）
-- [ ] 用户同意启动当前 agent
+- [ ] 前置阶段的 agents 已完成（如有）
+- [ ] 用户同意启动当前 agent（或 agent 组）
 
 ---
 
 ## 五、全局禁止
 
 1. ❌ 跳过用户确认就执行大规模修改
-2. ❌ 并发启动 agents（顺序执行）
+2. ❌ 违反依赖顺序并发（task-planner 后、dev-coder 前才能并发分析类）
 3. ❌ **自动使用任何调试 skill 或系统能力**，除非用户明确要求
 4. ❌ 过度形式化（输出 500 行的 Research Ledger）
 5. ❌ **跳过检查点**（任何检查点未通过都应停止）
