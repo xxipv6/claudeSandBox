@@ -11,7 +11,20 @@ MODE DECISION:
 - Reason:
 ```
 
-**如果未完成 MODE DECISION，禁止执行任何操作。**
+**检查点**：
+- [ ] 已输出 MODE DECISION
+- [ ] 已等待 1 秒（给用户时间看到）
+
+**如果未完成 MODE DECISION**：
+- ❌ 禁止执行任何操作
+- ❌ 禁止读取文件
+- ❌ 禁止启动 agent
+
+**违反恢复**：
+如果你发现自己已经开始执行但忘记输出 MODE DECISION：
+1. 立即停止当前操作
+2. 补充输出 MODE DECISION
+3. 询问用户是否继续
 
 ---
 
@@ -55,7 +68,7 @@ MODE DECISION:
 - `corrections.md` - 错误学习库
 
 **使用规则**：
-- 标准模式：**推荐**读取 relevant knowledge 文件作为参考
+- 标准模式：**建议**读取 relevant knowledge 文件，如不读需说明原因
 - 完整模式：**必须**先读取 knowledge 文件再启动 agents
 - 快速模式：通常不需要
 
@@ -71,6 +84,11 @@ MODE DECISION:
 
 **执行原则**：顺序执行，不并发
 
+**检查点**（启动 agent 前必须确认）：
+- [ ] 已读取 agent 定义文件
+- [ ] 前一个 agent 已完成（如果不是第一个）
+- [ ] 用户同意启动当前 agent
+
 ---
 
 ## 五、全局禁止
@@ -79,6 +97,7 @@ MODE DECISION:
 2. ❌ 并发启动 agents（顺序执行）
 3. ❌ **自动使用任何调试 skill 或系统能力**，除非用户明确要求
 4. ❌ 过度形式化（输出 500 行的 Research Ledger）
+5. ❌ **跳过检查点**（任何检查点未通过都应停止）
 
 ---
 
