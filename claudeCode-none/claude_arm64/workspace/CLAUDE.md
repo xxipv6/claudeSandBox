@@ -7,7 +7,7 @@
 ```
 MODE DECISION:
 - Detected signals:
-- Selected mode: [快速 | 标准 | 完整]
+- Selected mode: [标准 | 完整]
 - Reason:
 ```
 
@@ -30,9 +30,7 @@ MODE DECISION:
 
 ## 一、任务判断逻辑（保守策略）
 
-**快速模式**：单文件操作 OR 明确的 bug 修复 OR 用户说"快速/简单/直接"
-
-**标准模式**：多文件操作（2-10 个文件）OR 需要分析/理解代码 OR 用户说"分析/实现/帮我看看" OR 任何不确定的情况
+**标准模式**：多文件操作（2-10 个文件）OR 需要分析/理解代码 OR 用户说"分析/实现/帮我看看" OR 任何不确定的情况（默认）
 
 **完整模式**：架构级任务 AND 用户明确说"完整分析/完整编排" AND 环境变量 `CLAUDE_FULL_MODE=1` 已设置
 
@@ -42,11 +40,7 @@ MODE DECISION:
 
 ## 二、模式执行（读取对应文件）
 
-### 快速模式
-**第一步**：**现在读取** `.claude/workflow/quick-mode.md`
-**后续**：按照 quick-mode.md 的步骤执行
-
-### 标准模式
+### 标准模式（默认）
 **第一步**：**现在读取** `.claude/workflow/standard-mode.md`
 **后续**：按照 standard-mode.md 的步骤执行
 
@@ -70,7 +64,6 @@ MODE DECISION:
 **使用规则**：
 - 标准模式：**建议**读取 relevant knowledge 文件，如不读需说明原因
 - 完整模式：**必须**先读取 knowledge 文件再启动 agents
-- 快速模式：通常不需要
 
 ---
 

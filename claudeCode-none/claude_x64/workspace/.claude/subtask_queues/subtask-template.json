@@ -1,0 +1,17 @@
+{
+  "parent_task_id": "task-{{parent_id}}",
+  "subtasks": [
+    {
+      "subtask_id": "{{subtask_id}}",
+      "name": "{{subtask_name}}",
+      "goal": "{{subtask_goal}}",
+      "status": "pending",
+      "dependencies": [],
+      "agents_needed": [],
+      "estimated_duration": null,
+      "complexity": "{{complexity}}"
+    }
+  ],
+  "execution_order": [],
+  "can_parallel": []
+}

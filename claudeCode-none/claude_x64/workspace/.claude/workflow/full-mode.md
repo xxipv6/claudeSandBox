@@ -27,17 +27,24 @@
 
 ### 第二步：制定详细计划
 制定包含以下阶段的详细计划：
-- Stage 00: Planning（任务规划）
-- Stage 01: Task Init（创建状态文件）
-- Stage 02: Git Prepare（创建分支）
-- Stage 03: Knowledge（读取知识库）
-- Stage 04: Mode Execution（执行模式）
-- Stage 05: Quality Gate（质量验证）
-- Stage 06: Completion（完成）
+
+**阶段列表（参考文件）**：
+- Stage 00: Planning（任务规划）- 参考 `workflow/stages/00-planning.md`
+- Stage 01: Task Init（创建状态文件）- 参考 `workflow/stages/01-task-init.md`
+- Stage 02: Git Prepare（创建分支）- 参考 `workflow/stages/02-git-prepare.md`
+- Stage 03: Mode Execution（执行模式+读取知识库）- 参考 `workflow/stages/03-mode-execution.md`
+- Stage 04: Quality Gate（质量验证）- 参考 `workflow/stages/04-quality-gate.md`
+- Stage 05: Completion（完成）- 参考 `workflow/stages/05-completion.md`
+
+**⚠️ 说明**：此步骤仅列出计划并标注参考文件，**不执行任何操作**。实际执行在第四步进行。
+
+**后续执行方式**（第四步）：
+按顺序执行每个阶段，在进入每个阶段前先读取对应的阶段文件，然后按照阶段文件的指示执行。
 
 **检查点**：
 - [ ] 已输出详细计划
 - [ ] 已包含所有阶段
+- [ ] 每个阶段都标注了对应的参考文件路径
 
 ### 第三步：询问用户确认
 **必须等待用户确认后才能继续**
@@ -51,21 +58,29 @@
 - [ ] 已询问用户确认
 - [ ] 用户已明确确认
 
-### 第四步：读取知识库（必须）
-**现在读取** .claude/knowledge 目录下的文件：
+### 第四步：按顺序执行各阶段
+
+按照第二步制定计划，按顺序执行每个阶段：
+
+**执行流程**：
+1. **Stage 00: Planning** - 读取 `workflow/stages/00-planning.md` 并执行
+2. **Stage 01: Task Init** - 读取 `workflow/stages/01-task-init.md` 并执行
+3. **Stage 02: Git Prepare** - 读取 `workflow/stages/02-git-prepare.md` 并执行
+4. **Stage 03: Mode Execution** - 读取 `workflow/stages/03-mode-execution.md` 并执行
+5. **Stage 04: Quality Gate** - 读取 `workflow/stages/04-quality-gate.md` 并执行
+6. **Stage 05: Completion** - 读取 `workflow/stages/05-completion.md` 并执行
+
+**知识库读取**（在 Stage 03 中执行）：
 - `.claude/knowledge/domains.md` - 10 个核心分析维度
 - `.claude/knowledge/patterns.md` - 系统性失败模式
 - `.claude/knowledge/tools.md` - Agent 工具视角
 - `.claude/knowledge/corrections.md` - 错误学习库
 
 **检查点**：
-- [ ] 已读取 domains.md
-- [ ] 已读取 patterns.md
-- [ ] 已读取 tools.md
-- [ ] 已读取 corrections.md
-
-**跳过的后果**：
-- 如果跳过任何 knowledge 文件，必须在报告中说明原因
+- [ ] 每个阶段都读取了对应的阶段文件
+- [ ] 每个阶段都按照阶段文件的指示执行
+- [ ] 知识库文件已读取（在 Stage 03 中）
+- [ ] 前一个阶段完成后才进入下一阶段
 
 ### 第五步：创建任务分支
 ```bash
@@ -309,8 +324,7 @@ echo '{"status": "completed", "end_time": "<timestamp>"}' > .claude/task_states/
 | Planning | ✅ | 10:30:00 | 10:30:15 | 15s |
 | Init | ✅ | 10:30:15 | 10:30:20 | 5s |
 | Git Prepare | ✅ | 10:30:20 | 10:30:25 | 5s |
-| Knowledge | ✅ | 10:30:25 | 10:30:40 | 15s |
-| Execution | ✅ | 10:30:40 | 10:58:00 | 27m20s |
+| Mode Execution | ✅ | 10:30:25 | 10:58:00 | 27m35s |
 | Quality Gate | ✅ | 10:58:00 | 10:59:30 | 1m30s |
 | Completion | ✅ | 10:59:30 | 11:00:00 | 30s |
 
@@ -370,7 +384,9 @@ echo '{"status": "completed", "end_time": "<timestamp>"}' > .claude/task_states/
 cat .claude/task_states/task-{id}.json
 
 # 2. 根据状态文件的 current_stage 决定恢复点
-# - 如果 current_stage = "knowledge"，从知识库读取阶段继续
+# - 如果 current_stage = "planning"，从 Stage 00 继续
+# - 如果 current_stage = "init"，从 Stage 01 继续
+# - 如果 current_stage = "git_prepare"，从 Stage 02 继续
 # - 如果 current_stage = "execution"，从失败的 agent 继续或跳过
 # - 如果 current_stage = "quality_gate"，从质量验证继续
 
@@ -380,8 +396,7 @@ echo "[$(date)] [RECOVER] Resuming from stage: {current_stage}" >> .claude/task_
 
 **恢复策略**：
 - **Planning/Init/Git Prepare 阶段中断**：重新执行该阶段
-- **Knowledge 阶段中断**：继续读取未完成的 knowledge 文件
-- **Execution 阶段中断**：根据 agents 数组，跳过已完成的，从失败的 agent 继续
+- **Mode Execution 阶段中断**：根据 agents 数组，跳过已完成的，从失败的 agent 继续
 - **Quality Gate 阶段中断**：根据失败记录决定重试或跳过
 
 ## 回滚机制

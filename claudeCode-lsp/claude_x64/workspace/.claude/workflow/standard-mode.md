@@ -8,8 +8,37 @@
 
 ## 执行步骤
 
-### 第一步：制定简要计划
-根据任务制定 2-3 个执行步骤，例如：
+### 第一步：启动 task-planner（可选但推荐）
+
+对于复杂任务，建议先启动 task-planner 进行任务规划：
+
+**何时使用 task-planner**：
+- 任务涉及多个模块或文件
+- 需要拆解为多个子任务
+- 需要识别依赖关系
+- 不确定如何执行
+
+**启动方式**：
+```
+Agent: task-planner
+Prompt: [用户输入]
+```
+
+**task-planner 输出应包含**：
+- 任务理解
+- 任务拆解（1-5 个子任务）
+- 依赖关系
+- 执行顺序
+- 资源规划（需要的 agents）
+
+**检查点**（如果使用了 task-planner）：
+- [ ] task-planner 已完成
+- [ ] 输出包含任务规划
+- [ ] 已明确需要的 agents
+
+### 第二步：制定简要计划（或使用 task-planner 输出）
+
+**如果不使用 task-planner**，根据任务制定 2-3 个执行步骤，例如：
 ```
 我打算这样分析：
 1. 先看项目结构
@@ -19,11 +48,13 @@
 可以吗？（请回复"继续"来确认）
 ```
 
+**如果使用 task-planner**，直接使用其输出的任务规划。
+
 **检查点**：
 - [ ] 已输出计划
 - [ ] 已等待用户确认
 
-### 第二步：询问用户确认
+### 第三步：询问用户确认
 **必须等待用户明确确认后才能继续**
 
 **有效的确认方式**：
@@ -34,7 +65,7 @@
 - 用户沉默（需要再次询问）
 - 用户说"嗯"、"啊"等模糊答复（需要明确确认）
 
-### 第三步：读取知识库（建议，如不读需说明原因）
+### 第四步：读取知识库（建议，如不读需说明原因）
 根据任务类型读取相关的 knowledge 文件：
 - 安全分析 → `.claude/knowledge/domains.md`、`.claude/knowledge/patterns.md`
 - 系统分析 → `.claude/knowledge/tools.md`
@@ -44,14 +75,28 @@
 - [ ] 已读取 relevant knowledge 文件
 - [ ] 或：已说明为什么跳过 knowledge
 
-### 第四步：按需读取 agent 定义
+### 第五步：按需读取 agent 定义
 根据需要读取 `.claude/agents/{agent-name}.md`
 
 **检查点**：
 - [ ] 已读取 agent 定义
 - [ ] 已了解 agent 的角色和职责
 
-### 第五步：启动 1-2 个 agents（顺序执行）
+### 第六步：启动 agents（按 task-planner 规划或手动选择）
+
+**如果使用了 task-planner**：
+- 按照 task-planner 输出的资源规划启动 agents
+- 按照执行顺序启动
+- 每次只启动一个 agent
+
+**如果未使用 task-planner**：
+- 手动选择 1-2 个 agents
+- 常用组合：
+  - 分析类：product-manager + backend-engineer
+  - 分析类：backend-engineer + frontend-engineer
+  - 分析类 + 执行类：product-manager + dev-coder
+
+### 第七步：启动 agents（顺序执行）
 不要并发启动 agents，顺序执行每个 agent
 
 **执行流程**：
@@ -79,7 +124,7 @@ echo "[$(date)] [ERROR] Agent {name} failed" >> .claude/task_logs/standard.log
 - 如果 agent 执行失败：记录错误，询问用户是否继续或重试
 - 如果 agent 超时（120 秒）：记录超时，停止并询问用户
 
-### 第六步：合并结果，输出简洁报告
+### 第八步：合并结果，输出简洁报告
 输出 ≤ 500 行的简洁报告
 
 **报告格式**：

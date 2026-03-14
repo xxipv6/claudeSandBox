@@ -1,0 +1,19 @@
+{
+  "task_id": "task-{{timestamp}}",
+  "status": "pending",
+  "created_at": "{{created_at}}",
+  "user_input": "{{user_input}}",
+  "goal": "{{goal}}",
+  "success_criteria": "{{success_criteria}}",
+  "mode": "{{mode}}",
+  "subtasks": [],
+  "dependencies": {},
+  "execution_order": [],
+  "estimated_duration": null,
+  "agents_needed": [],
+  "metadata": {
+    "complexity": "{{complexity}}",
+    "priority": "{{priority}}",
+    "tags": []
+  }
+}

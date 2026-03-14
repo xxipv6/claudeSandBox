@@ -1,0 +1,105 @@
+{
+  "task_id": "task-{timestamp}",
+  "status": "pending|running|completed|failed|cancelled|paused",
+  "mode": "standard|full",
+  "current_stage": "planning|init|git_prepare|knowledge|execution|quality_gate|completion",
+  "created_at": "{created_timestamp}",
+  "start_time": "{start_timestamp}",
+  "end_time": "{end_timestamp}",
+  "duration_seconds": 0,
+  "user_input": "{原始用户输入}",
+  "goal": "{任务目标}",
+  "success_criteria": "{成功标准}",
+  "stages": {
+    "planning": {
+      "status": "pending|completed|failed",
+      "start": "{timestamp}",
+      "end": "{timestamp}",
+      "duration_seconds": 0
+    },
+    "init": {
+      "status": "pending|completed|failed",
+      "start": "{timestamp}",
+      "end": "{timestamp}",
+      "duration_seconds": 0
+    },
+    "git_prepare": {
+      "status": "pending|completed|failed",
+      "start": "{timestamp}",
+      "end": "{timestamp}",
+      "duration_seconds": 0,
+      "branch": "{branch_name}"
+    },
+    "knowledge": {
+      "status": "pending|completed|failed",
+      "start": "{timestamp}",
+      "end": "{timestamp}",
+      "duration_seconds": 0,
+      "files_read": ["{file1}", "{file2}"]
+    },
+    "execution": {
+      "status": "pending|completed|failed",
+      "start": "{timestamp}",
+      "end": "{timestamp}",
+      "duration_seconds": 0
+    },
+    "quality_gate": {
+      "status": "pending|completed|failed",
+      "start": "{timestamp}",
+      "end": "{timestamp}",
+      "duration_seconds": 0,
+      "static_analysis": {"status": "passed|failed", "issues": 0},
+      "security_scan": {"status": "passed|failed", "vulnerabilities": 0},
+      "tests": {"status": "passed|failed", "total": 0, "passed": 0, "failed": 0},
+      "fix_attempts": 0
+    },
+    "completion": {
+      "status": "pending|completed|failed",
+      "start": "{timestamp}",
+      "end": "{timestamp}",
+      "duration_seconds": 0
+    }
+  },
+  "agents": [
+    {
+      "name": "{agent_name}",
+      "type": "planning|analysis|execution|quality",
+      "status": "pending|running|completed|failed",
+      "start_time": "{timestamp}",
+      "end_time": "{timestamp}",
+      "duration_seconds": 0,
+      "result": "success|failure",
+      "output_summary": "{简要输出}",
+      "errors": []
+    }
+  ],
+  "subtasks": [
+    {
+      "subtask_id": "{subtask_id}",
+      "name": "{子任务名称}",
+      "status": "pending|completed|failed",
+      "dependencies": [],
+      "agents_used": [],
+      "start_time": "{timestamp}",
+      "end_time": "{timestamp}",
+      "duration_seconds": 0
+    }
+  ],
+  "errors": [
+    {
+      "stage": "{stage_name}",
+      "error": "{错误信息}",
+      "timestamp": "{timestamp}",
+      "fatal": false,
+      "retries": 0
+    }
+  ],
+  "logs": ".claude/task_logs/task-{id}.log",
+  "report": ".claude/task_reports/task-{id}-report.md",
+  "metadata": {
+    "version": "2.0.0",
+    "complexity": "simple|standard|complex",
+    "priority": "low|medium|high",
+    "tags": ["{tag1}", "{tag2}"]
+  }
+}
