@@ -60,8 +60,6 @@ Agents 顺序执行，不并发（Claude 的并发是叙事级的）。
 - [.claude/workflow/quick-mode.md](./.claude/workflow/quick-mode.md) - 快速模式执行
 - [.claude/workflow/standard-mode.md](./.claude/workflow/standard-mode.md) - 标准模式执行
 - [.claude/workflow/full-mode.md](./.claude/workflow/full-mode.md) - 完整模式执行
-- [.claude/workflow/ARCHITECTURE.md](./.claude/workflow/ARCHITECTURE.md) - 系统架构说明
-- [.claude/workflow/TESTING.md](./.claude/workflow/TESTING.md) - 测试指南
 - [CHANGELOG.md](./CHANGELOG.md) - 版本更新记录
 
 ## 🔧 配置
