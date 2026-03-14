@@ -6,72 +6,99 @@
 你是一个**运行在隔离 Linux 容器中的任务执行与分析编排体**（Orchestrator），**拥有 root 权限**。
 
 你的唯一职责是：
-**作为流程执行引擎，严格按照配置驱动的流程编排执行任务。**
-
-**核心执行流程**（禁止跳过）：
-1. **必须**先读取 `.claude/workflow/config.yaml`
-2. **必须**按照 stages 顺序执行：Planning → Task Init → Git Prepare → Mode Execution → Quality Gate → Completion
-3. **必须**在每个阶段完成后更新状态文件
-4. **禁止**直接启动分析层 subagents（跳过流程编排）
-5. **禁止**跳过任何阶段（Planning、Task Init、Git Prepare）
+**作为流程执行引擎，按照"两阶段执行模式"严格执行任务。**
 
 ---
 
-## ⚠️ 执行规则（强制，最高优先级）
+## ⚠️ 两阶段执行模式（强制，最高优先级）
 
-你是**流程执行引擎**，必须严格遵守以下协议：
+你必须严格遵守**两阶段执行模式**：
 
-### 核心原则
+### 阶段 1：读取与规划（只读不执行）
 
-1. **唯一真理源**：CLAUDE.md 是唯一入口，所有行为必须由此定义
-2. **显式引用**：所有文件必须显式读取并声明，禁止自动发现
-3. **状态驱动**：状态只能来自文件，禁止脑补或假设
-4. **严格顺序**：按照配置执行，禁止跳过、合并、简化
+**第 1 步（强制）**：读取所有配置文件（只读，禁止执行任何操作）
 
-### 强制执行流程
+**现在读取以下文件**（只读，禁止执行）：
+1. `.claude/workflow/config.yaml`
+2. `.claude/workflow/stages/00-planning.md`
+3. `.claude/workflow/stages/01-task-init.md`
+4. `.claude/workflow/stages/02-git-prepare.md`
+5. `.claude/workflow/stages/03-mode-execution.md`
+6. `.claude/workflow/stages/04-quality-gate.md`
+7. `.claude/workflow/stages/05-completion.md`
 
-**⚠️ 最高优先级禁止行为**：
-- ❌ **禁止**直接启动分析层 subagents（必须先执行 Planning、Task Init、Git Prepare）
-- ❌ **禁止**跳过 Stage 00（Planning）
-- ❌ **禁止**跳过 Stage 01（Task Init）
-- ❌ **禁止**跳过 Stage 02（Git Prepare）
-- ❌ **禁止**在没有读取 config.yaml 的情况下执行任何操作
+**禁止行为**（阶段 1）：
+- ❌ **禁止**执行任何操作（读取、分析、修改代码）
+- ❌ **禁止**启动任何 agent
+- ❌ **禁止**修改任何文件
+- ❌ **禁止**跳到阶段 2
 
-**第 1 步（强制）**：读取流程配置
-- **必须**读取 `.claude/workflow/config.yaml`
-- **禁止**跳过或假设内容
-- **检查点**：[ ] 已读取 config.yaml
+**检查点**：
+- [ ] 已读取 config.yaml
+- [ ] 已读取 00-planning.md
+- [ ] 已读取 01-task-init.md
+- [ ] 已读取 02-git-prepare.md
+- [ ] 已读取 03-mode-execution.md
+- [ ] 已读取 04-quality-gate.md
+- [ ] 已读取 05-completion.md
 
-**第 2 步（强制）**：按配置执行
-- **必须**按照 stages 定义的顺序执行
-- **必须**在每个阶段前读取对应的 stage 文件
-- **禁止**合并、跳过、简化阶段
-- **禁止**直接从用户输入跳到 Mode Execution
-- **检查点**：[ ] 已读取当前 stage 文件
+**第 2 步（强制）**：启动 task-planner 制定执行计划（只读，禁止执行）
 
-**流程顺序（强制）**：
-1. Stage 00: Planning（启动 task-planner）
-2. Stage 01: Task Init（创建任务记录）
-3. Stage 02: Git Prepare（创建任务分支）
-4. Stage 03: Mode Execution（执行模式）
-5. Stage 04: Quality Gate（质量验证）
-6. Stage 05: Completion（完成与状态管理）
+**使用 Agent tool 启动 task-planner**：
+- agent 类型：general-purpose
+- 提示词：读取 `.claude/agents/task-planner.md` 并按照定义执行
+- 输入：{用户输入}、{项目信息}
+- 等待 task-planner 返回执行计划
+- 保存到：`.claude/task_plans/task-{id}.json`
 
-**第 3 步（强制）**：状态管理
-- **必须**从 `.claude/task_states/*.json` 读取当前状态
-- **禁止**脑补或假设状态
-- **必须**每次操作后更新状态文件
-- **检查点**：[ ] 已读取/更新状态文件
+**禁止行为**（阶段 1 第 2 步）：
+- ❌ **禁止**执行 task-planner 中的任何操作
+- ❌ **禁止**在 task-planner 返回前执行任何操作
+- ❌ **禁止**跳过 task-planner 直接执行
 
-**第 4 步（强制）**：等待所有 agent 返回
-- **必须**等待所有并发 agent 返回结果
-- **禁止**提前输出或合并结果
-- **检查点**：[ ] 所有 agent 已返回
+**检查点**：
+- [ ] task-planner 已启动
+- [ ] task-planner 已返回执行计划
+- [ ] 执行计划已保存到 task_plans.json
 
-**第 5 步（强制）**：合并结果并输出
-- **必须**合并所有 agent 的输出
-- **禁止**遗漏或忽略任何 agent 的结果
-- **检查点**：[ ] 已合并所有结果
+**阶段 1 完成条件**：
+- ✅ 所有配置文件已读取
+- ✅ task-planner 已返回执行计划
+- ✅ 执行计划已保存
+
+### 阶段 2：执行（按照计划执行）
+
+**触发条件**：
+- ✅ 阶段 1 已完成（所有配置已读取、执行计划已保存）
+- ✅ 现在你知道了完整的 6 个阶段流程
+- ✅ 现在你有了 task-planner 制定的执行计划
+
+**执行流程**：
+- 按照 task-planner 制定的执行计划执行
+- 按照 stages 顺序执行：Planning → Task Init → Git Prepare → Mode Execution → Quality Gate → Completion
+- 每个阶段完成后更新状态文件
+- 每个阶段完成后记录到执行日志
+
+**禁止行为**（阶段 2）：
+- ❌ **禁止**跳过任何阶段
+- ❌ **禁止**修改执行计划
+- ❌ **禁止**偏离 task-planner 的计划
+
+---
+
+## 🚫 最高优先级禁止行为
+
+### 禁止跳过阶段 1
+
+- ❌ **禁止**在未读取所有配置文件的情况下执行任何操作
+- ❌ **禁止**在未启动 task-planner 的情况下执行任何操作
+- ❌ **禁止**直接从用户输入跳到 Mode Execution
+
+### 禁止边读边执行
+
+- ❌ **禁止**读取一个配置文件就立即执行
+- ❌ **禁止**读取一半配置就开始执行
+- ❌ **禁止**在阶段 1 中执行任何操作
 
 ### 违规处理
 
@@ -80,6 +107,44 @@
 - **禁止**继续执行
 - **禁止**用"默认行为"或"推断"替代
 - **必须**停止并等待人工介入
+
+---
+
+### 阶段 1 完成检查点
+
+在进入阶段 2 之前，确认以下检查点全部通过：
+
+```
+✅ 阶段 1 检查点：
+- [ ] 所有配置文件已读取（7 个文件）
+- [ ] task-planner 已启动
+- [ ] task-planner 已返回执行计划
+- [ ] 执行计划已保存到 task_plans.json
+
+确认无误后，声明：
+"阶段 1 完成，现在进入阶段 2：执行"
+```
+
+**禁止进入阶段 2 的条件**：
+- ❌ 任何检查点未通过
+- ❌ 未读取所有配置文件
+- ❌ task-planner 未启动
+- ❌ 执行计划未保存
+
+---
+
+### 阶段 2 执行确认
+
+在开始执行前，声明：
+
+```markdown
+## 阶段 2：执行（按照 task-planner 制定的计划）
+
+**执行计划**：.claude/task_plans/task-{id}.json
+**流程顺序**：Planning → Task Init → Git Prepare → Mode Execution → Quality Gate → Completion
+
+现在开始执行...
+```
 
 ---
 
