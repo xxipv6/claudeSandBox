@@ -1,0 +1,210 @@
+# 子任务状态模板
+
+## 文件路径
+
+`.claude/subtask_queues/task-{id}.json`
+
+## JSON 格式
+
+```json
+{
+  "parent_task_id": "task-20250314-001",
+  "subtasks": [
+    {
+      "subtask_id": "subtask-001",
+      "name": "设计登录接口",
+      "description": "定义登录接口的请求/响应格式",
+      "status": "completed",
+      "agent": "dev-coder",
+      "dependencies": [],
+      "output": {
+        "files": ["src/api/login.ts"],
+        "commit": "abc123"
+      },
+      "error": null,
+      "started_at": "2025-03-14T10:05:00Z",
+      "completed_at": "2025-03-14T10:10:00Z"
+    },
+    {
+      "subtask_id": "subtask-002",
+      "name": "实现密码加密",
+      "description": "使用 bcrypt 加密密码",
+      "status": "running",
+      "agent": "dev-coder",
+      "dependencies": ["subtask-001"],
+      "output": null,
+      "error": null,
+      "started_at": "2025-03-14T10:10:00Z",
+      "completed_at": null
+    },
+    {
+      "subtask_id": "subtask-003",
+      "name": "实现登录逻辑",
+      "description": "实现用户验证和 token 生成",
+      "status": "pending",
+      "agent": "dev-coder",
+      "dependencies": ["subtask-001", "subtask-002"],
+      "output": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null
+    },
+    {
+      "subtask_id": "subtask-004",
+      "name": "编写单元测试",
+      "description": "测试登录功能",
+      "status": "pending",
+      "agent": "dev-coder",
+      "dependencies": ["subtask-003"],
+      "output": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null
+    }
+  ]
+}
+```
+
+## 字段说明
+
+### 父任务信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| parent_task_id | string | 是 | 父任务 ID |
+
+### 子任务信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| subtask_id | string | 是 | 子任务 ID |
+| name | string | 是 | 子任务名称 |
+| description | string | 是 | 子任务描述 |
+| status | string | 是 | 子任务状态 |
+| agent | string | 是 | 执行的 agent |
+| dependencies | array | 是 | 依赖的子任务 ID 列表 |
+| output | object | 否 | 子任务输出 |
+| error | object | 否 | 错误信息 |
+| started_at | string | 否 | 开始时间 |
+| completed_at | string | 否 | 完成时间 |
+
+### 子任务输出（output）
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| files | array | 是 | 生成的文件列表 |
+| commit | string | 是 | Git commit hash |
+
+### 错误信息（error）
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| type | string | 是 | 错误类型 |
+| message | string | 是 | 错误消息 |
+| timestamp | string | 是 | 错误时间 |
+
+## 状态值
+
+### status（子任务状态）
+
+| 值 | 说明 |
+|----|------|
+| pending | 待执行 |
+| running | 执行中 |
+| completed | 已完成 |
+| failed | 失败 |
+| blocked | 被阻塞（依赖不满足） |
+| skipped | 跳过 |
+
+## 依赖关系
+
+### 依赖格式
+
+```json
+"dependencies": ["subtask-001", "subtask-002"]
+```
+
+### 依赖规则
+
+1. **空依赖**：`[]` - 无依赖，可立即执行
+2. **单一依赖**：`["subtask-001"]` - 依赖一个子任务
+3. **多重依赖**：`["subtask-001", "subtask-002"]` - 依赖多个子任务（全部完成后才能执行）
+
+### 执行顺序（拓扑序）
+
+```
+subtask-001 (无依赖) → 执行
+subtask-002 (依赖 subtask-001) → 等待 subtask-001 完成
+subtask-003 (依赖 subtask-001, subtask-002) → 等待两者完成
+subtask-004 (依赖 subtask-003) → 等待 subtask-003 完成
+```
+
+## 使用示例
+
+### 创建子任务队列
+
+```json
+{
+  "parent_task_id": "task-20250314-001",
+  "subtasks": [
+    {
+      "subtask_id": "subtask-001",
+      "name": "子任务名称",
+      "description": "子任务描述",
+      "status": "pending",
+      "agent": "dev-coder",
+      "dependencies": [],
+      "output": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null
+    }
+  ]
+}
+```
+
+### 更新子任务状态
+
+```json
+{
+  "subtask_id": "subtask-001",
+  "status": "running",
+  "started_at": "2025-03-14T10:05:00Z"
+}
+```
+
+### 完成子任务
+
+```json
+{
+  "subtask_id": "subtask-001",
+  "status": "completed",
+  "output": {
+    "files": ["src/example.ts"],
+    "commit": "abc123"
+  },
+  "completed_at": "2025-03-14T10:10:00Z"
+}
+```
+
+### 子任务失败
+
+```json
+{
+  "subtask_id": "subtask-001",
+  "status": "failed",
+  "error": {
+    "type": "GenerationError",
+    "message": "Failed to generate code",
+    "timestamp": "2025-03-14T10:10:00Z"
+  }
+}
+```
+
+## 注意事项
+
+1. **ID 唯一性**：subtask_id 必须唯一
+2. **依赖有效性**：dependencies 中的 subtask_id 必须存在
+3. **无循环依赖**：禁止 A 依赖 B，B 依赖 A
+4. **状态转换**：pending → running → completed/failed
+5. **时间记录**：started_at 和 completed_at 必须准确

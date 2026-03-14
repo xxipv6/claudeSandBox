@@ -1,0 +1,170 @@
+# 任务状态模板
+
+## 文件路径
+
+`.claude/task_states/task-{id}.json`
+
+## JSON 格式
+
+```json
+{
+  "task_id": "task-20250314-001",
+  "name": "任务名称",
+  "description": "任务描述",
+  "status": "running",
+  "status_history": [
+    {
+      "status": "pending",
+      "timestamp": "2025-03-14T10:00:00Z",
+      "reason": "Task created"
+    },
+    {
+      "status": "running",
+      "timestamp": "2025-03-14T10:01:00Z",
+      "reason": "Dependencies satisfied"
+    }
+  ],
+  "current_stage": "03-mode-execution",
+  "current_step": "Executing subtask 2/4",
+  "progress": 50,
+  "mode": "coding",
+  "priority": "P1",
+  "subtasks": {
+    "total": 4,
+    "completed": 2,
+    "running": 1,
+    "pending": 1,
+    "failed": 0
+  },
+  "git": {
+    "branch": "task-20250314-001",
+    "start_commit": "abc123",
+    "current_commit": "def456",
+    "status": "clean"
+  },
+  "dependencies": {
+    "waiting_for": [],
+    "blocked_by": []
+  },
+  "quality_checks": {
+    "static_analysis": "pending",
+    "security_scan": "pending",
+    "tests": "pending"
+  },
+  "error": null,
+  "created_at": "2025-03-14T10:00:00Z",
+  "updated_at": "2025-03-14T10:05:00Z",
+  "completed_at": null
+}
+```
+
+## 字段说明
+
+### 基本信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| task_id | string | 是 | 任务 ID |
+| name | string | 是 | 任务名称 |
+| description | string | 否 | 任务描述 |
+| status | string | 是 | 任务状态 |
+| priority | string | 是 | 优先级（P0/P1/P2/P3） |
+| mode | string | 是 | 模式（analysis/coding） |
+
+### 状态管理
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| status_history | array | 是 | 状态转换历史 |
+| current_stage | string | 是 | 当前阶段（00-05） |
+| current_step | string | 是 | 当前步骤描述 |
+| progress | number | 是 | 进度（0-100） |
+
+### 子任务信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| subtasks | object | 是 | 子任务统计 |
+| subtasks.total | number | 是 | 总子任务数 |
+| subtasks.completed | number | 是 | 已完成数 |
+| subtasks.running | number | 是 | 执行中数 |
+| subtasks.pending | number | 是 | 待执行数 |
+| subtasks.failed | number | 是 | 失败数 |
+
+### Git 信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| git | object | 是 | Git 信息 |
+| git.branch | string | 是 | 任务分支名称 |
+| git.start_commit | string | 是 | 起点 commit hash |
+| git.current_commit | string | 是 | 当前 commit hash |
+| git.status | string | 是 | Git 状态（clean/dirty） |
+
+### 依赖信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| dependencies | object | 是 | 依赖信息 |
+| dependencies.waiting_for | array | 是 | 等待的任务列表 |
+| dependencies.blocked_by | array | 是 | 被阻塞的任务列表 |
+
+### 质量检查
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| quality_checks | object | 是 | 质量检查结果 |
+| quality_checks.static_analysis | string | 是 | 静态分析状态 |
+| quality_checks.security_scan | string | 是 | 安全扫描状态 |
+| quality_checks.tests | string | 是 | 测试状态 |
+
+### 时间信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| created_at | string | 是 | 创建时间 |
+| updated_at | string | 是 | 更新时间 |
+| completed_at | string | 否 | 完成时间 |
+
+### 错误信息
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| error | object | 否 | 错误信息 |
+| error.type | string | 是 | 错误类型 |
+| error.message | string | 是 | 错误消息 |
+| error.timestamp | string | 是 | 错误时间 |
+
+## 状态值
+
+### status（任务状态）
+
+| 值 | 说明 |
+|----|------|
+| pending | 待执行 |
+| running | 执行中 |
+| paused | 暂停（等待依赖） |
+| completed | 已完成 |
+| failed | 失败 |
+| cancelled | 已取消 |
+
+### current_stage（当前阶段）
+
+| 值 | 说明 |
+|----|------|
+| 00-planning | 任务规划 |
+| 01-task-init | 任务初始化 |
+| 02-git-prepare | Git 准备 |
+| 03-mode-execution | 模式执行 |
+| 04-quality-gate | 质量门禁 |
+| 05-completion | 完成与状态管理 |
+
+### quality_checks.*（质量检查状态）
+
+| 值 | 说明 |
+|----|------|
+| pending | 待检查 |
+| running | 检查中 |
+| passed | 通过 |
+| failed | 不通过 |
+| skipped | 跳过 |

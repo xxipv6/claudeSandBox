@@ -1,0 +1,141 @@
+name: "Claude Code Orchestrator Workflow"
+version: "1.0"
+description: "安全研究多 Agent 团队流程编排"
+
+# 流程阶段
+stages:
+  - id: "00-planning"
+    name: "Task Planning"
+    description: "启动 task-planner，规划任务"
+    file: "workflow/stages/00-planning.md"
+    required: true
+    timeout: 120
+    depends_on: []
+
+  - id: "01-task-init"
+    name: "Task Initialization"
+    description: "创建任务记录，检查依赖"
+    file: "workflow/stages/01-task-init.md"
+    required: true
+    timeout: 30
+    depends_on: ["00-planning"]
+
+  - id: "02-git-prepare"
+    name: "Git Preparation"
+    description: "Git 前置准备，创建任务分支"
+    file: "workflow/stages/02-git-prepare.md"
+    required: true
+    timeout: 60
+    depends_on: ["01-task-init"]
+
+  - id: "03-mode-execution"
+    name: "Mode Execution"
+    description: "执行模式（Analysis/Coding）"
+    file: "workflow/stages/03-mode-execution.md"
+    required: true
+    timeout: 600
+    depends_on: ["02-git-prepare"]
+
+  - id: "04-quality-gate"
+    name: "Quality Gate"
+    description: "质量验证"
+    file: "workflow/stages/04-quality-gate.md"
+    required: true
+    timeout: 180
+    depends_on: ["03-mode-execution"]
+
+  - id: "05-completion"
+    name: "Completion"
+    description: "完成与状态管理"
+    file: "workflow/stages/05-completion.md"
+    required: true
+    timeout: 60
+    depends_on: ["04-quality-gate"]
+
+# 错误处理
+error_handling:
+  max_retries: 3
+  on_failure: "rollback"
+  rollback_strategy: "git_reset_hard"
+
+# 状态管理
+state_management:
+  state_file: ".claude/task_states/task-{id}.json"
+  status_transitions:
+    pending: ["running", "cancelled"]
+    running: ["completed", "failed", "cancelled", "paused"]
+    paused: ["running", "cancelled"]
+    completed: []
+    failed: ["pending"]  # 允许重试
+    cancelled: []
+
+# Git 配置
+git:
+  branch_prefix: "task-"
+  commit_message_template: "Stage {stage_id}: {stage_name}"
+  merge_strategy: "merge"
+
+# Agent 配置
+agents:
+  # 分析层 agents
+  analysis:
+    - id: "product-manager"
+      name: "Product Manager"
+      file: "agents/product-manager.md"
+    - id: "backend-engineer"
+      name: "Backend Engineer"
+      file: "agents/backend-engineer.md"
+    - id: "frontend-engineer"
+      name: "Frontend Engineer"
+      file: "agents/frontend-engineer.md"
+    - id: "security-tester"
+      name: "Security Tester"
+      file: "agents/security-tester.md"
+
+  # 执行层 agents
+  execution:
+    - id: "dev-coder"
+      name: "Dev Coder"
+      file: "agents/dev-coder.md"
+    - id: "script-coder"
+      name: "Script Coder"
+      file: "agents/script-coder.md"
+
+  # 支持层 agents
+  support:
+    - id: "ops-engineer"
+      name: "Ops Engineer"
+      file: "agents/ops-engineer.md"
+
+  # 前置规划 agent
+  planning:
+    - id: "task-planner"
+      name: "Task Planner"
+      file: "agents/task-planner.md"
+
+# 任务优先级
+priority:
+  levels:
+    - id: "P0"
+      name: "Critical"
+      description: "紧急任务，立即执行"
+    - id: "P1"
+      name: "High"
+      description: "高优先级任务"
+    - id: "P2"
+      name: "Medium"
+      description: "中等优先级任务"
+    - id: "P3"
+      name: "Low"
+      description: "低优先级任务"
+  default: "P2"
+
+# 超时配置
+timeout:
+  planning: 120
+  task_init: 30
+  git_prepare: 60
+  mode_execution: 600
+  quality_gate: 180
+  completion: 60
+  agent_timeout: 120

@@ -1,4 +1,4 @@
-# 多 Agent 团队架构流程图（v1.1.0）
+# 多 Agent 团队架构流程图（v2.0.0）
 
 ## 完整调度流程
 
@@ -30,9 +30,9 @@ flowchart TD
     subgraph AnalysisMode["🔵 Analysis Mode（默认）"]
         Complexity{任务复杂度判断}
 
-        Complexity -->|简单任务<br/>单一问题/明确边界| Simple[3 个 Agent]
-        Complexity -->|标准任务<br/>多问题/需设计| Standard[5 个 Agent]
-        Complexity -->|深度任务<br/>复杂系统/高风险| Deep[5 个 Agent]
+        Complexity -->|简单任务<br/>单一问题/明确边界| Simple[4 个 Agent]
+        Complexity -->|标准任务<br/>多问题/需设计| Standard[4 个 Agent]
+        Complexity -->|深度任务<br/>复杂系统/高风险| Deep[4 个 Agent]
 
         Simple --> ScheduleSimple
         Standard --> ScheduleStandard
@@ -40,21 +40,19 @@ flowchart TD
     end
 
     %% 分析层调度
-    subgraph ScheduleSimple["简单任务调度：3 个 Agent"]
-        TP1[task-planner<br/>任务拆解]
-        Expert[核心专家<br/>2个<br/>根据任务类型]
+    subgraph ScheduleSimple["简单任务调度：4 个 Agent"]
+        PM1[product-manager<br/>需求分析]
+        Expert1[核心专家<br/>3个<br/>根据任务类型]
     end
 
-    subgraph ScheduleStandard["标准任务调度：5 个 Agent"]
-        TP2[task-planner<br/>任务拆解]
-        PM[product-manager<br/>需求分析]
-        BE[backend-engineer<br/>架构分析]
-        MultiExpert[专家<br/>2个<br/>根据任务类型]
-    end
-
-    subgraph ScheduleDeep["深度任务调度：5 个 Agent"]
-        TP3[task-planner<br/>任务拆解]
+    subgraph ScheduleStandard["标准任务调度：4 个 Agent"]
         PM2[product-manager<br/>需求分析]
+        BE[backend-engineer<br/>架构分析]
+        Expert2[专家<br/>2个<br/>根据任务类型]
+    end
+
+    subgraph ScheduleDeep["深度任务调度：4 个 Agent"]
+        PM3[product-manager<br/>需求分析]
         BE2[backend-engineer<br/>架构分析]
         FE[frontend-engineer<br/>输入面分析]
         ST[security-tester<br/>安全分析]
@@ -117,24 +115,22 @@ flowchart LR
     Check -->|多个问题<br/>需要设计| StandardLevel[🟡 标准任务]
     Check -->|复杂系统<br/>高风险| DeepLevel[🔴 深度任务]
 
-    subgraph SimpleAgents["简单任务：3 个 Agent"]
-        S1[task-planner<br/>任务拆解]
-        S2[核心专家 ×2<br/>例: security-tester<br/>+ backend-engineer]
+    subgraph SimpleAgents["简单任务：4 个 Agent"]
+        S1[product-manager<br/>需求分析]
+        S2[核心专家 ×3<br/>例: security-tester<br/>+ backend-engineer<br/>+ frontend-engineer]
     end
 
-    subgraph StandardAgents["标准任务：5 个 Agent"]
-        ST1[task-planner<br/>任务拆解]
-        ST2[product-manager<br/>需求分析]
-        ST3[backend-engineer<br/>架构分析]
-        ST4[专家 ×2<br/>例: frontend-engineer<br/>+ security-tester]
+    subgraph StandardAgents["标准任务：4 个 Agent"]
+        ST1[product-manager<br/>需求分析]
+        ST2[backend-engineer<br/>架构分析]
+        ST3[专家 ×2<br/>例: frontend-engineer<br/>+ security-tester]
     end
 
-    subgraph DeepAgents["深度任务：5 个 Agent"]
-        D1[task-planner<br/>任务拆解]
-        D2[product-manager<br/>需求分析]
-        D3[backend-engineer<br/>架构分析]
-        D4[frontend-engineer<br/>输入面分析]
-        D5[security-tester<br/>安全分析]
+    subgraph DeepAgents["深度任务：4 个 Agent"]
+        D1[product-manager<br/>需求分析]
+        D2[backend-engineer<br/>架构分析]
+        D3[frontend-engineer<br/>输入面分析]
+        D4[security-tester<br/>安全分析]
     end
 
     SimpleLevel --> SimpleAgents
@@ -154,9 +150,9 @@ flowchart LR
 
 | 等级 | Agent 数量 | 组成 | 适用场景 |
 |------|-----------|------|---------|
-| **简单任务** | 3 个 | task-planner + 2个核心专家 | 单一问题、边界明确 |
-| **标准任务** | 5 个 | task-planner + product-manager + backend-engineer + 2个专家 | 多个问题、需要设计 |
-| **深度任务** | 5 个 | 全部分析层 agents | 复杂系统、高风险 |
+| **简单任务** | 4 个 | product-manager + 3个核心专家 | 单一问题、边界明确 |
+| **标准任务** | 4 个 | product-manager + backend-engineer + 2个专家 | 多个问题、需要设计 |
+| **深度任务** | 4 个 | 全部分析层 agents | 复杂系统、高风险 |
 
 ---
 
@@ -222,8 +218,7 @@ graph TB
         Decision[行动决策]
     end
 
-    subgraph Analysis["🔵 分析层 - 5 个 Agents"]
-        TP[task-planner<br/>📋 任务拆解]
+    subgraph Analysis["🔵 分析层 - 4 个 Agents"]
         PM[product-manager<br/>📊 需求分析]
         BE[backend-engineer<br/>🔧 架构分析]
         FE[frontend-engineer<br/>🎨 输入面分析]
@@ -239,6 +234,11 @@ graph TB
         OE[ops-engineer<br/>⚙️ 环境配置]
     end
 
+    subgraph Planning["📋 前置规划 - 1 个 Agent"]
+        TP[task-planner<br/>📋 任务规划]
+    end
+
+    Planning --> Orchestrator
     Orchestrator -->|同时启动| Analysis
     Orchestrator -->|执行调用| Execution
     Orchestrator -.->|按需调用| Support
@@ -249,12 +249,15 @@ graph TB
     style Analysis fill:#e3f2fd
     style Execution fill:#fff3e0
     style Support fill:#fce4ec
+    style Planning fill:#e0f2f1
 ```
 
 **Agent 职责详解**：
 
-**分析层（5 个）**：
-- `task-planner`：任务拆解、优先级排序、依赖识别、资源规划
+**前置规划（1 个）**：
+- `task-planner`：任务拆解、优先级排序、依赖识别、资源规划、模式选择
+
+**分析层（4 个）**：
 - `product-manager`：需求与业务目标分析
 - `backend-engineer`：系统结构与状态机分析
 - `frontend-engineer`：输入面与攻击面分析
@@ -514,7 +517,120 @@ Coding Mode 完成代码输出后，进入迭代循环：
 
 ---
 
+## 流程编排（v2.0.0 新增）
+
+### 配置驱动的流程编排
+
+```mermaid
+flowchart TD
+    Start([用户输入]) --> TP[Task Planner<br/>前置规划]
+    TP --> Plan[任务规划<br/>拆解/依赖/模式]
+
+    Plan --> Stage0[Stage 00<br/>Planning]
+    Stage0 --> Stage1[Stage 01<br/>Task Init]
+    Stage1 --> Stage2[Stage 02<br/>Git Prepare]
+    Stage2 --> Stage3[Stage 03<br/>Mode Execution]
+    Stage3 --> Stage4[Stage 04<br/>Quality Gate]
+    Stage4 --> Stage5[Stage 05<br/>Completion]
+
+    Stage3 --> Analysis[Analysis Mode]
+    Stage3 --> Coding[Coding Mode]
+
+    Analysis --> Merge[合并结果]
+    Coding --> Subtasks[子任务执行]
+
+    Merge --> Stage4
+    Subtasks --> Stage4
+
+    Stage5 --> End([完成])
+
+    style Stage0 fill:#e1f5fe
+    style Stage1 fill:#e8f5e9
+    style Stage2 fill:#fff3e0
+    style Stage3 fill:#f3e5f5
+    style Stage4 fill:#e0f2f1
+    style Stage5 fill:#fce4ec
+```
+
+### 6 个执行阶段
+
+| 阶段 | ID | 名称 | 主要职责 |
+|------|----|----|---------|
+| **任务规划** | 00 | Planning | 启动 task-planner，规划任务 |
+| **任务初始化** | 01 | Task Init | 创建任务记录，检查依赖 |
+| **Git 准备** | 02 | Git Prepare | Git 前置准备，创建任务分支 |
+| **模式执行** | 03 | Mode Execution | 执行模式（Analysis/Coding） |
+| **质量门禁** | 04 | Quality Gate | 质量验证 |
+| **完成管理** | 05 | Completion | 完成与状态管理 |
+
+### 任务生命周期
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending: 任务创建
+    pending --> running: 依赖满足
+    pending --> paused: 依赖不满足
+    running --> completed: 任务成功
+    running --> failed: 任务失败
+    running --> cancelled: 用户取消
+    running --> paused: 等待依赖/人工介入
+    paused --> running: 恢复执行
+    paused --> cancelled: 用户取消
+    failed --> pending: 用户重试
+    completed --> [*]
+    failed --> [*]
+    cancelled --> [*]
+```
+
+### 状态文件结构
+
+```
+.claude/
+├── task_queue.json              # 任务队列
+├── task_states/                 # 任务状态
+│   └── task-{id}.json
+├── task_plans/                  # 任务规划
+│   └── task-{id}.json
+├── subtask_queues/              # 子任务队列
+│   └── task-{id}.json
+├── task_dependencies.json       # 任务依赖
+└── execution_logs/              # 执行日志
+    └── {id}.log
+```
+
+### Git 管理策略
+
+| 操作 | 命令 | 说明 |
+|------|------|------|
+| **创建分支** | `git checkout -b task-{id}` | 每个任务独立分支 |
+| **提交代码** | `git commit -m "Stage {id}: {name}"` | 按阶段提交 |
+| **合并分支** | `git merge task-{id}` | 完成后合并到主分支 |
+| **回滚** | `git reset --hard {commit}` | 失败时回滚 |
+
+---
+
 ## 版本历史
+
+### v2.0.0 (2026-03-15)
+
+**重大更新**：
+- ✅ 采用配置驱动的流程编排
+- ✅ 添加 task-planner 前置规划
+- ✅ 移除 qa-engineer（分析层从 5 个减少到 4 个）
+- ✅ 添加 6 个执行阶段
+- ✅ 添加任务生命周期管理
+- ✅ 添加 Git 分支管理
+- ✅ 添加任务依赖管理
+- ✅ 添加子任务管理
+- ✅ 添加质量门禁
+- ✅ 添加状态持久化
+
+**核心变化**：
+- 从描述式流程 → 配置驱动流程
+- 从 Analysis Mode 包含 task-planner → task-planner 前置独立
+- 从 5 个分析层 agents → 4 个分析层 agents（移除 qa-engineer）
+- 从无状态管理 → 完整的状态持久化
+- 从无 Git 管理 → 完整的 Git 分支管理
 
 ### v1.1.0 (2026-03-12)
 
