@@ -57,14 +57,18 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 
 **标准模式**（轻量级）：
 - 可选 task-planner 预规划
-- 1-2 个分析 agents + 1 个执行 agent
+- 3 阶段并发执行（task-planner → 分析类 agents 并发 → dev-coder）
+- Agent 超时：600 秒
 - 简洁报告（≤500 行）
 - 适用于：项目分析、功能实现、代码审查
 
 **完整模式**（重量级）：
 - 强制 task-planner 预规划
 - 6 个执行阶段（Planning → Init → Git → Execution → Quality → Completion）
+- 3 阶段并发执行（task-planner → 分析类 agents 并发 → dev-coder）
+- Agent 超时：600 秒
 - 详细状态追踪、日志记录、Git 分支管理
+- 完整验证闭环（类似问题检查 + 回归检查 + 完整性检查）
 - 适用于：架构级任务、需要完整流程的大型项目
 
 ---
@@ -101,11 +105,13 @@ services:
 |------|----------|----------|
 | **触发条件** | 默认模式 | 需要设置 `CLAUDE_FULL_MODE=1` |
 | **Task Planner** | 可选 | 强制执行 |
-| **Agent 执行** | 简化流程 | 6 个完整阶段 |
+| **Agent 执行** | 3 阶段并发（可选 task-planner → 分析类并发 → dev-coder） | 6 个完整阶段 + 3 阶段并发 |
+| **并发策略** | 支持阶段内并发 | 支持阶段内并发 |
+| **Agent 超时** | 600 秒 | 600 秒 |
 | **状态追踪** | 无 | 完整状态文件 + 日志 |
 | **Git 分支** | 不创建 | 自动创建任务分支 |
 | **质量门禁** | 可选 | 强制执行（静态分析 + 安全扫描 + 测试）|
-| **修复循环** | 建议 | 最多 3 次自动修复尝试 |
+| **修复循环** | 建议 | 最多 3 次自动修复尝试 + 完整验证闭环 |
 | **执行报告** | 简洁报告（≤500 行） | 详细执行报告 |
 | **崩溃恢复** | 不支持 | 支持中断恢复 |
 | **适用场景** | 日常任务 | 大型项目 |
@@ -118,9 +124,9 @@ services:
     ↓
 MODE DECISION → 标准模式
     ↓
-可选 task-planner
+可选 task-planner（Stage 1）
     ↓
-启动 agents（1-2 个分析 + 1 个执行）
+并发启动 agents（Stage 2: 分析类 agents 并发 → Stage 3: 执行类 agent）
     ↓
 输出简洁报告（≤500 行）
     ↓
@@ -229,33 +235,89 @@ docker run -it --rm \
 
 ## 🛠️ ArvinENV 工具集
 
-容器内预配置了便捷管理工具：
+容器内预配置了便捷管理工具，用于快速配置和管理 Claude Code 环境。
 
 ### 命令列表
 
 ```bash
-config              # 查看所有配置信息
+config              # 查看所有配置信息（Token、URL、Model、代理等）
 key -k <token>      # 修改 API Token
 key -u <url>        # 修改 Base URL
 key -m <model>      # 修改 Model
-key -k <token> -u <url> -m <model>  # 同时修改
+key -k <token> -u <url> -m <model>  # 同时修改多个配置
 rms                 # 清理配置和缓存
 ```
+
+### 配置文件位置
+
+所有配置保存在容器内的 `~/.claude/` 目录：
+- `config.json` - Claude Code 配置文件
+- `api_key` - API Token 存储
+- `settings.json` - 用户设置
+- `cache/` - 缓存目录
 
 ### 使用示例
 
 ```bash
 # 查看当前配置
 config
+# 输出：
+# API Token: sk-ant-xxxxx
+# Base URL: https://api.anthropic.com
+# Model: claude-sonnet-4-6
+# HTTP Proxy: http://host.docker.internal:1087
 
 # 更新 Token
 key "sk-ant-xxxxx"
 
-# 更新 Base URL
+# 更新 Base URL（支持第三方 API）
 key -u "https://api.anthropic.com"
 
-# 清理缓存
+# 更新 Model
+key -m "claude-sonnet-4-6"
+
+# 同时更新多个配置
+key -k "sk-ant-xxxxx" -u "https://api.anthropic.com" -m "claude-sonnet-4-6"
+
+# 清理缓存和配置（重置为默认）
 rms
+```
+
+### 环境变量配置
+
+除了使用命令工具，也可以通过环境变量配置：
+
+```bash
+# 在 docker run 时设置
+docker run -it --rm \
+  -e ANTHROPIC_AUTH_TOKEN="sk-ant-xxxxx" \
+  -e ANTHROPIC_BASE_URL="https://api.anthropic.com" \
+  -e CLAUDE_DEFAULT_MODEL="claude-sonnet-4-6" \
+  claude-sandbox:latest
+
+# 在 docker-compose.yml 中设置
+services:
+  claude-sandbox:
+    environment:
+      - ANTHROPIC_AUTH_TOKEN=sk-ant-xxxxx
+      - ANTHROPIC_BASE_URL=https://api.anthropic.com
+      - CLAUDE_DEFAULT_MODEL=claude-sonnet-4-6
+```
+
+### 代理配置
+
+Claude Code 支持通过环境变量配置代理：
+
+```bash
+# HTTP 代理
+export HTTP_PROXY=http://host.docker.internal:1087
+export HTTPS_PROXY=http://host.docker.internal:1087
+
+# 或在 docker run 时设置
+docker run -it --rm \
+  -e HTTP_PROXY=http://host.docker.internal:1087 \
+  -e HTTPS_PROXY=http://host.docker.internal:1087 \
+  claude-sandbox:latest
 ```
 
 ## 📖 使用场景
@@ -288,8 +350,8 @@ Claude：[MODE DECISION: 标准模式]
 你：帮我分析这个项目的架构
 
 Claude：[MODE DECISION: 标准模式]
-- 启动 task-planner 规划分析任务
-- 并行启动 backend-engineer + frontend-engineer
+- 启动 task-planner 规划分析任务（Stage 1）
+- 并发启动 backend-engineer + frontend-engineer（Stage 2）
 - 输出架构分析报告
 ```
 
@@ -299,12 +361,12 @@ Claude：[MODE DECISION: 标准模式]
 你：完整实现一个用户系统（需要设置 CLAUDE_FULL_MODE=1）
 
 Claude：[MODE DECISION: 完整模式]
-- Stage 00: task-planner 规划任务
-- Stage 01: 创建任务状态文件
-- Stage 02: 创建 Git 分支 task-xxx
-- Stage 03: 启动 agents（backend + frontend + dev-coder）
-- Stage 04: 质量门禁（静态分析 + 安全扫描 + 测试）
-- Stage 05: 合并分支，生成执行报告
+- Stage 00: Planning（task-planner 规划任务）
+- Stage 01: Task Init（创建任务状态文件）
+- Stage 02: Git Prepare（创建任务分支 task-xxx）
+- Stage 03: Mode Execution（并发启动 agents：分析类 → dev-coder）
+- Stage 04: Quality Gate（质量门禁 + 完整验证闭环）
+- Stage 05: Completion（合并分支 + 生成执行报告）
 ```
 
 ## 📚 项目结构
@@ -385,6 +447,84 @@ docker run -it --rm \
   claude-sandbox:latest
 ```
 
+## 🧰 预装工具集
+
+容器内预装了常用的安全研究和开发工具，开箱即用。
+
+### 开发工具
+
+| 工具 | 说明 | 用途 |
+|------|------|------|
+| **git** | 版本控制 | 代码管理、分支操作 |
+| **vim / nano** | 文本编辑器 | 快速编辑配置文件 |
+| **curl / wget** | 网络工具 | 下载文件、API 测试 |
+| **jq** | JSON 处理 | JSON 数据解析和格式化 |
+| **ripgrep (rg)** | 快速搜索 | 代码搜索和内容查找 |
+| **fd** | 快速文件查找 | 文件名搜索 |
+| **bat** | 增强版 cat | 代码高亮显示 |
+| **htop / btop** | 系统监控 | 资源使用情况查看 |
+
+### 编程语言环境
+
+| 语言 | 版本 | 说明 |
+|------|------|------|
+| **Python 3** | 最新版 | 脚本编写、安全工具开发 |
+| **Node.js** | LTS | JavaScript/TypeScript 开发 |
+| **Bun** | 最新版 | 快速 JavaScript 运行时 |
+| **Go** | 最新版 | 高性能工具开发 |
+
+### Claude Code CLI
+
+- **claude** - Claude Code 命令行工具
+- 支持交互式对话和代码生成
+- 集成多 Agent 协作系统
+- 配置驱动的流程编排
+
+### 使用示例
+
+```bash
+# 搜索代码
+rg "TODO" --type py
+
+# 查找文件
+fd "Dockerfile"
+
+# 查看系统资源
+htop
+
+# JSON 数据处理
+curl -s https://api.github.com/repos/anthropics/claude-code | jq '.description'
+
+# Python 脚本
+python3 -c "import anthropic; print('Claude SDK ready')"
+
+# Node.js 开发
+node --version
+npm install
+
+# Go 工具编译
+go version
+go build -o mytool main.go
+```
+
+### 工具更新
+
+容器内的工具可以通过包管理器更新：
+
+```bash
+# 更新系统包
+apt update && apt upgrade -y
+
+# 安装新的 Python 包
+pip install <package-name>
+
+# 安装新的 Node.js 包
+npm install -g <package-name>
+
+# 安装 Go 工具
+go install <package-path>@latest
+```
+
 ## 📝 更新日志
 
 查看 [CHANGELOG.md](CHANGELOG.md) 了解详细更新历史。
@@ -397,17 +537,24 @@ docker run -it --rm \
 - 🌿 **Git 分支管理**：每个任务独立分支，支持失败回滚
 - ✅ **质量门禁**：静态分析、安全扫描、自动测试，最多 3 次修复尝试
 - 🎭 **双模式系统**：标准模式（轻量）+ 完整模式（重量）
+- ⚡ **并发 Agent 执行**：支持阶段内并发，提升执行效率
+- ⏱️ **Agent 超时调整**：从 120 秒调整为 600 秒
 - 📜 **协议声明**：明确系统性质和强制协议
 - 🚫 **移除快速模式**：简化为双模式架构
 - 🧠 **Agent 持久记忆**：6 个 agent 各自拥有独立的记忆目录
+- 🔍 **完整验证闭环**：修复后验证类似问题、回归检查、完整性检查
 
 ## 🎓 核心原则
 
 1. **唯一真理源**：CLAUDE.md 是唯一入口
 2. **显式引用**：所有 `.claude/` 目录下的文件必须显式读取
 3. **状态驱动**：状态只能来自文件，支持崩溃恢复
-4. **严格顺序**：agents 顺序执行，不并发
+4. **支持阶段内并发**：
+   - Stage 1: task-planner（必须最先执行）
+   - Stage 2: 分析类 agents 并发（product-manager + backend-engineer + frontend-engineer + security-tester）
+   - Stage 3: 执行类 agent（dev-coder，等分析完成）
 5. **保守策略**：任何不确定情况默认进入标准模式
+6. **Agent 超时**：600 秒（10 分钟）
 
 ## 🤝 贡献
 
