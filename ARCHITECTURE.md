@@ -1,209 +1,110 @@
 # 多 Agent 团队架构流程图（v2.0.0）
 
-## 完整调度流程
+## 系统协议
+
+claudeSandBox 是一个**人为定义的智能任务执行系统**，采用配置驱动的流程编排架构。
+
+### 核心协议
+
+- **唯一真理源**：CLAUDE.md 是唯一入口
+- **显式引用**：所有配置文件必须显式读取
+- **状态驱动**：状态只能来自文件，支持崩溃恢复
+- **支持阶段内并发**：按依赖关系并发执行 agents
+
+详见 `.claude/PROTOCOL.md`
+
+---
+
+## 双模式决策系统
 
 ```mermaid
 flowchart TD
-    Start([用户输入]) --> Intent{意图识别}
+    Start([用户输入]) --> ModeDecision{MODE DECISION}
 
-    %% 意图识别判断
-    Intent -->|明确跳过 + 极简任务| CodingMode
-    Intent -->|其他所有情况（默认）| AnalysisMode
+    ModeDecision -->|多文件操作 OR 代码分析 OR 不确定| StandardMode[标准模式<br/>默认]
+    ModeDecision -->|架构级任务 + 明确请求 + 环境变量| FullMode[完整模式<br/>CLAUDE_FULL_MODE=1]
 
-    %% Coding Mode
-    subgraph CodingMode["🟢 Coding Mode（执行模式）"]
-        Direction1[轻量分析 30秒]
-        Direction1 --> Scan[快速扫描]
-        Scan --> Understand[需求理解]
-        Understand --> Locate[问题定位]
-        Locate --> Select[选择 Coder]
-        Select --> ExecLayer
+    subgraph StandardMode["🟦 标准模式（轻量级）"]
+        Std1[可选 task-planner 预规划]
+        Std2[3 阶段并发执行]
+        Std3[简洁报告 ≤500 行]
     end
 
-    %% 执行层
-    subgraph ExecLayer["⚡ 执行层"]
-        DevCoder[dev-coder<br/>前端/后端/全栈/API]
-        ScriptCoder[script-coder<br/>PoC/Exploit/Fuzzer]
+    subgraph FullMode["🟩 完整模式（重量级）"]
+        Full1[强制 task-planner 预规划]
+        Full2[6 个执行阶段]
+        Full3[3 阶段并发执行]
+        Full4[详细状态追踪 + 日志]
+        Full5[完整验证闭环]
     end
 
-    %% Analysis Mode
-    subgraph AnalysisMode["🔵 Analysis Mode（默认）"]
-        Complexity{任务复杂度判断}
+    StandardMode --> StdEnd([完成])
+    FullMode --> FullEnd([完成])
 
-        Complexity -->|简单任务<br/>单一问题/明确边界| Simple[4 个 Agent]
-        Complexity -->|标准任务<br/>多问题/需设计| Standard[4 个 Agent]
-        Complexity -->|深度任务<br/>复杂系统/高风险| Deep[4 个 Agent]
+    style StandardMode fill:#e3f2fd
+    style FullMode fill:#e8f5e9
+    style ModeDecision fill:#fff9c4
+```
 
-        Simple --> ScheduleSimple
-        Standard --> ScheduleStandard
-        Deep --> ScheduleDeep
-    end
+### 模式对比
 
-    %% 分析层调度
-    subgraph ScheduleSimple["简单任务调度：4 个 Agent"]
-        PM1[product-manager<br/>需求分析]
-        Expert1[核心专家<br/>3个<br/>根据任务类型]
-    end
+| 特性 | 标准模式 | 完整模式 |
+|------|----------|----------|
+| **触发条件** | 默认模式 | `CLAUDE_FULL_MODE=1` |
+| **Task Planner** | 可选 | 强制执行 |
+| **执行阶段** | 简化流程 | 6 个完整阶段 |
+| **并发策略** | 3 阶段并发 | 3 阶段并发 |
+| **Agent 超时** | 600 秒 | 600 秒 |
+| **状态追踪** | 无 | 完整状态文件 + 日志 |
+| **Git 分支** | 不创建 | 自动创建任务分支 |
+| **质量门禁** | 可选 | 强制执行 |
+| **修复循环** | 建议 | 最多 3 次 + 完整验证闭环 |
+| **执行报告** | 简洁报告 | 详细执行报告 |
+| **崩溃恢复** | 不支持 | 支持中断恢复 |
 
-    subgraph ScheduleStandard["标准任务调度：4 个 Agent"]
-        PM2[product-manager<br/>需求分析]
+---
+
+## 3 阶段并发执行策略
+
+```mermaid
+flowchart TD
+    Start([任务开始]) --> Stage1[Stage 1<br/>task-planner<br/>必须最先执行]
+
+    Stage1 --> Stage2[Stage 2<br/>分析类 agents 并发]
+
+    subgraph Stage2["分析层并发执行"]
+        PM[product-manager<br/>需求分析]
         BE[backend-engineer<br/>架构分析]
-        Expert2[专家<br/>2个<br/>根据任务类型]
-    end
-
-    subgraph ScheduleDeep["深度任务调度：4 个 Agent"]
-        PM3[product-manager<br/>需求分析]
-        BE2[backend-engineer<br/>架构分析]
-        FE[frontend-engineer<br/>输入面分析]
+        FE[frontend-engineer<br/>前端分析]
         ST[security-tester<br/>安全分析]
     end
 
-    %% 分析层并行执行
-    ScheduleSimple --> Parallel1[⚡ 同时启动]
-    ScheduleStandard --> Parallel2[⚡ 同时启动]
-    ScheduleDeep --> Parallel3[⚡ 同时启动]
+    Stage2 --> Stage3[Stage 3<br/>执行层 agent]
 
-    %% 合并结果
-    Parallel1 --> Merge{收集 & 合并}
-    Parallel2 --> Merge
-    Parallel3 --> Merge
-
-    Merge --> ResearchLedger[📋 Research Ledger]
-    ResearchLedger --> ActionDecision[下一步建议 1-3选项]
-
-    ActionDecision --> CodingMode2[→ Coding Mode]
-    ActionDecision --> End([等待用户])
-
-    CodingMode --> CodeOutput[💻 代码输出]
-    CodeOutput --> Loop{迭代循环}
-
-    Loop -->|有问题| Fix[修复问题]
-    Loop -->|优化| Optimize[优化建议]
-    Loop -->|完成| End
-
-    Fix --> CodeOutput
-    DevCoder --> CodeOutput
-    ScriptCoder --> CodeOutput
-
-    %% 支持层（按需调用）
-    CodingMode -.->|按需| SupportLayer
-    AnalysisMode -.->|按需| SupportLayer
-
-    subgraph SupportLayer["🔧 支持层"]
-        OpsEngineer[ops-engineer<br/>环境配置/工具安装]
+    subgraph Stage3["执行层"]
+        DC[dev-coder<br/>代码开发]
     end
 
-    style CodingMode fill:#e8f5e8
-    style AnalysisMode fill:#e3f2fd
-    style ExecLayer fill:#fff3e0
-    style SupportLayer fill:#fce4ec
-    style ResearchLedger fill:#f3e5f5
-    style Parallel1 fill:#fff9c4
-    style Parallel2 fill:#fff9c4
-    style Parallel3 fill:#fff9c4
+    Stage3 --> End([完成])
+
+    style Stage1 fill:#e0f2f1
+    style Stage2 fill:#e3f2fd
+    style Stage3 fill:#fff3e0
 ```
 
----
+### 并发规则
 
-## 分级调度详解
+**Stage 1**（必须最先）：
+- `task-planner`：任务拆解、依赖识别、模式选择、资源规划
 
-```mermaid
-flowchart LR
-    Input[任务输入] --> Check{复杂度判断}
+**Stage 2**（并发执行）：
+- `product-manager`：需求与业务目标分析
+- `backend-engineer`：系统结构与后端分析
+- `frontend-engineer`：前端与用户界面分析
+- `security-tester`：安全测试、漏洞扫描、质量验证
 
-    Check -->|单一问题<br/>明确边界| SimpleLevel[🟢 简单任务]
-    Check -->|多个问题<br/>需要设计| StandardLevel[🟡 标准任务]
-    Check -->|复杂系统<br/>高风险| DeepLevel[🔴 深度任务]
-
-    subgraph SimpleAgents["简单任务：4 个 Agent"]
-        S1[product-manager<br/>需求分析]
-        S2[核心专家 ×3<br/>例: security-tester<br/>+ backend-engineer<br/>+ frontend-engineer]
-    end
-
-    subgraph StandardAgents["标准任务：4 个 Agent"]
-        ST1[product-manager<br/>需求分析]
-        ST2[backend-engineer<br/>架构分析]
-        ST3[专家 ×2<br/>例: frontend-engineer<br/>+ security-tester]
-    end
-
-    subgraph DeepAgents["深度任务：4 个 Agent"]
-        D1[product-manager<br/>需求分析]
-        D2[backend-engineer<br/>架构分析]
-        D3[frontend-engineer<br/>输入面分析]
-        D4[security-tester<br/>安全分析]
-    end
-
-    SimpleLevel --> SimpleAgents
-    StandardLevel --> StandardAgents
-    DeepLevel --> DeepAgents
-
-    SimpleAgents --> Output[同时启动 → 合并结果]
-    StandardAgents --> Output
-    DeepAgents --> Output
-
-    style SimpleLevel fill:#e8f5e8
-    style StandardLevel fill:#fff9c4
-    style DeepLevel fill:#ffcdd2
-```
-
-**分级判断标准**：
-
-| 等级 | Agent 数量 | 组成 | 适用场景 |
-|------|-----------|------|---------|
-| **简单任务** | 4 个 | product-manager + 3个核心专家 | 单一问题、边界明确 |
-| **标准任务** | 4 个 | product-manager + backend-engineer + 2个专家 | 多个问题、需要设计 |
-| **深度任务** | 4 个 | 全部分析层 agents | 复杂系统、高风险 |
-
----
-
-## 意图识别决策树
-
-```mermaid
-flowchart TD
-    Start([用户输入]) --> Q1{任务复杂度?}
-
-    Q1 -->|多模块<br/>需要设计<br/>有风险| Analysis
-    Q1 -->|单一功能<br/>< 50行| Q2{需求明确?}
-
-    Q2 -->|模糊<br/>需要澄清| Analysis
-    Q2 -->|完全明确| Q3{用户说"直接写"?}
-
-    Q3 -->|是| Q4{用户说"别分析"?}
-    Q3 -->|否| Analysis
-
-    Q4 -->|是| Coding
-    Q4 -->|否| Analysis
-
-    subgraph Analysis["🔵 Analysis Mode"]
-        A1[同时启动分析层 agents]
-        A2[输出 Research Ledger]
-        A3[提供行动决策选项]
-    end
-
-    subgraph Coding["🟢 Coding Mode"]
-        C1[轻量分析 30秒]
-        C2[调用执行层 coder]
-        C3[输出代码]
-    end
-
-    Analysis --> Next([等待用户选择])
-    Coding --> Loop([迭代优化])
-
-    style Analysis fill:#e3f2fd
-    style Coding fill:#e8f5e8
-```
-
-**进入 Coding Mode 的条件**（必须**全部满足）：
-1. ✅ 用户明确说："直接写"、"快速实现"、"简单实现"
-2. ✅ 任务极其简单：< 50 行代码，单一功能
-3. ✅ 用户明确跳过分析："不用分析了"、"别分析"
-
-**典型示例**：
-- ✅ "直接写个 hello world" → **Coding Mode**
-- ✅ "不用分析了，直接写个简单脚本" → **Coding Mode**
-- ❌ "写个用户系统" → **Analysis Mode**（复杂）
-- ❌ "做个扫描器" → **Analysis Mode**（需求不明确）
-- ❌ "这个代码有问题吗" → **Analysis Mode**（需要分析）
+**Stage 3**（等分析完成）：
+- `dev-coder`：所有代码开发（前端、后端、全栈、API、组件、数据库）
 
 ---
 
@@ -211,336 +112,64 @@ flowchart TD
 
 ```mermaid
 graph TB
-    subgraph Orchestrator["🎯 Orchestrator 编排器"]
-        Direction[意图识别]
-        Schedule[分级调度]
-        Merge[合并冲突]
-        Decision[行动决策]
+    subgraph Planning["📋 前置规划（1 个 Agent）"]
+        TP[task-planner<br/>任务拆解/依赖识别/模式选择]
     end
 
-    subgraph Analysis["🔵 分析层 - 4 个 Agents"]
-        PM[product-manager<br/>📊 需求分析]
-        BE[backend-engineer<br/>🔧 架构分析]
-        FE[frontend-engineer<br/>🎨 输入面分析]
-        ST[security-tester<br/>🛡️ 安全分析]
+    subgraph Analysis["🔍 分析层（4 个 Agents）"]
+        PM[product-manager<br/>需求分析]
+        BE[backend-engineer<br/>架构分析]
+        FE[frontend-engineer<br/>前端分析]
+        ST[security-tester<br/>安全分析]
     end
 
-    subgraph Execution["⚡ 执行层 - 2 个 Coder Agents"]
-        DC[dev-coder<br/>💻 全栈开发]
-        SC[script-coder<br/>🔓 安全脚本]
+    subgraph Execution["💻 执行层（1 个 Agent）"]
+        DC[dev-coder<br/>代码开发]
     end
 
-    subgraph Support["🔧 支持层 - 1 个 Agent"]
-        OE[ops-engineer<br/>⚙️ 环境配置]
-    end
+    Planning --> Stage1[Stage 1]
+    Stage1 --> Stage2[Stage 2 并发]
+    Stage2 --> Analysis
+    Analysis --> Stage3[Stage 3]
+    Stage3 --> Execution
 
-    subgraph Planning["📋 前置规划 - 1 个 Agent"]
-        TP[task-planner<br/>📋 任务规划]
-    end
-
-    Planning --> Orchestrator
-    Orchestrator -->|同时启动| Analysis
-    Orchestrator -->|执行调用| Execution
-    Orchestrator -.->|按需调用| Support
-
-    Analysis -->|合并结果| Orchestrator
-
-    style Orchestrator fill:#f3e5f5
+    style Planning fill:#e0f2f1
     style Analysis fill:#e3f2fd
     style Execution fill:#fff3e0
-    style Support fill:#fce4ec
-    style Planning fill:#e0f2f1
+    style Stage1 fill:#fff9c4
+    style Stage2 fill:#fff9c4
+    style Stage3 fill:#fff9c4
 ```
 
-**Agent 职责详解**：
+### Agent 职责详解
 
 **前置规划（1 个）**：
-- `task-planner`：任务拆解、优先级排序、依赖识别、资源规划、模式选择
+- `task-planner`：任务拆解、依赖识别、模式选择、资源规划
 
 **分析层（4 个）**：
 - `product-manager`：需求与业务目标分析
-- `backend-engineer`：系统结构与状态机分析
-- `frontend-engineer`：输入面与攻击面分析
-- `security-tester`：攻击路径与漏洞分析
+- `backend-engineer`：系统结构与后端分析
+- `frontend-engineer`：前端与用户界面分析
+- `security-tester`：安全测试、漏洞扫描、质量验证
 
-**执行层（2 个）**：
+**执行层（1 个）**：
 - `dev-coder`：所有代码开发（前端、后端、全栈、API、组件、数据库）
-- `script-coder`：安全脚本（PoC、Exploit、Fuzzer、扫描工具）
-
-**支持层（1 个）**：
-- `ops-engineer`：环境配置、工具安装、系统调试、依赖管理
 
 ---
 
-## Research Ledger 输出结构
-
-```mermaid
-graph TD
-    subgraph Ledger["📋 Research Ledger"]
-        Goal[Goal<br/>研究目标]
-        SM[System Model<br/>系统模型<br/>≥2 个 subagent]
-        VF[Verified Facts<br/>已验证事实<br/>带证据]
-        AH[Active Hypotheses<br/>活跃假设<br/>不同视角]
-        RH[Rejected Hypotheses<br/>已否定假设<br/>含失败路径]
-        KD[Key Decisions<br/>关键决策]
-        Art[Artifacts<br/>产物<br/>流程图/状态机]
-        OQ[Open Questions<br/>未解决问题]
-        NA[Next Actions<br/>下一步行动 ≤3项]
-    end
-
-    VF --> Evidence{证据有效性}
-    Evidence -->|✅ 有效| Valid[代码引用/日志<br/>测试结果/文档]
-    Evidence -->|❌ 无效| Invalid[主观判断/推测<br/>缺少来源]
-
-    style Ledger fill:#f3e5f5
-    style Evidence fill:#fff9c4
-```
-
-**字段说明**：
-
-| 字段 | 说明 | 来源 |
-|------|------|------|
-| **Goal** | 研究目标 | 用户输入 |
-| **System Model** | 系统模型 | 来自 ≥2 个 subagent |
-| **Verified Facts** | 已验证的事实 | 仅接受带证据输出 |
-| **Active Hypotheses** | 活跃假设 | 来自不同视角 subagent |
-| **Rejected Hypotheses** | 已否定的假设 | 必须包含失败路径 |
-| **Key Decisions** | 关键决策 | 合并后的决策 |
-| **Artifacts** | 产物 | 流程图、状态机等 |
-| **Open Questions** | 未解决问题 | 待澄清的问题 |
-| **Next Actions** | 下一步行动 | ≤3 项 |
-
-**证据有效性标准**：
-
-| 类型 | 示例 | 有效性 |
-|------|------|--------|
-| **✅ 有效证据** | 代码引用（文件:行号）、日志输出、测试结果、文档引用 | 可接受为 Verified Facts |
-| **❌ 无效证据** | 主观判断（"我认为"）、无根据推测、缺少来源的陈述 | 放入 Active Hypotheses |
-
----
-
-## 轻量分析流程（Coding Mode）
-
-```mermaid
-flowchart LR
-    Start([用户需求]) --> Step1[📖 快速扫描<br/>10秒]
-    Step1 --> Step2[🎯 需求理解<br/>5秒]
-    Step2 --> Step3[🔍 问题定位<br/>10秒]
-    Step3 --> Step4[⚙️ 选择 Coder<br/>5秒]
-    Step4 --> Step5[🚀 调用执行]
-
-    Step4 -->|前端/后端/全栈| DevCoder[dev-coder]
-    Step4 -->|安全脚本| ScriptCoder[script-coder]
-
-    DevCoder --> Output([代码输出])
-    ScriptCoder --> Output
-
-    Output --> Validate{验证}
-    Validate -->|通过| End([完成])
-    Validate -->|问题| Fix[修复 → 输出完整文件]
-    Fix --> Output
-
-    style Step1 fill:#e8f5e8
-    style Step2 fill:#e8f5e8
-    style Step3 fill:#e8f5e8
-    style Step4 fill:#fff9c4
-    style Step5 fill:#fff9c4
-```
-
-**轻量分析步骤**（30 秒内完成）：
-
-1. **快速扫描**（10 秒）：读取用户提到的文件/代码，快速浏览上下文
-2. **需求理解**（5 秒）：明确用户要做什么（修复 bug、添加功能、写新代码）
-3. **问题定位**（10 秒）：找到问题行/位置，或确定新代码应该插入的位置
-4. **选择 Coder**（5 秒）：根据任务类型选择 dev-coder 或 script-coder
-5. **启动执行**：立即启动相应 coder，附带上下文信息
-
-**轻量分析场景**：
-- 用户指出 bug：→ 读取文件 → 定位 bug → 启动 coder 修复
-- 用户要新功能：→ 理解现有代码 → 启动 coder 添加
-- 用户要 PoC：→ 理解目标 → 启动 script-coder
-
----
-
-## 数据流向
-
-```mermaid
-flowchart LR
-    User[用户输入] --> Orchestrator[Orchestrator]
-
-    Orchestrator -->|Analysis Mode| AnalysisAgents[分析层 Agents]
-    Orchestrator -->|Coding Mode| ExecutionAgents[执行层 Agents]
-    Orchestrator -.->|环境问题| SupportAgent[支持层 Agent]
-
-    AnalysisAgents -->|并行输出| Merge[合并冲突解析]
-    Merge --> Ledger[Research Ledger]
-    Ledger --> Action[行动决策选项]
-
-    ExecutionAgents --> Code[代码输出]
-    Code --> Iterate[迭代优化]
-
-    Action -->|选择执行| ExecutionAgents
-    Action -.->|等待| User
-
-    Iterate -->|优化建议| User
-    Iterate -->|完成| End([结束])
-
-    SupportAgent --> Orchestrator
-
-    style Orchestrator fill:#f3e5f5
-    style AnalysisAgents fill:#e3f2fd
-    style ExecutionAgents fill:#fff3e0
-    style SupportAgent fill:#fce4ec
-```
-
----
-
-## 行动决策（Analysis Mode 完成后）
-
-Analysis Mode 完成后，必须给出明确的下一步建议（1-3 个可执行选项）：
-
-### 行动决策模板
-
-```markdown
-## 分析完成 - 下一步建议
-
-根据分析结果，我建议以下下一步行动：
-
-**选项 1**：[具体行动]
-- 描述：[详细说明]
-- 需要的 Agent：[agent 名称]
-- 预计时间：[估算]
-
-**选项 2**：[具体行动]
-- 描述：[详细说明]
-- 需要的 Agent：[agent 名称]
-- 预计时间：[估算]
-
-**选项 3**：[具体行动]
-- 描述：[详细说明]
-- 需要的 Agent：[agent 名称]
-- 预计时间：[估算]
-
-**跳过**：暂不执行，等待进一步指示
-
-**请选择**：[1] [2] [3] [跳过] [自定义]
-```
-
-### 典型行动决策场景
-
-**场景 1：发现漏洞**
-```
-选项 1：编写 SQL 注入 PoC（script-coder，15分钟）
-选项 2：编写修复建议文档（dev-coder，10分钟）
-选项 3：深入分析漏洞影响范围（security-tester，10分钟）
-```
-
-**场景 2：架构评审完成**
-```
-选项 1：实现状态恢复机制（dev-coder，30分钟）
-选项 2：完善权限判断逻辑（dev-coder，20分钟）
-选项 3：编写架构文档（dev-coder，15分钟）
-```
-
-**场景 3：任务拆解完成**
-```
-选项 1：开始执行子任务 T1（同时启动相关 agent）
-选项 2：调整任务优先级（重新启动 task-planner）
-选项 3：等待用户确认（暂不执行）
-```
-
-**场景 4：分析完成但无明确行动**
-```
-选项 1：输出分析报告（Markdown 格式）
-选项 2：继续深入分析 [某个方面]
-选项 3：等待用户指示
-```
-
----
-
-## 迭代循环（Coding Mode 完成后）
-
-Coding Mode 完成代码输出后，进入迭代循环：
-
-### 1. 代码验证
-
-**自动检查项**：
-- ✅ 语法正确性
-- ✅ 逻辑完整性
-- ✅ 错误处理覆盖
-- ✅ 边界条件处理
-
-**验证方式**：
-- 静态分析：检查代码逻辑
-- 动态验证：如果可以，建议运行验证
-- 边界测试：测试输入边界情况
-
-### 2. 问题识别
-
-如果发现问题，进入修复循环：
-- **语法错误**：直接修复
-- **逻辑错误**：分析并修复
-- **边界问题**：补充处理
-
-### 3. 优化建议
-
-代码可用后，给出优化建议（如果有）：
-- **性能优化**：性能瓶颈、优化方向
-- **安全优化**：安全风险、加固建议
-- **代码质量**：可读性、可维护性
-- **最佳实践**：更好的实现方式
-
-### 4. 迭代完成标志
-
-当满足以下条件时，迭代循环完成：
-- 代码可直接运行
-- 没有明显的错误或问题
-- 已给出必要的优化建议（如有）
-
-**迭代循环模板**：
-
-```markdown
-## 代码输出完成
-
-### 验证结果
-✅ 语法检查通过
-✅ 逻辑验证通过
-⚠️ 发现 [问题类型]
-
-### 优化建议
-[如果有明显的优化机会]
-
-### 下一步
-1. 确认代码可用
-2. 如果有问题，请指出具体问题，我会修复
-```
-
----
-
-## 流程编排（v2.0.0 新增）
-
-### 配置驱动的流程编排
+## 完整模式：6 个执行阶段
 
 ```mermaid
 flowchart TD
-    Start([用户输入]) --> TP[Task Planner<br/>前置规划]
-    TP --> Plan[任务规划<br/>拆解/依赖/模式]
+    Start([用户输入]) --> Stage0[Stage 00<br/>Planning<br/>task-planner 规划任务]
 
-    Plan --> Stage0[Stage 00<br/>Planning]
-    Stage0 --> Stage1[Stage 01<br/>Task Init]
-    Stage1 --> Stage2[Stage 02<br/>Git Prepare]
-    Stage2 --> Stage3[Stage 03<br/>Mode Execution]
-    Stage3 --> Stage4[Stage 04<br/>Quality Gate]
-    Stage4 --> Stage5[Stage 05<br/>Completion]
+    Stage0 --> Stage1[Stage 01<br/>Task Init<br/>创建状态文件和日志]
+    Stage1 --> Stage2[Stage 02<br/>Git Prepare<br/>创建任务分支 task-xxx]
+    Stage2 --> Stage3[Stage 03<br/>Mode Execution<br/>读取知识库 + 启动 agents]
+    Stage3 --> Stage4[Stage 04<br/>Quality Gate<br/>静态分析 + 安全扫描 + 测试]
+    Stage4 --> Stage5[Stage 05<br/>Completion<br/>合并分支 + 生成执行报告]
 
-    Stage3 --> Analysis[Analysis Mode]
-    Stage3 --> Coding[Coding Mode]
-
-    Analysis --> Merge[合并结果]
-    Coding --> Subtasks[子任务执行]
-
-    Merge --> Stage4
-    Subtasks --> Stage4
+    Stage3 --> Concurrent[3 阶段并发执行]
 
     Stage5 --> End([完成])
 
@@ -550,28 +179,31 @@ flowchart TD
     style Stage3 fill:#f3e5f5
     style Stage4 fill:#e0f2f1
     style Stage5 fill:#fce4ec
+    style Concurrent fill:#fff9c4
 ```
 
-### 6 个执行阶段
+### 阶段职责
 
 | 阶段 | ID | 名称 | 主要职责 |
 |------|----|----|---------|
-| **任务规划** | 00 | Planning | 启动 task-planner，规划任务 |
-| **任务初始化** | 01 | Task Init | 创建任务记录，检查依赖 |
-| **Git 准备** | 02 | Git Prepare | Git 前置准备，创建任务分支 |
-| **模式执行** | 03 | Mode Execution | 执行模式（Analysis/Coding） |
-| **质量门禁** | 04 | Quality Gate | 质量验证 |
-| **完成管理** | 05 | Completion | 完成与状态管理 |
+| **任务规划** | 00 | Planning | task-planner 规划任务、拆解、依赖识别 |
+| **任务初始化** | 01 | Task Init | 创建状态文件、日志、检查前置条件 |
+| **Git 准备** | 02 | Git Prepare | 创建任务分支 task-xxx、初始化 Git |
+| **模式执行** | 03 | Mode Execution | 读取知识库、3 阶段并发启动 agents |
+| **质量门禁** | 04 | Quality Gate | 静态分析、安全扫描、自动测试、修复循环 |
+| **完成管理** | 05 | Completion | 合并分支、生成执行报告、清理临时文件 |
 
-### 任务生命周期
+---
+
+## 任务生命周期
 
 ```mermaid
 stateDiagram-v2
     [*] --> pending: 任务创建
-    pending --> running: 依赖满足
+    pending --> running: 依赖满足 + 启动执行
     pending --> paused: 依赖不满足
     running --> completed: 任务成功
-    running --> failed: 任务失败
+    running --> failed: 任务失败（最多3次重试）
     running --> cancelled: 用户取消
     running --> paused: 等待依赖/人工介入
     paused --> running: 恢复执行
@@ -582,30 +214,174 @@ stateDiagram-v2
     cancelled --> [*]
 ```
 
-### 状态文件结构
+### 状态定义
+
+| 状态 | 说明 | 触发条件 |
+|------|------|---------|
+| **pending** | 等待执行 | 任务创建、依赖未满足 |
+| **running** | 正在执行 | 依赖满足、启动执行 |
+| **paused** | 暂停等待 | 等待依赖、等待人工介入 |
+| **completed** | 执行成功 | 所有阶段完成、质量检查通过 |
+| **failed** | 执行失败 | 达到最大重试次数、不可恢复错误 |
+| **cancelled** | 用户取消 | 用户主动取消任务 |
+
+---
+
+## 状态文件结构
 
 ```
 .claude/
-├── task_queue.json              # 任务队列
-├── task_states/                 # 任务状态
+├── PROTOCOL.md                    # 协议声明
+├── workflow/                      # 流程编排配置
+│   ├── standard-mode.md           # 标准模式流程
+│   ├── full-mode.md               # 完整模式流程
+│   ├── stages/                    # 各阶段配置
+│   │   ├── 00-planning.md
+│   │   ├── 01-task-init.md
+│   │   ├── 02-git-prepare.md
+│   │   ├── 03-mode-execution.md
+│   │   ├── 04-quality-gate.md
+│   │   ├── 05-completion.md
+│   │   └── templates/             # 状态文件模板
+│   └── agents/                    # Agent 定义
+│       ├── task-planner.md
+│       ├── product-manager.md
+│       ├── backend-engineer.md
+│       ├── frontend-engineer.md
+│       ├── dev-coder.md
+│       └── security-tester.md
+├── agent-memory/                  # Agent 持久记忆
+│   ├── task-planner/
+│   ├── product-manager/
+│   ├── backend-engineer/
+│   ├── frontend-engineer/
+│   ├── dev-coder/
+│   └── security-tester/
+├── task_logs/                     # 执行日志
+│   └── task-{id}.log
+├── task_states/                   # 任务状态文件
 │   └── task-{id}.json
-├── task_plans/                  # 任务规划
+├── task_plans/                    # 任务规划存储
 │   └── task-{id}.json
-├── subtask_queues/              # 子任务队列
+├── subtask_queues/                # 子任务队列存储
 │   └── task-{id}.json
-├── task_dependencies.json       # 任务依赖
-└── execution_logs/              # 执行日志
-    └── {id}.log
+└── task_reports/                  # 执行报告
+    └── task-{id}.md
 ```
 
-### Git 管理策略
+---
+
+## 质量门禁与修复循环
+
+```mermaid
+flowchart TD
+    Code[代码生成] --> QA[Quality Gate<br/>质量门禁]
+
+    QA --> Static[静态分析<br/>语法/风格/结构]
+    QA --> Security[安全扫描<br/>漏洞/依赖/敏感信息]
+    QA --> Test[自动测试<br/>单元/集成/功能]
+
+    Static --> Check{检查通过?}
+    Security --> Check
+    Test --> Check
+
+    Check -->|是| Pass[质量通过]
+    Check -->|否| FixLoop[修复循环<br/>最多 3 次]
+
+    subgraph FixLoop["完整验证闭环"]
+        Fix1[识别问题]
+        Fix2[搜索类似问题]
+        Fix3[影响范围评估]
+        Fix4[dev-coder 修复]
+        Fix5[security-tester 验证]
+        Fix6[重新检查]
+    end
+
+    FixLoop --> Check
+    Pass --> End([继续下一阶段])
+
+    style QA fill:#e0f2f1
+    style FixLoop fill:#fff9c4
+    style Pass fill:#e8f5e9
+```
+
+### 完整验证闭环
+
+**修复前分析**：
+1. 问题模式识别（这个问题属于什么类型？）
+2. 类似问题搜索（项目中是否有相同模式？）
+3. 影响范围评估（修复会影响哪些功能？）
+
+**执行修复**：
+4. 修复所有相关问题（不只是单个问题）
+5. 确保修复的一致性
+
+**修复后验证**（security-tester）：
+6. ✅ 确认原始问题已修复
+7. ✅ 确认所有类似问题已修复
+8. ✅ 确认未引入新问题（回归检查）
+9. ✅ 确认未破坏现有功能
+
+---
+
+## Knowledge 共享知识库
+
+```
+knowledge/
+├── patterns.md      # 系统性失败模式（状态、边界、信任、时间、资源、组合）
+├── domains.md       # 统一安全问题空间（入侵链、漏洞分类、控制基线）
+├── tools.md         # 工具视角认知（选用决策、能力边界、组合工作流）
+└── corrections.md   # 错误学习库（常见错误模式与正确修复流程）
+```
+
+### 知识库使用规则
+
+**标准模式**：
+- 建议读取 relevant knowledge 文件
+- 如不读需说明原因
+
+**完整模式**：
+- 必须先读取 knowledge 文件再启动 agents
+- 禁止跳过知识库读取
+
+---
+
+## Git 分支管理策略
+
+```mermaid
+flowchart LR
+    Main[main 分支] --> Create[创建 task-xxx 分支]
+    Create --> Execute[执行任务]
+    Execute --> Success{成功?}
+    Success -->|是| Merge[合并到 main]
+    Success -->|否| Rollback[回滚到 main]
+    Merge --> Report[生成执行报告]
+    Rollback --> Report
+    Report --> Clean[删除临时分支]
+    Clean --> End([完成])
+```
+
+### Git 操作
 
 | 操作 | 命令 | 说明 |
 |------|------|------|
 | **创建分支** | `git checkout -b task-{id}` | 每个任务独立分支 |
 | **提交代码** | `git commit -m "Stage {id}: {name}"` | 按阶段提交 |
-| **合并分支** | `git merge task-{id}` | 完成后合并到主分支 |
+| **合并分支** | `git merge --no-ff task-{id}` | 完成后合并到主分支 |
 | **回滚** | `git reset --hard {commit}` | 失败时回滚 |
+
+---
+
+## Agent 超时配置
+
+| Agent | 超时时间 | 说明 |
+|-------|----------|------|
+| **所有 Agents** | 600 秒（10 分钟） | 包括分析和执行层 |
+
+**超时处理**：
+- 超时后记录日志
+- 询问用户是否继续
+- 可选择延长超时或终止任务
 
 ---
 
@@ -614,44 +390,41 @@ stateDiagram-v2
 ### v2.0.0 (2026-03-15)
 
 **重大更新**：
-- ✅ 采用配置驱动的流程编排
+- ✅ 配置驱动的流程编排（6 个执行阶段）
+- ✅ 双模式系统（标准模式 + 完整模式）
 - ✅ 添加 task-planner 前置规划
-- ✅ 移除 qa-engineer（分析层从 5 个减少到 4 个）
-- ✅ 添加 6 个执行阶段
-- ✅ 添加任务生命周期管理
-- ✅ 添加 Git 分支管理
-- ✅ 添加任务依赖管理
-- ✅ 添加子任务管理
-- ✅ 添加质量门禁
-- ✅ 添加状态持久化
+- ✅ 3 阶段并发执行策略
+- ✅ Agent 超时从 120 秒调整为 600 秒
+- ✅ 完整验证闭环（类似问题检查 + 回归检查 + 完整性检查）
+- ✅ 任务生命周期管理（pending → running → completed/failed/cancelled/paused）
+- ✅ Git 分支管理（每个任务独立分支）
+- ✅ 质量门禁（静态分析 + 安全扫描 + 自动测试）
+- ✅ Agent 持久记忆（6 个 agent 各自拥有独立的记忆目录）
+- ✅ 协议声明（PROTOCOL.md）
+- ✅ 移除快速模式（简化为双模式）
 
 **核心变化**：
-- 从描述式流程 → 配置驱动流程
-- 从 Analysis Mode 包含 task-planner → task-planner 前置独立
-- 从 5 个分析层 agents → 4 个分析层 agents（移除 qa-engineer）
+- 从快速模式 + 标准模式 → 标准模式 + 完整模式
+- 从 7 个 agents → 6 个 agents（移除 script-coder 和 ops-engineer）
+- 从顺序执行 → 3 阶段并发执行
 - 从无状态管理 → 完整的状态持久化
 - 从无 Git 管理 → 完整的 Git 分支管理
+- 从简单修复 → 完整验证闭环
 
 ### v1.1.0 (2026-03-12)
 
 **更新内容**：
 - ✅ 移除 "Agent tool" 机制描述
-- ✅ 将 "并行调度" 改为 "同时启动"（更清晰的命令式语言）
-- ✅ 将 "调用" 统一改为 "启动"
-- ✅ 强调并发/并行执行，而非机制细节
-- ✅ 明确分级调度：简单（3个）/ 标准（4个）/ 深度（5个）
+- ✅ 强调并发/并行执行
+- ✅ 明确分级调度
 - ✅ 添加行动决策框架
 - ✅ 添加迭代循环流程
-
-**核心变化**：
-- 从 "并行调度"（parallel dispatch）→ "同时启动"（concurrent start）
-- 强调**同时启动**所有需要的 subagents，而非串行或依赖特定工具机制
 
 ### v1.0.0 (2026-03-11)
 
 **初始版本**：
 - 多 Agent 编排系统
-- 双模式架构（Analysis Mode / Coding Mode）
+- 双模式架构
 - 5 个分析层 agents
 - 2 个执行层 coder agents
 - 1 个支持层 agent
