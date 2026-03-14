@@ -241,6 +241,8 @@ docker run -it --rm \
 
 ```bash
 config              # 查看所有配置信息（Token、URL、Model、代理等）
+mode                # 查看当前模式
+mode <模式>         # 切换模式（standard/full）
 key -k <token>      # 修改 API Token
 key -u <url>        # 修改 Base URL
 key -m <model>      # 修改 Model
@@ -266,6 +268,27 @@ config
 # Base URL: https://api.anthropic.com
 # Model: claude-sonnet-4-6
 # HTTP Proxy: http://host.docker.internal:1087
+# Execution Mode: standard
+
+# 查看当前模式
+mode
+# 输出：
+# Current mode: standard
+# CLAUDE_FULL_MODE: 0
+
+# 切换到完整模式
+mode full
+# 输出：
+# Mode switched to: full
+# CLAUDE_FULL_MODE: 1
+# 重启容器后生效
+
+# 切换到标准模式
+mode standard
+# 输出：
+# Mode switched to: standard
+# CLAUDE_FULL_MODE: 0
+# 重启容器后生效
 
 # 更新 Token
 key "sk-ant-xxxxx"
@@ -293,6 +316,7 @@ docker run -it --rm \
   -e ANTHROPIC_AUTH_TOKEN="sk-ant-xxxxx" \
   -e ANTHROPIC_BASE_URL="https://api.anthropic.com" \
   -e CLAUDE_DEFAULT_MODEL="claude-sonnet-4-6" \
+  -e CLAUDE_FULL_MODE=1 \
   claude-sandbox:latest
 
 # 在 docker-compose.yml 中设置
@@ -302,7 +326,16 @@ services:
       - ANTHROPIC_AUTH_TOKEN=sk-ant-xxxxx
       - ANTHROPIC_BASE_URL=https://api.anthropic.com
       - CLAUDE_DEFAULT_MODEL=claude-sonnet-4-6
+      - CLAUDE_FULL_MODE=1
 ```
+
+**模式设置方式对比**：
+
+| 方式 | 命令 | 生效时间 | 持久性 |
+|------|------|---------|--------|
+| **mode 命令** | `mode full` | 重启容器后 | 持久（写入配置） |
+| **环境变量** | `CLAUDE_FULL_MODE=1` | 容器启动时 | 仅当前容器 |
+| **Dockerfile** | `ENV CLAUDE_FULL_MODE=1` | 构建时 | 永久（镜像级别） |
 
 ### 代理配置
 
@@ -319,6 +352,49 @@ docker run -it --rm \
   -e HTTPS_PROXY=http://host.docker.internal:1087 \
   claude-sandbox:latest
 ```
+
+### 模式管理
+
+**mode 命令**用于查看和切换执行模式（标准模式/完整模式）：
+
+```bash
+# 查看当前模式
+mode
+# 输出示例：
+# MODE DECISION: Current mode is [标准]
+# CLAUDE_FULL_MODE: 0
+# Config file: /root/.claude/mode.json
+
+# 切换到完整模式
+mode full
+# 输出：
+# ✓ Mode switched to: 完整
+# ✓ CLAUDE_FULL_MODE set to: 1
+# ✓ Please restart the container to apply changes
+# 提示：使用 docker restart <container> 重启容器
+
+# 切换到标准模式
+mode standard
+# 输出：
+# ✓ Mode switched to: 标准
+# ✓ CLAUDE_FULL_MODE set to: 0
+# ✓ Please restart the container to apply changes
+
+# 查看模式帮助
+mode help
+```
+
+**模式说明**：
+
+| 模式 | 说明 | 适用场景 |
+|------|------|---------|
+| **standard** | 标准模式（默认） | 日常任务、项目分析、功能实现 |
+| **full** | 完整模式 | 大型项目、架构级任务、需要完整流程 |
+
+**注意事项**：
+- 切换模式后需要重启容器才能生效
+- 完整模式需要设置 `CLAUDE_FULL_MODE=1`
+- 标准模式是默认模式，无需特殊配置
 
 ## 📖 使用场景
 
