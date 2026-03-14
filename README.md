@@ -77,22 +77,57 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 
 ### 如何开启完整模式？
 
-**环境变量设置**：
+有 **3 种方式**可以开启完整模式：
+
+#### 方式 1：使用 mode 命令（推荐）
+
+在容器内使用 `mode` 命令切换模式：
+
 ```bash
-# 方式 1：在启动命令中设置
+# 在容器内执行
+mode full
+
+# 输出：
+# ✓ Mode switched to: 完整
+# ✓ CLAUDE_FULL_MODE set to: 1
+# ✓ Please restart the container to apply changes
+
+# 重启容器使配置生效
+exit  # 退出容器
+docker restart <container-id>  # 重启容器
+```
+
+**优点**：
+- 简单直接，一条命令即可
+- 持久化保存，重启后依然有效
+- 不需要修改 Dockerfile 或 docker-compose.yml
+
+#### 方式 2：环境变量设置
+
+```bash
+# 在 docker run 时设置
 docker run -it --rm \
   -v $(pwd)/workspace:/workspace \
   -e CLAUDE_FULL_MODE=1 \
   claude-sandbox:latest
 
-# 方式 2：在 Dockerfile 中设置
-ENV CLAUDE_FULL_MODE=1
-
-# 方式 3：在 docker-compose.yml 中设置
+# 在 docker-compose.yml 中设置
 services:
   claude-sandbox:
     environment:
       - CLAUDE_FULL_MODE=1
+```
+
+#### 方式 3：在 Dockerfile 中设置
+
+```dockerfile
+# 在 Dockerfile 中添加
+ENV CLAUDE_FULL_MODE=1
+```
+
+**然后重新构建镜像**：
+```bash
+docker build -t claude-sandbox:latest .
 ```
 
 **验证是否开启**：
