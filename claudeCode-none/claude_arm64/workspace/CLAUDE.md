@@ -17,41 +17,71 @@
 
 ---
 
-## 二、三种工作模式
+## 二、三种工作模式（含执行步骤）
 
 ### 快速模式
-| Agent | 0 个 | 状态文件 | 无 | 计划确认 | 否 |
-|-------|------|---------|-----|----------|-----|
-| 适用 | 单文件修改、明确 bug 修复 |
 
-### 标准模式
-| Agent | 1-2 个（顺序） | 状态文件 | 可选 | 计划确认 | 简要 |
-|-------|---------------|---------|------|----------|------|
-| 适用 | 项目分析、功能实现 |
+**执行步骤**：
+1. 读取用户指定的文件
+2. 修改代码
+3. 输出结果
 
-### 完整模式
-| Agent | 2-4 个（顺序） | 状态文件 | 完整 | 计划确认 | 详细 | Git | 创建分支 |
-|-------|---------------|---------|------|----------|------|------|---------|
-| 触发 | `CLAUDE_FULL_MODE=1` + 用户明确要求 |
+**禁止**：
+- ❌ 启动任何 agent
+- ❌ 读取 workflow/ 文件
+- ❌ 创建状态文件
 
-**Agent 执行原则**：顺序执行，不并发（Claude 的并发是叙事级的）
+**适用**：单文件修改、明确 bug 修复
 
 ---
 
-## 三、可用的 Agents
+### 标准模式
 
-**分析类**（选 1-2 个）：product-manager（需求/架构）、backend-engineer（后端）、frontend-engineer（前端）
-**执行类**（选 1 个）：dev-coder（代码实现）
-**质量类**（可选）：security-tester（安全检查）
+**执行步骤**：
+1. 制定简要计划（2-3 个步骤）
+2. 询问用户确认
+3. 按需读取 agent 定义：`.claude/agents/{agent-name}.md`
+4. 启动 1-2 个 agents（顺序执行）
+5. 合并结果，输出简洁报告
 
-详细定义：见 `.claude/agents/{agent-name}.md`
+**可选**：创建状态文件 `.claude/task_states/task-{id}.json`
+
+**适用**：项目分析、功能实现、任何不确定的情况
+
+---
+
+### 完整模式
+
+**第一步**：**现在读取** `.claude/workflow/full-workflow.md`
+
+**后续步骤**：按照 full-workflow.md 的定义执行完整流程
+
+**触发条件**（必须同时满足）：
+- 架构级任务
+- 用户明确说"完整分析/完整编排"
+- 环境变量 `CLAUDE_FULL_MODE=1` 已设置
+
+**适用**：架构级安全研究、需要明确授权的场景
+
+---
+
+## 三、Agent 执行原则
+
+**顺序执行，不并发**（Claude 的并发是叙事级的，不是系统级的）
+
+**可用的 Agents**：
+- 分析类（选 1-2 个）：product-manager、backend-engineer、frontend-engineer
+- 执行类（选 1 个）：dev-coder
+- 质量类（可选）：security-tester
+
+**Agent 定义位置**：`.claude/agents/{agent-name}.md`
 
 ---
 
 ## 四、全局禁止
 
 1. ❌ 跳过用户确认就执行大规模修改
-2. ❌ 读取 `.claude/workflow/` 来决定"该做什么"（它是参考文档）
+2. ❌ 在快速/标准模式读取 workflow/
 3. ❌ 并发启动 agents（顺序执行）
 4. ❌ 在完整模式未启用时执行复杂的多阶段流程
 5. ❌ 过度形式化（输出 500 行的 Research Ledger）
@@ -81,28 +111,7 @@
 
 ---
 
-## 七、配置说明
-
-**文件结构**：
-```
-.claude/
-├── agents/                  # Agent 定义（模板库）
-│   ├── product-manager.md
-│   ├── backend-engineer.md
-│   ├── frontend-engineer.md
-│   ├── dev-coder.md
-│   └── security-tester.md
-├── workflow/                # 参考文档（不是配置）
-│   ├── full-workflow.md
-│   └── examples/
-└── task_states/             # 按需创建
-```
-
-**核心原则**：`.claude/workflow/` 是参考文档，Agent 定义是模板库，状态文件按需创建
-
----
-
-## 八、系统声明
+## 七、系统声明
 
 这是**人为定义的智能任务执行系统**，不是 Claude Code 的官方支持模式。
 
