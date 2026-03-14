@@ -1,0 +1,74 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: mode [full|standard|status]"
+    echo ""
+    echo "Arguments:"
+    echo "  full     启用完整模式 (设置 CLAUDE_FULL_MODE=1)"
+    echo "  standard 启用标准模式 (取消 CLAUDE_FULL_MODE)"
+    echo "  status   查看当前模式"
+    echo ""
+    echo "Examples:"
+    echo "  mode full      # 启用完整模式"
+    echo "  mode standard  # 启用标准模式"
+    echo "  mode status    # 查看当前模式"
+    exit 1
+}
+
+show_status() {
+    if [ "$CLAUDE_FULL_MODE" = "1" ]; then
+        echo "📊 当前模式: 完整模式 (CLAUDE_FULL_MODE=1)"
+        echo ""
+        echo "完整模式特点:"
+        echo "  • 创建 Git 分支"
+        echo "  • 完整状态文件"
+        echo "  • 详细执行计划"
+        echo "  • Quality Gate 验证"
+        echo "  • 2-4 个 agents 顺序执行"
+    else
+        echo "📊 当前模式: 标准模式 (默认)"
+        echo ""
+        echo "标准模式特点:"
+        echo "  • 简要计划 + 用户确认"
+        echo "  • 1-2 个 agents 顺序执行"
+        echo "  • 可选状态文件"
+        echo "  • 适合大多数任务"
+    fi
+    echo ""
+}
+
+set_full_mode() {
+    echo "export CLAUDE_FULL_MODE=1" >> /root/.bashrc
+    export CLAUDE_FULL_MODE=1
+    echo "✅ 已启用完整模式 (CLAUDE_FULL_MODE=1)"
+    echo ""
+    echo "⚠️  注意: 完整模式需要用户明确说'完整分析'或'完整编排'才会触发"
+    echo ""
+    echo "要使更改生效，请运行: source /root/.bashrc"
+    echo "或者重新启动容器"
+}
+
+set_standard_mode() {
+    sed -i '/CLAUDE_FULL_MODE/d' /root/.bashrc
+    unset CLAUDE_FULL_MODE
+    echo "✅ 已切换到标准模式 (默认模式)"
+    echo ""
+    echo "要使更改生效，请运行: source /root/.bashrc"
+    echo "或者重新启动容器"
+}
+
+# 参数解析
+case "$1" in
+    full)
+        set_full_mode
+        ;;
+    standard)
+        set_standard_mode
+        ;;
+    status)
+        show_status
+        ;;
+    *)
+        usage
+        ;;
+esac
