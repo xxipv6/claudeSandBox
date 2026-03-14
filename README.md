@@ -131,8 +131,36 @@ docker build -t claude-sandbox:latest .
 ```
 
 **验证是否开启**：
-- 开启后：系统会输出 "MODE DECISION: Selected mode: 完整"
-- 未开启：系统会输出 "MODE DECISION: Selected mode: 标准"
+
+```bash
+# 在容器内执行 mode 命令查看当前模式
+mode
+# 输出示例：
+# Current mode: standard
+# CLAUDE_FULL_MODE: 0
+```
+
+**判断标准**：
+- ✅ **已开启**：`CLAUDE_FULL_MODE: 1`，系统会输出 "MODE DECISION: Selected mode: 完整"
+- ❌ **未开启**：`CLAUDE_FULL_MODE: 0` 或未设置，系统会输出 "MODE DECISION: Selected mode: 标准"
+
+**如果未开启，快速启用**：
+
+```bash
+# 在容器内执行（推荐方式）
+mode full
+
+# 重启容器使配置生效
+exit
+docker restart <container-id>
+
+# 重新进入容器
+docker run -it --rm -v $(pwd)/workspace:/workspace claude-sandbox:latest
+
+# 验证已开启
+mode
+# 输出：CLAUDE_FULL_MODE: 1
+```
 
 ### 模式对比表
 
@@ -468,8 +496,18 @@ Claude：[MODE DECISION: 标准模式]
 
 ### 4. 复杂系统开发（完整模式）
 
+**前置准备**：
+```bash
+# 在容器内开启完整模式
+mode full
+# 重启容器
+exit
+docker restart <container-id>
 ```
-你：完整实现一个用户系统（需要设置 CLAUDE_FULL_MODE=1）
+
+**执行流程**：
+```
+你：完整实现一个用户系统
 
 Claude：[MODE DECISION: 完整模式]
 - Stage 00: Planning（task-planner 规划任务）
@@ -686,5 +724,6 @@ MIT License
 **提示**：
 - 推荐使用 `claudeCode-none` 版本，性能更好且更稳定
 - v2.0.0 采用配置驱动架构，双模式系统（标准模式 + 完整模式）
-- 完整模式需要设置环境变量 `CLAUDE_FULL_MODE=1`
+- **推荐使用 `mode` 命令开启完整模式**（无需修改环境变量或 Dockerfile）
+- 如果 `CLAUDE_FULL_MODE` 未设置，请在容器内执行 `mode full` 然后重启容器
 - 确保 Git 已正确配置，以便完整模式的任务分支管理正常工作
