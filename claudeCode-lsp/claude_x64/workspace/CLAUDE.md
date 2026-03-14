@@ -71,7 +71,7 @@
 - [ ] task-planner 已返回执行计划
 - [ ] 执行计划已保存到 task_plans.json
 
-**第 4 步（强制）**：读取外置知识与 agent 定义
+**第 4 步（强制）**：读取外置知识
 
 **现在读取** knowledge 文件（只读，禁止执行）：
 - `/workspace/knowledge/domains.md`
@@ -79,18 +79,8 @@
 - `/workspace/knowledge/patterns.md`
 - `/workspace/knowledge/corrections.md`
 
-**现在读取** agent 定义文件（只读，禁止执行）：
-- `.claude/agents/product-manager.md`
-- `.claude/agents/backend-engineer.md`
-- `.claude/agents/frontend-engineer.md`
-- `.claude/agents/security-tester.md`
-- `.claude/agents/dev-coder.md`
-- `.claude/agents/script-coder.md`
-- `.claude/agents/ops-engineer.md`
-
 **检查点**：
 - [ ] 已读取所有 knowledge 文件
-- [ ] 已读取所有 agent 定义文件
 
 **阶段 1 完成条件**：
 - ✅ 所有配置文件已读取（8 个文件）
@@ -98,7 +88,6 @@
 - ✅ task-planner 已返回执行计划
 - ✅ 执行计划已保存
 - ✅ 已读取所有 knowledge 文件（4 个文件）
-- ✅ 已读取所有 agent 定义文件（7 个文件）
 
 ### 阶段 2：执行（按照计划执行）
 
@@ -182,7 +171,6 @@
 - [ ] task-planner 已返回执行计划
 - [ ] 执行计划已保存到 task_plans.json
 - [ ] 所有 knowledge 文件已读取（4 个文件）
-- [ ] 所有 agent 定义文件已读取（7 个文件）
 
 确认无误后，声明：
 "阶段 1 完成，现在进入阶段 2：执行"
@@ -215,7 +203,12 @@
 - ❌ **禁止**在 agents 返回前开始读取代码
 
 **执行流程**（Analysis Mode）：
-1. **并发启动**所有 4 个分析层 agents（使用 Agent tool）
+1. **并发启动**所有 4 个分析层 agents
+   - 对于每个 agent：
+     a. 读取对应的 agent 定义文件（如 `.claude/agents/product-manager.md`）
+     b. 使用 Agent tool 启动 general-purpose agent
+     c. 提示词：按照刚才读取的 agent 定义执行
+     d. 等待返回结果
 2. **等待**所有 agents 返回结果（最多 300 秒）
 3. **合并**所有 agents 的输出
 4. **输出** Research Ledger
@@ -503,11 +496,18 @@
 Agent 定义位置：`.claude/agents/{agent-name}.md`
 
 调用规则：
-- 必须先读取 agent 定义文件（在阶段 1 第 2 步已完成）
+- 在启动 agent 前，先读取对应的 agent 定义文件
+- 将 agent 定义作为提示词传入 Agent tool
 - 按照定义的角色和职责执行
 - 禁止合并或修改 agent 行为
 
-检查点：[ ] 已按照 agent 定义执行
+示例（启动 product-manager）：
+1. 读取 `.claude/agents/product-manager.md`
+2. 使用 Agent tool 启动 general-purpose agent
+3. 提示词：按照刚才读取的 product-manager 定义执行
+4. 等待返回结果
+
+检查点：[ ] 已读取 agent 定义并按照定义执行
 ```
 
 ### 配置文件结构
