@@ -99,7 +99,7 @@ RUN npm config set prefix /usr/local
 # Git 配置
 # ============================================
 ARG PROXY_HOST=host.docker.internal
-ARG PROXY_PORT=1087
+ARG PROXY_PORT=10808
 RUN git config --global http.proxy http://${PROXY_HOST}:${PROXY_PORT} && \
     git config --global https.proxy http://${PROXY_HOST}:${PROXY_PORT}
 
