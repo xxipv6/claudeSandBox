@@ -1,9 +1,18 @@
 ---
-description: 测试驱动开发（TDD）工作流和最佳实践
-disable-model-invocation: false
+name: tdd-workflow
+description: 测试驱动开发（TDD）工作流和最佳实践，RED→GREEN→IMPROVE 循环，确保 80%+ 测试覆盖率
 ---
 
 # 测试驱动开发（TDD）
+
+## 何时启用
+
+- 用户请求实现新功能或修复 bug 时
+- dev-coder agent 调用时
+- 需要编写或修改代码时
+- 强调测试优先的开发场景时
+
+---
 
 ## TDD 循环
 

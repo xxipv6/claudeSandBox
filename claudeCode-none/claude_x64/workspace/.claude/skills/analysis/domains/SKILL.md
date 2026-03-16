@@ -1,9 +1,20 @@
 ---
+name: domains
 description: 10 个核心分析维度，适用于所有系统的安全分析
 disable-model-invocation: false
 ---
 
 # Unified Security Problem Space
+
+## 何时启用
+
+- 进行系统化安全分析时
+- security-tester agent 调用时
+- 需要从多维度分析系统安全性时
+- 进行漏洞挖掘或安全研究时
+- 需要结构化分析复杂系统时
+
+---
 
 本文件定义安全工程的"问题本质"，不区分 Web / Binary / IoT / Protocol。
 

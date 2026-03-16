@@ -1,9 +1,18 @@
 ---
-description: Web 应用白盒安全审计 - 完整 8 阶段流程
-disable-model-invocation: false
+name: whitebox-audit
+description: Web 应用白盒安全审计 - 完整 8 阶段流程，系统性识别漏洞、越权、逻辑缺陷与状态联动风险
 ---
 
 # Web 白盒安全审计
+
+## 何时启用
+
+- 用户请求安全审计或漏洞分析时
+- 检测到 Web 应用代码需要进行安全检查时
+- 进行代码审查且涉及安全敏感内容时
+- 需要分析越权、状态机、业务逻辑漏洞时
+
+---
 
 ## Skill 定位与适用范围
 

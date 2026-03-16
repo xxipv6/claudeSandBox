@@ -1,9 +1,18 @@
 ---
-description: IoT 安全审计（自动识别版 · 固件 / 源码 / 混合）
-disable-model-invocation: false
+name: iot-audit
+description: IoT 安全审计（自动识别版）- 固件/源码/混合，统一风险建模，识别入口、权限、状态、副作用
 ---
 
 # IoT 安全审计（自动识别版）
+
+## 何时启用
+
+- 用户请求 IoT 设备或固件安全审计时
+- 检测到固件文件（.bin、.elf、.fw）或 IoT 源码时
+- 需要分析嵌入式系统、IoT 设备安全性时
+- 涉及硬件接口、固件漏洞分析时
+
+---
 
 ## Skill 定位
 

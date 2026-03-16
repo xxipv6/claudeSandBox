@@ -1,11 +1,18 @@
 ---
-description: 代码审查清单和最佳实践
-disable-model-invocation: false
+name: code-review
+description: 代码审查清单和最佳实践，功能性、性能、可读性、可维护性、测试、安全性六维度审查
 ---
 
 # 代码审查
 
-## 审查目标
+## 何时启用
+
+- 代码审查或 review 时
+- agent（backend-engineer/frontend-engineer）调用时
+- 需要检查代码质量、安全性、可维护性时
+- 编写或修改代码后需要审查时
+
+---
 
 1. **发现缺陷** - 找出潜在的 bug
 2. **保证质量** - 确保代码符合标准

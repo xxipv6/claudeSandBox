@@ -1,9 +1,20 @@
 ---
+name: e2e-testing
 description: E2E 测试方法论，使用 Playwright 进行端到端测试
 disable-model-invocation: false
 ---
 
 # E2E 测试（End-to-End Testing）
+
+## 何时启用
+
+- 用户请求 E2E 测试或端到端测试时
+- 执行 /e2e 命令时
+- 需要验证完整用户流程时
+- 需要进行安全相关的端到端验证时
+- 测试认证、授权、CSRF 等安全场景时
+
+---
 
 ## 核心理念
 
