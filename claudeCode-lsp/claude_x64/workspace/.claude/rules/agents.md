@@ -110,14 +110,16 @@ Claude：[自动识别关键词"审计"]
 ### Skills 自动触发
 
 **开发 Skills**（应主动（PROACTIVELY）使用）：
-- `brainstorming` - **所有创造性工作必须先使用**
-  - 创建功能、构建组件、添加行为、修改行为时必须先调用
-  - 在调用任何 agent 之前，先使用 brainstorming 探索设计
 - `frontend-patterns` - React/Next.js 前端开发
 - `backend-patterns` - 后端开发模式
 - `tdd-workflow` - 测试驱动开发
 - `debugging` - 调试问题
 - `code-review` - 代码审查
+
+**手动 Skills**（用户明确要求时使用）：
+- `brainstorming` - 仅在用户明确要求时使用
+  - 用于设计探索、方案对比
+  - 不会自动触发
 
 **关键词自动触发（Keyword Auto-Trigger）**：
 
