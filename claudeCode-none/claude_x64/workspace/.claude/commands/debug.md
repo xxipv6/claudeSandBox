@@ -4,7 +4,123 @@ description: 系统化调试问题，从症状到根因分析
 
 # 调试
 
-## 调试方法论
+## 自动识别：前端 vs 后端
+
+在开始调试前，自动识别任务类型：
+
+**前端任务特征**：
+- 涉及浏览器、页面、UI
+- 涉及 HTML、CSS、JavaScript
+- 涉及用户界面、交互
+- 提到"页面"、"按钮"、"表单"、"样式"
+
+**后端任务特征**：
+- 涉及 API、数据库、服务器
+- 涉及业务逻辑、数据处理
+- 提到"接口"、"查询"、"服务"、"后端"
+
+**如果识别为前端任务**：
+```
+✅ 自动切换到前端调试模式
+✅ 使用 Playwright 进行调试
+✅ 加载 E2E 测试技能
+```
+
+**如果识别为后端任务**：
+```
+✅ 使用常规调试方法
+✅ 加载 debugging 技能
+✅ 使用日志、断点等工具
+```
+
+---
+
+## 前端调试（自动识别）
+
+### 触发条件
+
+当检测到以下情况时，自动使用前端调试：
+
+```javascript
+// 用户输入示例
+"页面登录按钮点击没反应"
+"样式在浏览器上显示不正确"
+"表单提交后页面没有刷新"
+"React 组件状态不对"
+"前端路由跳转有问题"
+```
+
+### 前端调试流程
+
+#### 第一步：启动 Playwright
+
+```bash
+# 自动启动 Playwright 调试
+npx playwright code http://localhost:3000
+
+# 或使用 Playwright Inspector
+npx playwright test --debug
+```
+
+#### 第二步：检查页面状态
+
+```javascript
+// 使用 Playwright 检查页面
+await page.goto('http://localhost:3000/login');
+
+// 检查元素是否存在
+const button = page.locator('#login-button');
+await expect(button).toBeVisible();
+
+// 检查元素属性
+const isEnabled = await button.isEnabled();
+console.log('Button enabled:', isEnabled);
+
+// 检查控制台错误
+page.on('console', msg => {
+  if (msg.type() === 'error') {
+    console.error('Browser console error:', msg.text());
+  }
+});
+```
+
+#### 第三步：调试前端逻辑
+
+```javascript
+// 截图查看页面状态
+await page.screenshot({ path: 'debug-screenshot.png' });
+
+// 慢动作观察执行过程
+await page.slowMo(1000);
+
+// 等待特定状态
+await page.waitForSelector('.success-message');
+
+// 执行 JavaScript
+const result = await page.evaluate(() => {
+  return window.userState;
+});
+```
+
+#### 第四步：网络请求调试
+
+```javascript
+// 监听网络请求
+page.on('request', request => {
+  console.log('Request:', request.url());
+});
+
+page.on('response', response => {
+  console.log('Response:', response.url(), response.status());
+});
+
+// 等待特定请求
+await page.waitForResponse('**/api/login');
+```
+
+---
+
+## 后端调试（常规方法）
 
 ### 核心原则
 
