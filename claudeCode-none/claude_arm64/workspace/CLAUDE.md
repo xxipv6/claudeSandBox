@@ -42,6 +42,7 @@
 
 **安全分析**：
 - `skills/security/whitebox-audit/` - Web 白盒安全审计（8 阶段流程）
+- `skills/security/iot-audit/` - IoT 安全审计（自动识别固件/源码/混合）
 
 **开发辅助**：
 - `skills/development/debugging/` - 调试方法论

@@ -220,14 +220,26 @@ app.get('/api/users/:id', async (req, res) => {
 
 ---
 
-## 二进制审计
+## IoT 设备审计
 
-**二进制文件审计请直接使用**：
+**IoT 设备审计请使用**：
 ```
-.claude/skills/security/binary-reverse/
+.claude/skills/security/iot-audit/
 ```
 
-该 Skill 基于 IDA MCP 进行二进制逆向安全分析，包含完整的 8 阶段流程。
+该 Skill 自动识别资产形态（固件 / 源码 / 混合），进行 IoT 设备安全审计。
+
+### 支持的资产类型
+
+- **仅固件**：.bin / .img / .trx / .fw
+- **仅源代码**：Makefile / CMakeLists.txt / src/
+- **混合**：固件 + 源代码
+
+### 审计内容
+
+- 远程攻击（无认证访问、默认凭证、升级链）
+- 局域网攻击（协议漏洞、中间人）
+- 物理接触（调试接口、固件提取）
 
 ---
 
