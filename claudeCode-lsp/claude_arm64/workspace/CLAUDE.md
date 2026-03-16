@@ -52,34 +52,12 @@
 
 ## 可用资源
 
-### Agents（按需调用）
+### Agents & Skills 自动触发
 
-**规划类**：
-- `task-planner` - 任务规划与分解
+Claude 会根据任务上下文自动调用合适的 agents 和 skills。
 
-**分析类**（可并发）：
-- `product-manager` - 产品需求分析
-- `backend-engineer` - 后端架构分析
-- `frontend-engineer` - 前端实现分析
-- `security-tester` - 安全测试与漏洞分析
-
-**执行类**：
-- `dev-coder` - 代码实现（TDD）
-
-**Agent 主动编排**：
-- 复杂功能 → `task-planner`
+**Agent 编排关系**：
 - 代码审查 → `backend-engineer` + `frontend-engineer`（并发）
-- 安全审计 → `security-tester`
-- 代码实现 → `dev-coder`
-
-### Skills（按需加载）
-
-- `security/whitebox-audit` - Web 白盒安全审计（8 阶段）
-- `security/iot-audit` - IoT 安全审计
-- `development/debugging` - 调试方法论
-- `development/code-review` - 代码审查清单
-- `development/tdd-workflow` - TDD 工作流
-- `testing/e2e-testing` - E2E 测试
 
 ### Rules（强制约束）
 
