@@ -54,8 +54,6 @@
 
 **分析能力**：
 - `skills/analysis/domains/` - 10 个分析维度
-- `skills/analysis/tools/` - 工具使用指南
-- `skills/analysis/patterns/` - 模式识别
 
 ### Agents（按需调用）
 
@@ -64,16 +62,12 @@
 
 **分析类**（可并发）：
 - `product-manager` - 产品需求分析
-- `backend-engineer` - 后端架构分析
-- `frontend-engineer` - 前端实现分析
-- `security-tester` - 安全测试与漏洞分析
+- `backend-engineer` - 后端架构分析（使用 `code-review` skill）
+- `frontend-engineer` - 前端实现分析（使用 `code-review` skill）
+- `security-tester` - 安全测试与漏洞分析（使用 `whitebox-audit` + `iot-audit` skills）
 
 **执行类**：
-- `dev-coder` - 代码实现
-
-**安全专用**：
-- `vuln-analyst` - 漏洞分析专家
-- `secure-coder` - 安全编码专家
+- `dev-coder` - 代码实现（使用 `tdd-workflow` skill）
 
 **Agent 定义**：`.claude/agents/{agent-name}.md`
 
