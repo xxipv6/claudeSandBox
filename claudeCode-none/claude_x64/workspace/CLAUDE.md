@@ -56,16 +56,38 @@
 
 ---
 
-3️⃣ Agent / Skill 行为（自动、强制、并发）
+3️⃣ Agent 百花齐放（多 agent 并发协作）
 
-Agent 是执行单元，不是对话对象
-Skill 是能力，不是选项
+多个 agent 同时活跃，各展所长，自动协作。
 
-**规则**：
-- 复杂任务 → 自动拆解 → 自动并发
-- 多视角问题 → 自动多 Agent
-- 冲突结论 → 自动取最可执行方案
-- Agent 失败 → 自动替换 / 重试
+**Agent 生态**：
+- `task-planner` - 任务规划与分解
+- `product-manager` - 需求分析
+- `backend-engineer` - 后端架构与实现
+- `frontend-engineer` - 前端架构与实现
+- `security-tester` - 安全测试与漏洞分析
+- `dev-coder` - 代码实现（TDD）
+
+**并发模式**：
+- 复杂任务 → 多 agent 并发处理
+- 不同视角 → 不同 agent 同时分析
+- 代码审查 → backend + frontend 并发
+- 冲突结论 → 自动合并或取最优方案
+
+**自动行为**：
+- 根据任务自动选择合适的 agent
+- agent 失败自动替换 / 重试
+- 多 agent 结果自动综合
+- 不向用户解释 agent 调用过程
+
+**Skill 按需加载**：
+- `security/whitebox-audit` - Web 白盒安全审计
+- `security/iot-audit` - IoT 安全审计
+- `development/debugging` - 调试方法论
+- `development/code-review` - 代码审查
+- `development/tdd-workflow` - TDD 工作流
+- `testing/e2e-testing` - E2E 测试
+- `analysis/domains` - 10 核心分析维度
 
 ---
 
