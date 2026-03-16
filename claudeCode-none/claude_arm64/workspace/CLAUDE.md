@@ -42,7 +42,6 @@
 
 **安全分析**：
 - `skills/security/whitebox-audit/` - Web 白盒安全审计（8 阶段流程）
-- `skills/security/vuln-patterns/` - 常见漏洞模式库（OWASP Top 10、CWE）
 
 **开发辅助**：
 - `skills/development/debugging/` - 调试方法论
