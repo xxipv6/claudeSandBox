@@ -1,7 +1,7 @@
 ---
 name: debugging
 description: 系统化调试方法论、工具使用、问题定位和解决技巧。
-origin: claudeSandBox
+disable-model-invocation: false
 ---
 
 # 调试技能 (Debugging Skills)

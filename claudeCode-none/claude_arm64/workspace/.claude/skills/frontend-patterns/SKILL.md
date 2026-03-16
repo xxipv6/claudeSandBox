@@ -1,7 +1,7 @@
 ---
 name: frontend-patterns
 description: React、Next.js、状态管理（State Management）、性能优化（Performance Optimization）及 UI 最佳实践的前端开发模式。
-origin: ECC
+disable-model-invocation: false
 ---
 
 # 前端开发模式 (Frontend Development Patterns)
