@@ -18,20 +18,14 @@
 
 ```bash
 # 安全研究
-/security-audit     # 完整安全审计
-/vuln-scan          # 漏洞扫描
-/exploit-gen        # 生成 PoC
-
-# 安全开发
+/security-audit     # 完整安全审计（包含漏洞扫描）
 /secure-review      # 安全代码审查
-/threat-model       # 威胁建模
 
 # 日常开发
-/full "task"        # 完整开发流程
-/quick "task"       # 快速修复
 /debug              # 调试问题
+/test               # 功能测试
+/e2e                # 全部测试（前端 + 后端，并发）
 /code-review        # 代码审查
-/test               # 运行测试
 ```
 
 ### 核心原则
@@ -48,14 +42,15 @@
 ### Skills（按需加载）
 
 **安全分析**：
-- `skills/security/vuln-analysis/` - 漏洞分析方法论（CWE、OWASP）
-- `skills/security/secure-coding/` - 安全编码规范
-- `skills/security/vuln-patterns/` - 常见漏洞模式库
+- `skills/security/vuln-patterns/` - 常见漏洞模式库（OWASP Top 10、CWE）
 
 **开发辅助**：
 - `skills/development/debugging/` - 调试方法论
 - `skills/development/code-review/` - 代码审查清单
 - `skills/development/tdd-workflow/` - TDD 工作流
+
+**测试能力**：
+- `skills/testing/e2e-testing/` - E2E 测试（Playwright）
 
 **分析能力**：
 - `skills/analysis/domains/` - 10 个分析维度
@@ -86,6 +81,9 @@
 
 **安全规则**（`.claude/rules/security.md`）：
 - ❌ 禁止硬编码密钥
+- ❌ 禁止 SQL 注入
+- ❌ 禁止 XSS 漏洞
+- ❌ 禁止弱加密
 - ✅ 必须输入验证
 - ✅ 必须输出编码
 - ✅ 遵循认证/授权规范
