@@ -181,6 +181,10 @@ dev agent（实现）
     → 运行测试
     → 提交代码
     ↓
+doc-updater agent（文档更新）
+    → 更新文档
+    → 更新 API 文档
+    ↓
 reviewer agent（审查）
     → 代码质量审查
     → 修复问题
