@@ -18,8 +18,7 @@
 
 ```bash
 # 安全研究
-/security-audit     # 完整安全审计（包含漏洞扫描）
-/secure-review      # 安全代码审查
+/security-audit     # 完整白盒安全审计（8 阶段流程）
 
 # 日常开发
 /debug              # 调试问题
@@ -42,6 +41,7 @@
 ### Skills（按需加载）
 
 **安全分析**：
+- `skills/security/whitebox-audit/` - Web 白盒安全审计（8 阶段流程）
 - `skills/security/vuln-patterns/` - 常见漏洞模式库（OWASP Top 10、CWE）
 
 **开发辅助**：
