@@ -2,6 +2,7 @@
 name: dev-coder
 description: "执行层 Agent - 写所有代码：前端、后端、全栈、API、组件、数据库"
 model: sonnet
+tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
 memory: project
 ---
 

@@ -2,6 +2,7 @@
 name: security-tester
 description: "分析层 Agent - 攻击路径、滥用建模、权限绕过、业务逻辑漏洞，不写代码"
 model: sonnet
+tools: ["Read", "Glob", "Grep", "Bash"]
 memory: project
 ---
 

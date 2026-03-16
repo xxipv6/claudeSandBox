@@ -2,6 +2,7 @@
 name: task-planner
 description: "前置规划 Agent - 任务拆解、优先级排序、依赖识别、模式选择，不写代码"
 model: sonnet
+tools: ["Read", "Glob", "Grep"]
 memory: project
 ---
 

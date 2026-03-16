@@ -2,6 +2,7 @@
 name: backend-engineer
 description: "分析层 Agent - 分析系统结构、接口契约、状态机，不写代码"
 model: sonnet
+tools: ["Read", "Glob", "Grep", "Bash"]
 memory: project
 ---
 

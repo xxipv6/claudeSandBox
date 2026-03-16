@@ -217,7 +217,27 @@ Claude：开始执行...
 
 **Agent 定义**：`.claude/agents/{agent-name}.md`
 
-### Rules（强制约束）
+### Agent 主动编排（无需用户提示）
+
+根据任务类型，主动使用相应的 agents：
+
+**任务规划**：
+- 复杂功能、架构调整 → `task-planner`
+- 需求不明确 → `product-manager`
+
+**代码审查**（可并发）：
+- 编写/修改代码后 → `backend-engineer` + `frontend-engineer`（并发）
+
+**安全审计**：
+- 提交前、敏感代码 → `security-tester`
+
+**代码实现**：
+- 新功能、Bug 修复 → `dev-coder`（使用 TDD）
+
+**并行执行**：
+- 对于独立操作，同时启动多个 agents（如代码审查时前后端并发）
+
+---
 
 **安全规则**（`.claude/rules/security.md`）：
 - ❌ 禁止硬编码密钥
