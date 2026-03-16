@@ -220,8 +220,12 @@ workspace/.claude/
 在容器中输入：
 
 ```
+/save               # 自动保存（最常用）⚡
 /learn              # 学习技能
 /tdd                # TDD 工作流
+/debug              # 调试问题
+/test               # 运行测试
+/deploy             # 部署应用
 /learn-eval         # 评估学习效果
 ```
 

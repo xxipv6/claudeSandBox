@@ -82,6 +82,7 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 - `/tdd` - 测试驱动开发工作流（RED → GREEN → REFACTOR）
 
 **实用命令**：
+- `/save` - 自动保存（git add + commit + 同步变体）⚡ **最常用**
 - `/debug` - 系统化调试流程，定位问题根因并修复
 - `/test` - 运行测试套件，检查代码覆盖率
 - `/deploy` - 部署应用到目标环境
