@@ -16,6 +16,13 @@ disable-model-invocation: false
 - 设计新系统
 - 重构现有代码
 
+**不需要使用的场景**：
+- 文件操作：解压、复制、移动、删除
+- 查询操作：查看文件、搜索代码、查看日志
+- 简单命令：ls, cat, grep, find
+- 信息查看：git status, git log, ps aux
+- **安全研究**：PoC 编写、漏洞验证（使用 poc-exploit skill）
+
 **核心原则**：
 - ✅ **所有创造性工作都必须先经过设计探索**
 - ❌ **禁止跳过设计直接实现**

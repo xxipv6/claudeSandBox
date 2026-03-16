@@ -47,6 +47,7 @@
    - 查询操作：查看文件、搜索代码、查看日志
    - 简单命令：ls, cat, grep, find
    - 信息查看：git status, git log, ps aux
+   - **安全研究**：PoC 编写、漏洞验证（使用 poc-exploit skill）
 
    **流程**：
    ```
@@ -58,6 +59,7 @@
 **判断标准**：
 - 如果任务涉及**设计/新功能** → brainstorming → planner → 执行
 - 如果任务涉及**明确编码**（设计已完成） → planner → 执行
+- 如果是**PoC 编写/漏洞验证** → 直接使用 poc-exploit skill
 - 如果只是**文件操作/信息查看** → 直接执行
 
 **特定场景自动调用**：
