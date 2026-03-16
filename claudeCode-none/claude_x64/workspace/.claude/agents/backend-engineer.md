@@ -1,6 +1,6 @@
 ---
 name: backend-engineer
-description: "分析层 Agent - 分析系统结构、接口契约、状态机，不写代码"
+description: "分析层 Agent - 分析系统结构、接口契约、状态机。当审查后端代码、分析架构时，应主动（PROACTIVELY）使用此 agent，不写代码"
 model: sonnet
 tools: ["Read", "Glob", "Grep", "Bash"]
 memory: project

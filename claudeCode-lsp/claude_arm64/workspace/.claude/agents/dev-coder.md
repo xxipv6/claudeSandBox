@@ -1,6 +1,6 @@
 ---
 name: dev-coder
-description: "执行层 Agent - 写所有代码：前端、后端、全栈、API、组件、数据库"
+description: "执行层 Agent - 写所有代码：前端、后端、全栈、API、组件、数据库。当需要实现代码功能时，应主动（PROACTIVELY）使用此 agent，使用 TDD 工作流"
 model: sonnet
 tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
 memory: project

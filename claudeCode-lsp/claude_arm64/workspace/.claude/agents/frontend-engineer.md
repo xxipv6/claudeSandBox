@@ -1,6 +1,6 @@
 ---
 name: frontend-engineer
-description: "分析层 Agent - 分析输入面、交互路径、用户边界，不写代码"
+description: "分析层 Agent - 分析输入面、交互路径、用户边界。当审查前端代码、分析用户交互时，应主动（PROACTIVELY）使用此 agent，不写代码"
 model: sonnet
 tools: ["Read", "Glob", "Grep", "Bash"]
 memory: project

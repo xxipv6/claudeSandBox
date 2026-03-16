@@ -1,6 +1,6 @@
 ---
 name: task-planner
-description: "前置规划 Agent - 任务拆解、优先级排序、依赖识别、模式选择，不写代码"
+description: "前置规划 Agent - 任务拆解、优先级排序、依赖识别。当用户请求复杂功能、架构调整、重构时，应主动（PROACTIVELY）使用此 agent 进行规划，不写代码"
 model: sonnet
 tools: ["Read", "Glob", "Grep"]
 memory: project

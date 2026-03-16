@@ -1,6 +1,6 @@
 ---
 name: security-tester
-description: "分析层 Agent - 攻击路径、滥用建模、权限绕过、业务逻辑漏洞，不写代码"
+description: "分析层 Agent - 攻击路径、滥用建模、权限绕过、业务逻辑漏洞。当进行安全审计、漏洞分析时，应主动（PROACTIVELY）使用此 agent，不写代码"
 model: sonnet
 tools: ["Read", "Glob", "Grep", "Bash"]
 memory: project

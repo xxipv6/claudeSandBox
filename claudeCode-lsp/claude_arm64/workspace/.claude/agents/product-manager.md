@@ -1,6 +1,6 @@
 ---
 name: product-manager
-description: "分析层 Agent - 识别需求、隐含前提、业务目标，不写代码"
+description: "分析层 Agent - 识别需求、隐含前提、业务目标。当需求不明确、需要澄清业务目标时，应主动（PROACTIVELY）使用此 agent，不写代码"
 model: sonnet
 tools: ["Read", "Glob", "Grep"]
 memory: project
