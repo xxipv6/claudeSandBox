@@ -1,20 +1,112 @@
 ---
-description: 执行 Web 应用白盒安全审计（8 阶段流程）
+description: 完整安全审计（Web 白盒 + IoT）
 ---
 
 # 安全审计
 
-## 审计目标
+## 功能说明
 
-系统性识别 Web 应用中的：
-- 漏洞（SQL 注入、XSS、CSRF 等）
-- 越权（水平、垂直、状态联动）
-- 逻辑缺陷（状态机绕过）
-- 跨接口联动风险
+执行完整的安全审计，自动识别审计类型并调用相应的 agent。
+
+---
+
+## 执行流程
+
+### 第一步：识别审计类型
+
+分析用户输入或项目结构，自动识别：
+
+**Web 应用审计**（白盒）：
+- 检测到 Web 框架（Express、Django、Spring 等）
+- 检测到 HTTP 路由、API 接口
+- 检测到前端代码
+
+**IoT 设备审计**：
+- 检测到固件文件（.bin、.elf、.fw）
+- 检测到嵌入式代码（C/C++、汇编）
+- 检测到硬件配置
+
+---
+
+### 第二步：调用 Security-Tester Agent
+
+```bash
+调用：security-tester agent
+
+Agent 职责：
+- Web 审计：使用 whitebox-audit skill（8 阶段流程）
+- IoT 审计：使用 iot-audit skill（统一模型）
+- 生成审计报告和修复建议
+```
+
+**Agent 调用方式**：
+
+```markdown
+请使用 security-tester agent 执行安全审计：
+
+**审计类型**：[Web 白盒 / IoT]
+**目标范围**：[文件路径或项目路径]
+**审计重点**：[可选：越权、注入、状态机等]
+
+**输出要求**：
+- 漏洞清单（按风险等级排序）
+- 攻击路径分析
+- 修复建议
+```
+
+---
+
+### 第三步：生成审计报告
+
+```markdown
+## 安全审计报告
+
+### 审计概览
+- 审计类型：[Web 白盒 / IoT]
+- 审计范围：[路径或模块]
+- 审计时间：[时间戳]
+
+### 漏洞清单
+
+#### 高危漏洞 (X)
+
+**1. [漏洞类型]**
+- **位置**：`file:line`
+- **风险等级**：高危
+- **CVSS 评分**：[评分]
+- **漏洞描述**：[详细描述]
+- **攻击路径**：[如何利用]
+- **修复建议**：[具体方案]
+
+#### 中危漏洞 (Y)
+
+[同上格式]
+
+#### 低危漏洞 (Z)
+
+[同上格式]
+
+### 攻击路径分析
+
+[跨接口联动、组合攻击等]
+
+### 修复优先级
+
+1. **立即修复**：[高危漏洞列表]
+2. **尽快修复**：[中危漏洞列表]
+3. **后续改进**：[低危漏洞列表]
+
+### 总结
+- 整体安全评分：[评分]
+- 主要风险：[总结]
+- 建议行动：[下一步]
+```
 
 ---
 
 ## 使用方式
+
+### Web 应用审计
 
 ```bash
 # 审计整个项目
@@ -22,234 +114,101 @@ description: 执行 Web 应用白盒安全审计（8 阶段流程）
 
 # 审计特定模块
 /security-audit src/auth/
+security-audit api/
 
-# 审计 API
-/security-audit api/
+# 审计特定文件
+/security-audit src/controllers/user.js
+```
+
+### IoT 设备审计
+
+```bash
+# 审计固件
+/security-audit firmware.bin
+
+# 审计源码
+/security-audit src/
+
+# 审计混合项目
+/security-audit ./
 ```
 
 ---
 
-## 审计流程（8 阶段）
+## Agent Skill 映射
 
-### 第一步：加载白盒审计技能
+**security-tester agent 使用的 skills**：
+
+| 审计类型 | Skill | 流程 |
+|----------|-------|------|
+| Web 白盒 | `security/whitebox-audit` | 8 阶段流程 |
+| IoT | `security/iot-audit` | 统一模型 |
+
+**Web 白盒 8 阶段**：
+1. 执行模型与信任边界
+2. 依赖与框架分析
+3. 执行链还原
+4. 路由枚举
+5. 业务流程分析
+6. 越权审计（主线）
+7. 状态机分析
+8. 攻击路径
+
+**IoT 统一模型**：
+- 入口 → 权限 → 状态 → 副作用
+
+---
+
+## 工作流程图
 
 ```
-读取：.claude/skills/security/whitebox-audit/
+用户输入
+    ↓
+识别审计类型
+    ↓
+security-tester agent
+    ↓
+    ├─→ Web 白盒 → whitebox-audit skill
+    └─→ IoT → iot-audit skill
+    ↓
+生成审计报告
 ```
-
-### 第二步：系统执行模型与信任边界建模
-
-**目标**：明确请求如何进入系统、在哪些地方被信任或放行
-
-**审计要点**：
-- 外部入口：HTTP API、RPC、MQ
-- 信任边界：用户 → Web → 内部服务
-- 输出：执行路径图
-
-### 第三步：依赖与框架层白盒分析
-
-**目标**：识别危险能力是否被引入并暴露
-
-**重点关注**：
-- 反序列化（JSON、XML）
-- 表达式解析（SpEL、OGNL）
-- 动态执行（脚本、反射）
-- 网络能力（SSRF）
-
-### 第四步：请求执行链还原
-
-**目标**：还原请求从入口到副作用的完整链路
-
-**审计要点**：
-- Filter / Middleware 顺序
-- Interceptor / Hook 覆盖
-- AOP / 注解完整性
-- 安全逻辑执行顺序
-
-### 第五步：路由全量枚举与能力分类
-
-**目标**：明确系统对外暴露的全部能力
-
-**审计要点**：
-- 枚举所有路由
-- 标注权限要求
-- 识别管理接口
-- 识别 Debug 路由
-
-### 第六步：控制器与业务流程级白盒审计
-
-**目标**：识别输入 → 校验 → 状态 → 副作用的完整链路
-
-**审计要点**：
-- 输入来源
-- 校验位置和完整性
-- 状态改变
-- 副作用
-
-### 第七步：越权专项审计（主线）
-
-**这是最重要的审计环节**
-
-**审计内容**：
-- 权限模型梳理
-- 权限控制点枚举
-- 路由级越权
-- 资源级越权（高发）
-- 状态 + 权限联动
-- 跨接口越权组合
-
-### 第八步：状态机与跨路由联动分析
-
-**目标**：识别业务状态被滥用的可能性
-
-**审计要点**：
-- 列出关键状态字段
-- 标注创建/修改/依赖接口
-- 检查状态转换是否受限
-
-### 第九步：攻击路径建模与验证
-
-**目标**：将发现的问题串联成可利用的攻击路径
-
-**验证步骤**：
-- 假设：我是最低权限用户
-- 构造：合法请求序列、参数
-- 确认：是否真实可利用、业务影响
 
 ---
 
 ## 输出格式
 
-### 审计报告结构
+### 漏洞格式
 
 ```markdown
-## Web 白盒安全审计报告
+#### [漏洞类型] - `[file:line]`
 
-### 审计范围
-- 目标：src/auth/
-- 框架：Express.js
-- 审计时间：2024-xx-xx
+**风险等级**：🔴 高危 / 🟡 中危 / 🟢 低危
 
-### 执行摘要
-- 发现漏洞：X 个高危，Y 个中危，Z 个低危
-- 主要风险：越权、逻辑缺陷
+**漏洞描述**：
+[详细说明]
 
-### 详细发现
-
-#### 1. [高危] 水平越权 - GET /api/users/:id
-
-**位置**：
-- 文件：src/controllers/UserController.js
-- 函数：getUser
-- 行号：45-50
-
-**触发路径**：
-```
-1. 用户 A 登录
-2. 请求：GET /api/users/2（用户 B 的 ID）
-3. 控制器：UserController.getUser()
-4. Service：UserService.findById(2)
-5. DAO：SELECT * FROM users WHERE id = 2
-6. 响应：返回用户 B 的数据
-```
-
-**代码片段**：
-```javascript
-app.get('/api/users/:id', async (req, res) => {
-  const userId = req.params.id;
-  // 风险：没有检查 userId 是否属于当前用户
-  const user = await User.findById(userId);
-  res.json(user);
-});
-```
-
-**业务影响**：
-- 任意用户可以查看其他用户信息
-- 敏感数据泄露（邮箱、手机号）
+**攻击路径**：
+1. 攻击者 [步骤 1]
+2. 然后 [步骤 2]
+3. 最终 [后果]
 
 **修复建议**：
-```javascript
-app.get('/api/users/:id', async (req, res) => {
-  const requestedId = req.params.id;
-  const currentUserId = req.session.userId;
-
-  // 添加所有权检查
-  if (requestedId !== currentUserId && !req.user.isAdmin) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-
-  const user = await User.findById(requestedId);
-  res.json(user);
-});
+```diff
+- vulnerable code
++ fixed code
 ```
 
----
-
-### 修复优先级
-
-#### 立即修复（高危）
-1. 水平越权 - GET /api/users/:id
-2. 垂直越权 - DELETE /api/users/:id
-3. SQL 注入 - POST /api/search
-
-#### 计划修复（中危）
-1. 状态机绕过 - PUT /api/orders/:id/status
-2. 信息泄露 - GET /api/debug/info
-
-#### 最佳实践（低危）
-1. 缺少日志记录
-2. 缺少速率限制
-
----
-
-## 审计原则
-
-1. **不只找"漏洞点"，而是还原真实执行模型**
-2. **不只看"有没有校验"，而是看校验是否完整、是否可组合**
-3. **不只看"单接口"，而是看跨接口、跨状态联动**
-4. **越权作为独立主线贯穿全流程**
+**参考**：
+- CWE-XXX
+- [相关文档]
+```
 
 ---
 
 ## 注意事项
 
-- 完整审计需要较长时间（取决于项目规模）
-- 建议在测试环境执行
-- 审计过程中需要代码访问权限
-- 遵循负责任的披露原则
-
----
-
-## IoT 设备审计
-
-**IoT 设备审计请使用**：
-```
-.claude/skills/security/iot-audit/
-```
-
-该 Skill 自动识别资产形态（固件 / 源码 / 混合），进行 IoT 设备安全审计。
-
-### 支持的资产类型
-
-- **仅固件**：.bin / .img / .trx / .fw
-- **仅源代码**：Makefile / CMakeLists.txt / src/
-- **混合**：固件 + 源代码
-
-### 审计内容
-
-- 远程攻击（无认证访问、默认凭证、升级链）
-- 局域网攻击（协议漏洞、中间人）
-- 物理接触（调试接口、固件提取）
-
----
-
-## 与其他命令的区别
-
-- `/security-audit` - Web 白盒安全审计
-- `/code-review` - 代码审查（6 维度，包含安全性）
-- `/debug` - 调试问题（从症状到根因）
-
-**使用建议**：
-- 安全研究 → `/security-audit` 或 `binary-reverse` Skill
-- 日常开发 → `/code-review`
-- 问题排查 → `/debug`
+1. **自动识别**：命令自动识别审计类型，无需手动指定
+2. **Agent 职责**：security-tester agent 负责实际审计工作
+3. **Skill 使用**：agent 根据审计类型加载相应的 skill
+4. **重点突出**：越权作为 Web 审计的主线
