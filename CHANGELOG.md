@@ -4,6 +4,126 @@
 
 ### 重大更新
 
+#### v2.2.0 - 智能体驱动架构
+
+从命令驱动（v2.1.0）重构为智能体驱动架构，实现智能体主动触发、职责边界清晰化、模型选择优化。
+
+**核心架构变化**：
+
+1. **智能体驱动系统**
+   - **新增**：9 个专业智能体（system-architect, planner, tdd-guide, research, dev, reviewer, ops, doc-updater）
+   - **新增**：主动触发机制 - "应主动（PROACTIVELY）使用"
+   - **优化**：职责边界清晰化
+     - research：负责安全问题（SQL 注入、XSS、权限绕过等）
+     - reviewer：负责逻辑正确性、架构边界、命名风格、可维护性（不含安全）
+   - **新增**：模型选择策略
+     - haiku：文档任务（doc-updater）- 成本优化
+     - sonnet：大部分智能体 - 平衡性能与成本
+     - opus：极复杂安全研究 - 最高性能
+
+2. **技能库扩展**
+   - **新增**：`frontend-patterns` skill - React/Next.js 前端开发模式
+   - **新增**：`backend-patterns` skill - 后端开发模式（API 设计、数据库、缓存等）
+   - **新增**：`code-review` skill - 代码审查方法论
+   - **新增**：`vuln-patterns` skill - OWASP Top 10 漏洞模式
+   - **保留**：`web-whitebox-audit`（8 阶段）、`iot-audit`（自动识别）、`debugging`、`tdd-workflow`
+
+3. **命令系统优化**
+   - **新增**：`/learn` - 从会话中提取模式并保存为技能
+   - **新增**：`/learn-eval` - 评估已学习的模式质量
+   - **新增**：`/tdd` - 测试驱动开发工作流（RED → GREEN → REFACTOR）
+   - **移除**：旧的通用命令（/security-audit, /code-review, /debug, /test, /e2e）
+
+4. **规则系统完善**
+   - **新增**：`agents.md` - 智能体编排规则、职责边界、协作模式
+   - **新增**：`security.md` - 安全编码规范（输入验证、输出编码、认证授权、加密等）
+   - **新增**：`git-workflow.md` - Git 工作流（提交格式、PR 流程、分支管理）
+   - **新增**：语言特定编码规范
+     - `python/coding-style.md` - PEP 8、类型注解、安全要求
+     - `javascript/coding-style.md` - TypeScript、React、安全要求
+     - `go/coding-style.md` - 命名、错误处理、并发安全
+     - `java/coding-style.md` - Spring、异常处理、依赖注入
+
+5. **文档优化**
+   - **简化**：CLAUDE.md 优化为"统一协作契约"（119 行）
+   - **移除**：Available Resources 部分（保持简洁，专注于协作契约）
+   - **新增**：Compact Instructions（控制上下文压缩时的内容保留）
+   - **更新**：ARCHITECTURE.md - 反映 v2.2.0 智能体驱动架构
+   - **更新**：README.md - 更新到 v2.2.0
+
+6. **智能体协作模式**
+   - **规划 → TDD → 审查流程**：planner → tdd-guide → dev → reviewer → doc-updater
+   - **研究分离流程**：research（安全审计）+ reviewer（质量审查）→ 并行
+   - **架构驱动流程**：system-architect → planner → dev → reviewer
+   - **运维集成流程**：dev → ops → doc-updater
+
+**文件结构变化**：
+
+```
+workspace/
+├── CLAUDE.md                    # 主配置（简化为 119 行）
+├── .claude/
+│   ├── commands/                # 命令定义
+│   │   ├── learn.md            # 新增
+│   │   ├── learn-eval.md       # 新增
+│   │   └── tdd.md              # 新增
+│   ├── skills/                  # 技能库（扩展）
+│   │   ├── security/
+│   │   │   ├── web-whitebox-audit/
+│   │   │   └── iot-audit/
+│   │   ├── development/        # 重命名
+│   │   │   ├── frontend-patterns/  # 新增
+│   │   │   ├── backend-patterns/   # 新增
+│   │   │   ├── debugging/
+│   │   │   ├── code-review/        # 新增
+│   │   │   └── tdd-workflow/
+│   │   └── vuln-patterns/      # 新增
+│   ├── agents/                 # 智能体定义（新增到 9 个）
+│   │   ├── system-architect.md  # 新增
+│   │   ├── planner.md           # 新增
+│   │   ├── tdd-guide.md         # 新增
+│   │   ├── research.md          # 新增
+│   │   ├── dev.md               # 新增
+│   │   ├── reviewer.md          # 新增
+│   │   ├── ops.md               # 新增
+│   │   └── doc-updater.md       # 新增
+│   ├── agent-memory/           # Agent 持久记忆（对应 9 个智能体）
+│   └── rules/                  # 强制规则（完善）
+│       ├── agents.md           # 新增
+│       ├── security.md         # 新增
+│       ├── git-workflow.md     # 新增
+│       ├── python/
+│       │   └── coding-style.md # 新增
+│       ├── javascript/
+│       │   └── coding-style.md # 新增
+│       ├── go/
+│       │   └── coding-style.md # 新增
+│       └── java/
+│           └── coding-style.md # 新增
+```
+
+**核心原则**：
+
+1. **智能体优先**：专业智能体负责特定领域，主动触发
+2. **职责清晰**：每个智能体有明确的职责边界，避免重叠
+3. **渐进式披露**：技能和规则按需加载，节省上下文
+4. **模型优化**：根据任务复杂度选择合适的模型
+
+**适用场景**：
+
+- ✅ 安全研究（漏洞分析、PoC 开发、渗透测试）
+- ✅ 安全开发（安全编码、威胁建模、代码审查）
+- ✅ 日常开发（调试、测试、重构）
+
+**适用版本**：
+
+- `claudeCode-none/claude_arm64` ✅
+- `claudeCode-none/claude_x64` ✅
+- `claudeCode-lsp/claude_arm64` ✅
+- `claudeCode-lsp/claude_x64` ✅
+
+---
+
 #### v2.1.0 - 命令驱动架构
 
 从模式驱动（v2.0.0）重构为命令驱动架构，简化使用流程，专注安全场景。

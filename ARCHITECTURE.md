@@ -1,299 +1,250 @@
-# claudeSandBox 架构设计（v2.1.0）
+# claudeSandBox 架构设计（v2.2.0）
 
 ## 系统定位
 
-claudeSandBox 是一个**命令驱动**的 Claude Code 沙箱环境，专为**安全研究、安全开发和日常开发**设计。
+claudeSandBox 是一个**智能体驱动**的 Claude Code 沙箱环境，专为**安全研究、安全开发和日常开发**设计。
 
 **核心特点**：
-- 🚀 **命令驱动** - 快捷命令，按需执行
+- 🤖 **智能体驱动** - 专业智能体，主动触发
 - 🧠 **技能库** - 按需加载的知识库
-- 🤖 **智能体** - 专门任务，按需调用
+- 💬 **命令系统** - 快捷命令，特定场景
 - 🛡️ **规则系统** - 强制约束（安全、编码、测试）
+
+**设计理念**：
+- ✅ **职责清晰** - 每个智能体有明确的职责边界
+- ✅ **主动触发** - "应主动（PROACTIVELY）使用"机制
+- ✅ **渐进式披露** - 技能和规则按需加载
+- ✅ **成本优化** - haiku 处理文档，sonnet 处理复杂任务
 
 ---
 
 ## 核心架构
 
-### 命令驱动系统
+### 智能体驱动系统
 
 ```
-用户输入 → 命令执行 → 完成任务
+用户输入 → 意图识别 → 智能体调度 → 完成任务
+   ↓           ↓          ↓          ↓
+ 理解需求    匹配场景   调用agent   输出结果
 ```
 
-**核心命令**：
-```bash
-/security-audit     # 安全审计
-/code-review        # 代码审查（前后端）
-/debug              # 调试问题
-/test               # 功能测试
-/e2e                # 全部测试（前端 + 后端，并发）
-```
+**核心智能体**（9个）：
+- `system-architect` - 系统架构设计
+- `planner` - 任务规划
+- `tdd-guide` - 测试驱动开发
+- `research` - 安全研究（PoC、漏洞复现、协议分析、代码安全审计）
+- `dev` - 日常开发
+- `reviewer` - 代码审查（逻辑/架构/质量，不含安全）
+- `ops` - 运维自动化
+- `doc-updater` - 文档维护
 
 **设计原则**：
-- ✅ 简洁直观 - 直接使用命令，无需模式选择
-- ✅ 按需调用 - 根据任务选择合适的命令/skill/agent
-- ✅ 专注安全 - 所有命令都针对安全场景优化
+- ✅ **职责分离** - research 负责安全，reviewer 负责质量
+- ✅ **主动触发** - 描述中包含"应主动（PROACTIVELY）使用"时自动调用
+- ✅ **模型选择** - haiku（文档）、sonnet（大部分）、opus（极复杂）
 
 ---
 
-### 四大组件
+## 四大组件
 
-#### 1. 命令（Commands）
+### 1. 智能体（Agents）
 
-**定义位置**：`.claude/commands/{command-name}.md`
+**定义位置**：`.claude/agents/{agent-name}.md`
 
-**可用命令**：
-- `/security-audit` - 安全审计（Web 白盒 + IoT）
-- `/code-review` - 代码审查（前后端）
-- `/debug` - 调试问题
-- `/test` - 功能测试
-- `/e2e` - 全部测试（并发）
+**架构类**：
+- `system-architect` - 系统架构设计、模块边界规划、架构风险评估
 
-#### 2. 技能库（Skills）
+**规划类**：
+- `planner` - 任务规划与分解、需求分析
+
+**开发类**：
+- `tdd-guide` - 测试驱动开发（80%+ 覆盖率要求）
+- `dev` - 日常开发（Web/API/工具开发、工程规范遵守）
+- `research` - 安全研究、PoC 开发、漏洞复现、协议分析、代码安全审计
+
+**质量类**：
+- `reviewer` - 代码审查（逻辑正确性、架构边界、命名风格、可维护性）
+
+**运维类**：
+- `ops` - 运维自动化、部署脚本、监控配置
+
+**文档类**：
+- `doc-updater` - 文档维护、代码映射图生成、README 更新
+
+### 2. 技能库（Skills）
 
 **定义位置**：`.claude/skills/{category}/{skill-name}/SKILL.md`
 
 **安全技能**：
-- `security/whitebox-audit` - Web 白盒安全审计（8 阶段流程）
+- `security/web-whitebox-audit` - Web 白盒安全审计（8 阶段流程）
 - `security/iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
+- `vuln-patterns` - OWASP Top 10 漏洞模式
 
 **开发技能**：
-- `development/debugging` - 调试方法论
-- `development/code-review` - 代码审查清单
-- `development/tdd-workflow` - TDD 工作流
+- `frontend-patterns` - React/Next.js 前端模式
+- `backend-patterns` - 后端开发模式
+- `debugging` - 调试方法论
+- `code-review` - 代码审查清单
+- `tdd-workflow` - TDD 工作流
 
-**测试技能**：
-- `testing/e2e-testing` - E2E 测试（Playwright）
+### 3. 命令（Commands）
 
-**分析技能**：
-- `analysis/domains` - 10 个分析维度
+**定义位置**：`.claude/commands/{command-name}.md`
 
-#### 3. 智能体（Agents）
+**学习命令**：
+- `/learn` - 从会话中提取模式并保存为技能
+- `/learn-eval` - 评估已学习的模式质量
 
-**定义位置**：`.claude/agents/{agent-name}.md`
+**开发命令**：
+- `/tdd` - 测试驱动开发工作流（RED → GREEN → REFACTOR）
 
-**规划类**：
-- `task-planner` - 任务规划与分解
-
-**分析类**（可并发）：
-- `product-manager` - 产品需求分析
-- `backend-engineer` - 后端架构分析（使用 `code-review` skill）
-- `frontend-engineer` - 前端实现分析（使用 `code-review` skill）
-- `security-tester` - 安全测试与漏洞分析（使用 `whitebox-audit` + `iot-audit` skills）
-
-**执行类**：
-- `dev-coder` - 代码实现（使用 `tdd-workflow` skill）
-
-#### 4. 规则（Rules）
+### 4. 规则（Rules）
 
 **定义位置**：`.claude/rules/{rule-name}.md`
 
-- `security.md` - 安全规则（禁止硬编码密钥、SQL 注入、XSS 等）
-- `coding-style.md` - 代码风格
-- `testing.md` - 测试要求
+**编排规则**：
+- `agents.md` - 智能体编排规则、职责边界、协作模式
+
+**安全规则**：
+- `security.md` - 安全编码规范（输入验证、输出编码、认证授权等）
+
+**工作流规则**：
+- `git-workflow.md` - Git 工作流（提交格式、PR 流程、分支管理）
+
+**编码规范**（语言特定）：
+- `python/coding-style.md` - Python 编码规范（PEP 8、类型注解、安全要求）
+- `javascript/coding-style.md` - JavaScript/TypeScript 编码规范（命名、TS 要求、React 规范）
+- `go/coding-style.md` - Go 编码规范（命名、错误处理、并发安全）
+- `java/coding-style.md` - Java 编码规范（命名、异常处理、Spring 规范）
 
 ---
 
-## 工作流程
+## 主动触发机制
 
-### 标准工作流程
+### 什么是"应主动（PROACTIVELY）使用"
 
-```
-用户输入 → 任务规划 → 用户确认 → 执行任务 → 完成反馈
-   ↓           ↓          ↓          ↓          ↓
- 理解意图    调用 planner  等待确认   执行操作   输出结果
-```
+所有智能体和技能的描述中都包含**"应主动（PROACTIVELY）使用"**标记，这意味着：
 
-### 工作流程示例
+**智能体会在识别到相关场景时自动调用，无需等待用户明确指示。**
+
+### 触发示例
 
 ```bash
 # 用户输入
-你：帮我实现用户登录功能
+你：帮我审查这段代码的性能问题
 
-# 第一步：任务规划
-Claude：让我先规划一下这个任务...
+# Claude 自动识别场景
+识别到：代码审查场景
+触发智能体：reviewer（应主动使用）
+原因：描述中包含"当代码编写完成后需要审查代码质量时，应主动（PROACTIVELY）使用此 agent"
 
-## 任务规划
-### 1. 任务理解
-**目标**：实现用户登录功能
-**边界**：前端登录页面 + 后端登录 API
-**成功标准**：用户可以使用邮箱密码登录
+# 自动调用
+Claude：让我调用 reviewer 智能体来审查代码质量...
+[执行审查]
+```
 
-### 2. 任务拆解
-- 子任务 1：设计数据库表结构
-- 子任务 2：实现后端登录 API
-- 子任务 3：实现前端登录页面
-- 子任务 4：集成前后端
+### 主动触发的优势
 
-### 3. 依赖关系
-T1（数据库）→ T2（后端 API）→ T3（前端页面）→ T4（集成）
-
-### 4. 执行顺序
-1. T1 → T2 → T3 → T4（串行）
-2. 预估时间：30 分钟
-
-### 5. 命令选择
-**选择的命令**：不使用命令，直接实现
-**理由**：这是完整的功能实现任务
-
-### 6. 资源规划
-- backend-engineer：设计数据库和 API
-- frontend-engineer：设计登录页面
-- dev-coder：实现代码
+- ✅ **减少沟通成本** - 无需用户明确指定
+- ✅ **提高效率** - 自动选择最合适的智能体
+- ✅ **避免遗漏** - 关键步骤不会错过
 
 ---
 
-# 第二步：等待用户确认
-是否开始执行？请确认。
+## 智能体协作模式
 
-# 第三步：用户确认后执行
-你：确认，开始执行。
+### 1. 规划 → TDD → 审查流程
 
-# 第四步：执行并反馈
-Claude：开始执行...
-[执行过程]
-完成！登录功能已实现。
 ```
+planner → tdd-guide → dev → reviewer → doc-updater
+```
+
+适用于：新功能开发、重大重构
+
+**关键点**：
+- tdd-guide 确保测试先行，80%+ 覆盖率
+- reviewer 检查逻辑/架构/质量（不含安全）
+- research 单独处理安全问题
+
+### 2. 研究分离流程
+
+```
+research (安全审计) + reviewer (质量审查) → 并行
+```
+
+适用于：代码提交前审查
+
+**职责边界**：
+- **research**: 安全问题（SQL 注入、XSS、权限绕过等）
+- **reviewer**: 逻辑正确性、架构边界、命名风格、可维护性
+
+### 3. 架构驱动流程
+
+```
+system-architect → planner → dev → reviewer
+```
+
+适用于：新系统设计、复杂模块
+
+### 4. 运维集成流程
+
+```
+dev → ops → doc-updater
+```
+
+适用于：部署、监控、配置管理
 
 ---
 
-## 命令详解
+## 模型选择策略
 
-### /security-audit - 安全审计
+### haiku（成本优化）
 
-**功能**：完整的安全审计，支持 Web 应用和 IoT 设备
+**适用场景**：
+- 文档生成和维护（doc-updater）
+- 代码映射图生成
+- README 更新
 
-**支持类型**：
-- **Web 白盒审计**（`whitebox-audit` skill）
-  - 8 阶段流程：执行模型 → 依赖分析 → 执行链 → 路由枚举 → 业务流程 → 越权审计 → 状态机 → 攻击路径
-  - 重点：越权作为主线、跨接口联动、状态机建模
+**优势**：成本低，速度快
 
-- **IoT 审计**（`iot-audit` skill）
-  - 自动识别资产形态（仅固件/仅源码/混合）
-  - 统一模型：入口 → 权限 → 状态 → 副作用
+### sonnet（默认）
 
-**使用示例**：
-```bash
-# Web 应用审计
-/security-audit
-/security-audit src/auth/
+**适用场景**：
+- 大部分智能体（system-architect, planner, tdd-guide, dev, reviewer, ops）
+- 日常开发任务
+- 代码审查
 
-# IoT 设备审计
-/security-audit firmware.bin
-/security-audit src/
-```
+**优势**：平衡性能与成本
 
-**输出**：
-- 漏洞清单（高/中/低风险）
-- 攻击路径
-- 修复建议
+### opus（极复杂任务）
 
-### /code-review - 代码审查
+**适用场景**：
+- 极其复杂的安全研究
+- 深度漏洞分析
+- 复杂协议逆向
 
-**功能**：前后端代码审查（6 维度）
-
-**审查维度**：
-- 功能性、性能、可读性、可维护性、测试、安全性（基础安全）
-
-**使用示例**：
-```bash
-/code-review
-/code-review src/auth/login.js
-```
-
-**输出**：
-- 问题清单
-- 修复建议
-- 优先级排序
-
-### /debug - 调试问题
-
-**功能**：系统化调试
-
-**特点**：
-- 自动识别前端/后端
-- 前端：自动使用 Playwright
-
-**使用示例**：
-```bash
-/debug "登录按钮点击没反应"
-/debug "API 返回 500 错误"
-```
-
-### /test - 功能测试
-
-**功能**：功能测试（前端或后端）
-
-**特点**：
-- 自动识别前端/后端
-- 前端：自动使用 Playwright
-
-**使用示例**：
-```bash
-/test "测试登录按钮"
-/test "测试 API 返回"
-```
-
-### /e2e - 全部测试
-
-**功能**：并发运行所有测试
-
-**执行内容**：
-- 后端测试（npm test）
-- 前端 E2E 测试（Playwright）
-
-**使用示例**：
-```bash
-/e2e
-/e2e "只运行包含 login 的测试"
-```
+**优势**：最高性能
 
 ---
 
-## Agents ↔ Skills 对齐
+## 职责边界清晰化
 
-| Agent | 使用 Skill | 职责 |
-|-------|-----------|------|
-| **security-tester** | `whitebox-audit` + `iot-audit` | 安全测试与漏洞分析 |
-| **backend-engineer** | `code-review`（后端） | 后端架构分析 |
-| **frontend-engineer** | `code-review`（前端） | 前端实现分析 |
-| **dev-coder** | `tdd-workflow` | 代码实现（TDD） |
-| **task-planner** | 无 | 任务规划与分解 |
-| **product-manager** | 无 | 产品需求分析 |
+### research vs reviewer
 
----
+| 维度 | research | reviewer |
+|------|----------|----------|
+| **安全** | ✅ 负责（SQL注入、XSS、权限绕过） | ❌ 不负责 |
+| **逻辑正确性** | ❌ 不负责 | ✅ 负责 |
+| **架构边界** | ❌ 不负责 | ✅ 负责 |
+| **命名风格** | ❌ 不负责 | ✅ 负责 |
+| **可维护性** | ❌ 不负责 | ✅ 负责 |
 
-## 强制要求
+### system-architect vs planner
 
-### 规划优先
-
-**所有任务都必须先规划**：
-1. ✅ 简单任务：快速规划（1-2 分钟）
-2. ✅ 复杂任务：详细规划（使用 task-planner agent）
-3. ✅ 规划内容包括：任务拆解、依赖关系、执行顺序、所需资源
-
-### 必须等待确认
-
-1. ✅ 规划完成后必须等待用户确认
-2. ✅ 展示规划结果
-3. ✅ 说明预期耗时和影响范围
-4. ✅ 等待用户明确确认后再执行
-
-### 规划未确认不得执行
-
-1. ❌ 不得跳过规划直接执行
-2. ❌ 不得假设用户会同意
-3. ❌ 不得在规划阶段就开始修改代码
-
----
-
-## 全局禁止
-
-1. ❌ **跳过规划直接执行任务**（最严重的违规）
-2. ❌ 跳过用户确认就执行大规模修改
-3. ❌ 违反安全规则（硬编码密钥、缺少输入验证等）
-4. ❌ 过度形式化（输出冗长的分析报告）
-5. ❌ 忽略用户的安全研究授权范围
+| 维度 | system-architect | planner |
+|------|------------------|---------|
+| **系统级架构** | ✅ 负责（模块边界、技术选型） | ❌ 不负责 |
+| **功能实现计划** | ❌ 不负责 | ✅ 负责（任务拆解、依赖分析） |
 
 ---
 
@@ -312,82 +263,96 @@ claudeSandBox/
     └── .claude/
         ├── CLAUDE.md         # 项目约定
         ├── commands/         # 命令定义
-        │   ├── security-audit.md
-        │   ├── code-review.md
-        │   ├── debug.md
-        │   ├── test.md
-        │   └── e2e.md
+        │   ├── learn.md
+        │   ├── learn-eval.md
+        │   └── tdd.md
         ├── skills/           # 技能库
-        │   ├── security/     # 安全技能
-        │   │   ├── whitebox-audit/
+        │   ├── security/
+        │   │   ├── web-whitebox-audit/
         │   │   └── iot-audit/
-        │   ├── development/  # 开发技能
+        │   ├── development/
+        │   │   ├── frontend-patterns/
+        │   │   ├── backend-patterns/
         │   │   ├── debugging/
         │   │   ├── code-review/
         │   │   └── tdd-workflow/
-        │   ├── testing/      # 测试技能
-        │   │   └── e2e-testing/
-        │   └── analysis/     # 分析技能
-        │       └── domains/
+        │   └── vuln-patterns/
         ├── agents/           # 智能体定义
-        │   ├── task-planner.md
-        │   ├── product-manager.md
-        │   ├── backend-engineer.md
-        │   ├── frontend-engineer.md
-        │   ├── security-tester.md
-        │   └── dev-coder.md
+        │   ├── system-architect.md
+        │   ├── planner.md
+        │   ├── tdd-guide.md
+        │   ├── research.md
+        │   ├── dev.md
+        │   ├── reviewer.md
+        │   ├── ops.md
+        │   └── doc-updater.md
         ├── agent-memory/     # Agent 持久记忆
-        │   ├── task-planner/
-        │   ├── product-manager/
-        │   ├── backend-engineer/
-        │   ├── frontend-engineer/
-        │   ├── security-tester/
-        │   └── dev-coder/
+        │   ├── system-architect/
+        │   ├── planner/
+        │   ├── tdd-guide/
+        │   ├── research/
+        │   ├── dev/
+        │   ├── reviewer/
+        │   ├── ops/
+        │   └── doc-updater/
         └── rules/            # 强制规则
+            ├── agents.md
             ├── security.md
-            ├── coding-style.md
-            └── testing.md
+            ├── git-workflow.md
+            ├── python/
+            │   └── coding-style.md
+            ├── javascript/
+            │   └── coding-style.md
+            ├── go/
+            │   └── coding-style.md
+            └── java/
+                └── coding-style.md
 ```
 
 ---
 
 ## 版本历史
 
-### v2.1.0 (2026-03-16)
+### v2.2.0 (2026-03-16)
 
-**重大更新**：从模式驱动重构为命令驱动
+**重大更新**：从命令驱动重构为智能体驱动
 
 **核心变化**：
-- ✅ 删除双模式系统（标准模式/完整模式）
-- ✅ 删除 6 阶段流程系统
-- ✅ 删除状态管理系统
-- ✅ 添加命令驱动系统
-- ✅ 添加技能库（按需加载）
-- ✅ 创建 whitebox-audit 和 iot-audit skills
-- ✅ 对齐 Agents 和 Skills
-- ✅ 添加"所有任务都必须先规划"的强制要求
 
-**删除的功能**：
-- ❌ 快速模式
-- ❌ 标准模式
-- ❌ 完整模式
-- ❌ 6 个执行阶段
-- ❌ 任务状态管理
-- ❌ Git 分支管理
-- ❌ 质量门禁
-- ❌ Knowledge 系统（改为 Skills）
+1. **智能体驱动系统**
+   - ✅ 新增 9 个专业智能体（system-architect, planner, tdd-guide, research, dev, reviewer, ops, doc-updater）
+   - ✅ 主动触发机制："应主动（PROACTIVELY）使用"
+   - ✅ 职责边界清晰化：research 负责安全，reviewer 负责质量
+   - ✅ 模型选择策略：haiku（文档）、sonnet（大部分）、opus（极复杂）
 
-**新增的功能**：
-- ✅ 命令驱动（5 个核心命令）
-- ✅ 技能库（7 个 skills）
-- ✅ 强制规划要求
-- ✅ 自动识别（前端/后端，固件/源码）
+2. **技能库扩展**
+   - ✅ 新增 frontend-patterns skill（React/Next.js 模式）
+   - ✅ 新增 backend-patterns skill（后端开发模式）
+   - ✅ 新增 code-review skill（代码审查清单）
+   - ✅ 新增 vuln-patterns skill（OWASP Top 10）
 
-### v2.0.0 (2026-03-15)
+3. **命令系统优化**
+   - ✅ 新增 learn 命令（从会话中提取模式）
+   - ✅ 新增 learn-eval 命令（评估已学习的模式）
+   - ✅ 新增 tdd 命令（测试驱动开发工作流）
+   - ✅ 移除旧的通用命令（security-audit, code-review, debug, test, e2e）
 
-**重大更新**：配置驱动的流程编排系统
+4. **规则系统完善**
+   - ✅ 新增 agents.md（智能体编排规则）
+   - ✅ 新增 security.md（安全编码规范）
+   - ✅ 新增 git-workflow.md（Git 工作流）
+   - ✅ 新增语言特定编码规范（Python, JavaScript, Go, Java）
 
-详见旧版本文档。
+5. **文档优化**
+   - ✅ CLAUDE.md 简化为"统一协作契约"（119 行）
+   - ✅ 移除 Available Resources 部分（保持简洁）
+   - ✅ 添加 Compact Instructions（控制上下文压缩）
+
+### v2.1.0 (2026-03-16)
+
+从模式驱动重构为命令驱动架构。
+
+详见 v2.1.0 版本文档。
 
 ---
 
@@ -401,10 +366,26 @@ claudeSandBox/
 
 ## 版本对比
 
-### v2.1.0（当前）- 命令驱动
+### v2.2.0（当前）- 智能体驱动
 
 ```bash
-# 直接使用命令
+# 自动触发智能体
+你：帮我审查这段代码
+Claude：[自动识别场景，调用 reviewer]
+你：分析这个安全问题
+Claude：[自动识别场景，调用 research]
+```
+
+**特点**：
+- ✅ 智能体主动触发
+- ✅ 职责边界清晰
+- ✅ 模型选择优化
+- ✅ 渐进式披露
+
+### v2.1.0 - 命令驱动
+
+```bash
+# 手动使用命令
 /security-audit
 /code-review
 /debug
@@ -413,10 +394,9 @@ claudeSandBox/
 ```
 
 **特点**：
-- ✅ 简洁直观
-- ✅ 按需调用
-- ✅ 无模式选择
-- ✅ 专注安全场景
+- ⚠️ 需要手动选择命令
+- ⚠️ 职责边界不够清晰
+- ⚠️ 没有模型选择优化
 
 ### v2.0.0 - 模式驱动
 

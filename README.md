@@ -4,16 +4,16 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-4.6-purple.svg)](https://claude.com/claude-code)
-[![Version](https://img.shields.io/badge/version-2.1.0-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.0-green.svg)](CHANGELOG.md)
 
 ## 📖 简介
 
 claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude Code CLI 和专为安全场景优化的工具集。
 
 **核心特点**：
-- 🚀 **命令驱动** - 快捷命令，按需执行
+- 🤖 **智能体驱动** - 专业智能体，主动触发
 - 🧠 **技能库（Skills）** - 按需加载的知识库
-- 🤖 **智能体（Agents）** - 专门任务，按需调用
+- 💬 **命令系统（Commands）** - 快捷命令，特定场景
 - 🛡️ **规则系统（Rules）** - 强制约束
 
 **专注场景**：
@@ -25,63 +25,68 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 
 ## ✨ 核心特性
 
-### 🎯 命令驱动
+### 🤖 智能体驱动（Agent-Driven）
 
-不再需要选择模式，直接使用命令：
+**9 个专业智能体，主动触发**：
 
-```bash
-# 安全研究
-/security-audit     # 安全审计（Web 白盒 + IoT）
+**架构类**：
+- `system-architect` - 系统架构设计、模块边界规划
 
-# 日常开发
-/code-review        # 代码审查（前后端）
-/debug              # 调试问题
-/test               # 功能测试
-/e2e                # 全部测试（前端 + 后端，并发）
-```
+**规划类**：
+- `planner` - 任务规划与分解、需求分析
+
+**开发类**：
+- `tdd-guide` - 测试驱动开发（80%+ 覆盖率）
+- `dev` - 日常开发（Web/API/工具开发）
+- `research` - 安全研究（PoC、漏洞复现、代码安全审计）
+
+**质量类**：
+- `reviewer` - 代码审查（逻辑/架构/质量，不含安全）
+
+**运维类**：
+- `ops` - 运维自动化、部署脚本、监控配置
+
+**文档类**：
+- `doc-updater` - 文档维护、代码映射图生成
 
 **特点**：
-- ✅ 简洁直观 - 直接使用命令
-- ✅ 按需调用 - 根据任务选择
-- ✅ 无模式选择 - 无需选择标准/完整模式
-- ✅ 专注安全 - 所有命令针对安全场景优化
+- ✅ **主动触发** - "应主动（PROACTIVELY）使用"机制，自动识别场景
+- ✅ **职责清晰** - research 负责安全，reviewer 负责质量
+- ✅ **模型优化** - haiku（文档）、sonnet（大部分）、opus（极复杂）
 
 ### 🧠 技能库（Skills）
 
 按需加载的知识库：
 
 **安全技能**：
-- `whitebox-audit` - Web 白盒安全审计（8 阶段流程）
+- `web-whitebox-audit` - Web 白盒安全审计（8 阶段流程）
 - `iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
+- `vuln-patterns` - OWASP Top 10 漏洞模式
 
 **开发技能**：
+- `frontend-patterns` - React/Next.js 前端模式
+- `backend-patterns` - 后端开发模式
 - `debugging` - 调试方法论
 - `code-review` - 代码审查清单
 - `tdd-workflow` - TDD 工作流
 
-**测试技能**：
-- `e2e-testing` - E2E 测试（Playwright）
+### 💬 命令系统（Commands）
 
-**分析技能**：
-- `domains` - 10 个核心分析维度
+特定场景的快捷命令：
 
-### 🤖 智能体（Agents）
+**学习命令**：
+- `/learn` - 从会话中提取模式并保存为技能
+- `/learn-eval` - 评估已学习的模式质量
 
-**规划类**：
-- `task-planner` - 任务规划与分解
+**开发命令**：
+- `/tdd` - 测试驱动开发工作流（RED → GREEN → REFACTOR）
 
-**分析类**（可并发）：
-- `product-manager` - 需求分析
-- `backend-engineer` - 后端架构分析（使用 `code-review` skill）
-- `frontend-engineer` - 前端实现分析（使用 `code-review` skill）
-- `security-tester` - 安全分析（使用 `whitebox-audit` + `iot-audit` skills）
+### 🛡️ 规则系统（Rules）
 
-**执行类**：
-- `dev-coder` - 代码实现（使用 `tdd-workflow` skill）
+**编排规则**：
+- `agents.md` - 智能体编排规则、职责边界、协作模式
 
-### 🛡️ 强制规则
-
-**安全规则**（`.claude/rules/security.md`）：
+**安全规则**（`security.md`）：
 - ❌ 禁止硬编码密钥
 - ❌ 禁止 SQL 注入
 - ❌ 禁止 XSS 漏洞
@@ -91,9 +96,14 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 - ✅ 遵循认证/授权规范
 - ✅ 正确使用加密
 
-**其他规则**：
-- `coding-style.md` - 代码风格
-- `testing.md` - 测试要求
+**工作流规则**：
+- `git-workflow.md` - Git 工作流（提交格式、PR 流程、分支管理）
+
+**编码规范**（语言特定）：
+- `python/coding-style.md` - Python 编码规范（PEP 8、类型注解）
+- `javascript/coding-style.md` - JavaScript/TypeScript 编码规范
+- `go/coding-style.md` - Go 编码规范（命名、并发安全）
+- `java/coding-style.md` - Java 编码规范（Spring、异常处理）
 
 ---
 
@@ -133,89 +143,69 @@ Claude：[开始完整安全审计流程]
 
 ## 📋 命令参考
 
-### 安全研究命令
+### 学习命令
 
-#### /security-audit
-完整的安全审计，支持 Web 应用和 IoT 设备。
+#### /learn
+从当前会话中提取有价值的模式，并保存为可复用的技能。
 
-**Web 白盒审计**（`whitebox-audit` skill）：
-- 8 阶段流程：执行模型 → 依赖分析 → 执行链 → 路由枚举 → 业务流程 → 越权审计 → 状态机 → 攻击路径
-- 重点：越权作为主线、跨接口联动、状态机建模
+**功能**：
+- 自动识别会话中的代码模式、问题解决方法、最佳实践
+- 将提取的模式保存为 `.claude/skills/learned/{pattern-name}/SKILL.md`
+- 模式会被命名为描述性名称（如 `react-form-handling`、`api-error-handling`）
 
-**IoT 审计**（`iot-audit` skill）：
-- 自动识别资产形态（仅固件/仅源码/混合）
-- 统一模型：入口 → 权限 → 状态 → 副作用
-
+**使用示例**：
 ```bash
-# Web 应用审计
-/security-audit
-/security-audit src/auth/
+# 从当前会话提取模式
+/learn
 
-# IoT 设备审计
-/security-audit firmware.bin
-/security-audit src/
+# 提取特定主题的模式
+/learn "React form validation patterns"
 ```
 
 **输出**：
-- 漏洞清单（高/中/低风险）
-- 攻击路径
-- 修复建议
+- 创建新的技能文件
+- 包含模式描述、示例代码、使用场景
 
-### 日常开发命令
+#### /learn-eval
+评估已学习模式的质量，提供改进建议。
 
-#### /code-review
-前后端代码审查（6 维度）。
+**功能**：
+- 检查模式的完整性
+- 验证示例代码的正确性
+- 提供优化建议
 
+**使用示例**：
 ```bash
-# 审查所有变更
-/code-review
+# 评估所有已学习的模式
+/learn-eval
 
-# 审查特定文件
-/code-review src/auth/login.js
+# 评估特定模式
+/learn-eval "react-form-handling"
 ```
 
-**审查维度**：
-- 功能性、性能、可读性、可维护性、测试、安全性（基础安全）
+### 开发命令
 
-#### /debug
-系统化调试，自动识别前端/后端。
+#### /tdd
+测试驱动开发工作流，强制执行"测试先行"方法论。
 
+**工作流程**：
+1. **RED** - 编写失败的测试
+2. **GREEN** - 编写最小代码使测试通过
+3. **REFACTOR** - 重构代码，保持测试通过
+
+**使用示例**：
 ```bash
-# 前端调试（自动使用 Playwright）
-/debug "登录按钮点击没反应"
+# 启动 TDD 工作流
+/tdd
 
-# 后端调试
-/debug "API 返回 500 错误"
+# 为特定功能启动 TDD
+/tdd "user authentication"
 ```
 
-**方法论**：
-- 理解问题 → 隔离变量 → 形成假设 → 验证假设 → 定位根因 → 实施修复
-
-#### /test
-功能测试，自动识别前端/后端。
-
-```bash
-# 前端测试（自动使用 Playwright）
-/test "测试登录按钮"
-
-# 后端测试（运行 npm test）
-/test "测试 API 返回"
-```
-
-#### /e2e
-并发运行所有测试（前端 + 后端）。
-
-```bash
-# 运行所有测试
-/e2e
-
-# 只运行包含 login 的测试
-/e2e "login"
-```
-
-**执行内容**：
-- 后端测试（npm test）
-- 前端 E2E 测试（Playwright）
+**特点**：
+- 80%+ 测试覆盖率要求
+- 自动使用 tdd-guide 智能体
+- 集成代码审查流程
 
 ---
 
@@ -324,43 +314,52 @@ claudeSandBox/
 │
 └── workspace/                # 工作目录
     └── .claude/
-        ├── CLAUDE.md         # 项目约定
+        ├── CLAUDE.md         # 项目约定（统一协作契约）
         ├── commands/         # 命令定义
-        │   ├── security-audit.md
-        │   ├── code-review.md
-        │   ├── debug.md
-        │   ├── test.md
-        │   └── e2e.md
+        │   ├── learn.md
+        │   ├── learn-eval.md
+        │   └── tdd.md
         ├── skills/           # 技能库
         │   ├── security/     # 安全技能
-        │   │   ├── whitebox-audit/
+        │   │   ├── web-whitebox-audit/
         │   │   └── iot-audit/
         │   ├── development/  # 开发技能
+        │   │   ├── frontend-patterns/
+        │   │   ├── backend-patterns/
         │   │   ├── debugging/
         │   │   ├── code-review/
         │   │   └── tdd-workflow/
-        │   ├── testing/      # 测试技能
-        │   │   └── e2e-testing/
-        │   └── analysis/     # 分析技能
-        │       └── domains/
+        │   └── vuln-patterns/
         ├── agents/           # 智能体定义
-        │   ├── task-planner.md
-        │   ├── product-manager.md
-        │   ├── backend-engineer.md
-        │   ├── frontend-engineer.md
-        │   ├── security-tester.md
-        │   └── dev-coder.md
+        │   ├── system-architect.md
+        │   ├── planner.md
+        │   ├── tdd-guide.md
+        │   ├── research.md
+        │   ├── dev.md
+        │   ├── reviewer.md
+        │   ├── ops.md
+        │   └── doc-updater.md
         ├── agent-memory/     # Agent 持久记忆
-        │   ├── task-planner/
-        │   ├── product-manager/
-        │   ├── backend-engineer/
-        │   ├── frontend-engineer/
-        │   ├── security-tester/
-        │   └── dev-coder/
+        │   ├── system-architect/
+        │   ├── planner/
+        │   ├── tdd-guide/
+        │   ├── research/
+        │   ├── dev/
+        │   ├── reviewer/
+        │   ├── ops/
+        │   └── doc-updater/
         └── rules/            # 强制规则
+            ├── agents.md
             ├── security.md
-            ├── coding-style.md
-            └── testing.md
+            ├── git-workflow.md
+            ├── python/
+            │   └── coding-style.md
+            ├── javascript/
+            │   └── coding-style.md
+            ├── go/
+            │   └── coding-style.md
+            └── java/
+                └── coding-style.md
 ```
 
 ---
@@ -386,8 +385,9 @@ claudeSandBox/
 ### 1. 安全研究
 
 ```
-你：/security-audit
-Claude：[执行完整安全审计]
+你：帮我审计这个登录模块的安全问题
+Claude：[自动识别安全审计场景，调用 research]
+[执行完整安全审计]
 - 执行模型还原
 - 越权专项审计
 - 状态机分析
@@ -397,46 +397,64 @@ Claude：[执行完整安全审计]
 ### 2. 代码审查
 
 ```
-你：/code-review
-Claude：[执行代码审查]
-- 前端代码审查（frontend-engineer）
-- 后端代码审查（backend-engineer）
-- 并发执行
+你：帮我审查这段代码的质量
+Claude：[自动识别代码审查场景，调用 reviewer]
+[执行代码质量审查]
+- 检查逻辑正确性
+- 检查架构边界
+- 检查命名风格
 - 生成审查报告
 ```
 
-### 3. 调试问题
+### 3. 新功能开发
 
 ```
-你：/debug "API 返回 500 错误"
-Claude：[系统化调试]
-- 理解问题
-- 隔离变量
-- 形成假设
-- 验证假设
-- 定位根因
-- 实施修复
+你：帮我实现用户登录功能
+Claude：[自动识别新功能开发，调用 planner]
+[规划任务]
+- 调用 tdd-guide（测试先行）
+- 调用 dev（实现代码）
+- 调用 reviewer（审查质量）
+- 完成功能
 ```
 
-### 4. 测试功能
+### 4. 系统设计
 
 ```
-你：/e2e
-Claude：[并发运行所有测试]
-- 后端测试（npm test）
-- 前端 E2E 测试（Playwright）
-- 并发执行
-- 生成测试报告
+你：帮我设计一个微服务架构
+Claude：[自动识别系统设计，调用 system-architect]
+[执行系统架构设计]
+- 模块边界规划
+- 技术选型
+- 架构风险评估
+- 生成架构文档
 ```
 
 ---
 
 ## 🆚 新旧架构对比
 
-### v2.1.0（当前）- 命令驱动
+### v2.2.0（当前）- 智能体驱动
 
 ```bash
-# 直接使用命令
+# 自动触发智能体
+你：帮我审查这段代码
+Claude：[自动识别场景，调用 reviewer]
+
+你：分析这个安全问题
+Claude：[自动识别场景，调用 research]
+```
+
+**特点**：
+- ✅ 智能体主动触发
+- ✅ 职责边界清晰
+- ✅ 模型选择优化
+- ✅ 渐进式披露
+
+### v2.1.0 - 命令驱动
+
+```bash
+# 手动使用命令
 /security-audit
 /code-review
 /debug
@@ -445,10 +463,9 @@ Claude：[并发运行所有测试]
 ```
 
 **特点**：
-- ✅ 简洁直观
-- ✅ 按需调用
-- ✅ 无模式选择
-- ✅ 专注安全场景
+- ⚠️ 需要手动选择命令
+- ⚠️ 职责边界不够清晰
+- ⚠️ 没有模型选择优化
 
 ### v2.0.0 - 模式驱动
 
@@ -466,6 +483,78 @@ Claude：[并发运行所有测试]
 ---
 
 ## 🛠️ 开发指南
+
+### 添加自定义智能体
+
+在 `.claude/agents/` 创建新的 `.md` 文件：
+
+```markdown
+---
+name: my-agent
+description: 我的智能体。当需要 XXX 时，应主动（PROACTIVELY）使用此 agent。
+model: sonnet
+tools: [Read, Write, Edit, Bash, Grep, Glob]
+memory: project
+---
+
+# My Agent（我的智能体）
+
+## Role
+智能体职责描述
+
+## Responsibilities
+- 职责 1
+- 职责 2
+
+## When to Invoke
+- 场景 1
+- 场景 2
+
+## Characteristics
+关键特性描述
+
+## Stop Conditions
+- 停止条件 1
+- 停止条件 2
+```
+
+### 添加自定义技能
+
+在 `.claude/skills/` 创建新的技能目录：
+
+```
+.claude/skills/my-category/my-skill/
+└── SKILL.md
+```
+
+**技能模板**：
+
+```markdown
+---
+name: my-skill
+description: 我的技能。当需要 XXX 时，应主动（PROACTIVELY）使用此 skill。
+disable-model-invocation: false
+---
+
+# My Skill（我的技能）
+
+## 何时激活
+
+- 场景 1
+- 场景 2
+
+---
+
+## 核心内容
+
+技能内容详细描述...
+
+---
+
+## 示例
+
+代码示例...
+```
 
 ### 添加自定义命令
 
@@ -487,15 +576,6 @@ description: 命令描述
 ```bash
 /command-name "参数"
 ```
-```
-
-### 添加自定义技能
-
-在 `.claude/skills/` 创建新的技能目录：
-
-```
-.claude/skills/my-skill/
-└── SKILL.md
 ```
 
 ### 添加自定义规则
