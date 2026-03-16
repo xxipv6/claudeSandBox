@@ -1,490 +1,214 @@
 ---
-description: 生成和运行前端 E2E 功能测试，使用 Playwright
+description: 并发运行所有测试（前端 + 后端）
 ---
 
-# E2E 功能测试
+# E2E 测试（全部）
 
-## 何时使用
+## 功能说明
 
-- 测试完整的用户流程
-- 验证前端到后端的集成
-- 测试多页面交互
-- 测试复杂表单流程
-
-**注意**：安全测试请使用 `/security-audit` 或 `/vuln-scan`
-
----
-
-## 测试类型
-
-### 1. 用户流程测试
-
-```bash
-/e2e "测试用户注册和登录流程"
-```
-
-**测试内容**：
-- 注册新用户
-- 邮箱验证
-- 首次登录
-- 完善个人信息
-
-### 2. 购物流程测试
-
-```bash
-/e2e "测试购物车完整流程"
-```
-
-**测试内容**：
-- 浏览商品
-- 添加到购物车
-- 修改数量
-- 结账支付
-
-### 3. 表单流程测试
-
-```bash
-/e2e "测试多步骤表单"
-```
-
-**测试内容**：
-- 表单验证
-- 步骤导航
-- 数据保存
-- 提交成功
+并发运行所有测试：
+- ✅ 后端测试（单元、集成、API）
+- ✅ 前端 E2E 测试（Playwright）
+- ✅ 生成完整测试报告
 
 ---
 
 ## 执行流程
 
-### 第一步：理解需求
-
-**明确测试目标**：
-- 要测试什么功能流程？
-- 涉及哪些页面？
-- 需要什么测试数据？
-- 关键验证点是什么？
-
-### 第二步：生成测试
-
-**使用 Playwright 生成测试**：
-
-```javascript
-// 测试文件：e2e/tests/login.spec.js
-const { test, expect } = require('@playwright/test');
-
-test('用户登录流程', async ({ page }) => {
-  // 访问登录页
-  await page.goto('/login');
-
-  // 输入用户名和密码
-  await page.fill('#username', 'testuser');
-  await page.fill('#password', 'password123');
-
-  // 点击登录按钮
-  await page.click('button[type="submit"]');
-
-  // 验证：重定向到 dashboard
-  await expect(page).toHaveURL('/dashboard');
-
-  // 验证：显示用户名
-  await expect(page.locator('.user-name')).toHaveText('testuser');
-});
-```
-
-### 第三步：运行测试
+### 第一步：检查环境
 
 ```bash
-# 安装依赖（首次运行）
-npm install -D @playwright/test
-npx playwright install
+# 检查是否在项目根目录
+if [ ! -f "package.json" ]; then
+  echo "错误：必须在项目根目录运行"
+  exit 1
+fi
 
-# 运行测试
-npx playwright test
+# 检查 Playwright 是否安装
+if ! npm list @playwright/test > /dev/null 2>&1; then
+  echo "Playwright 未安装，正在安装..."
+  npm install -D @playwright/test
+  npx playwright install
+fi
 
-# 调试模式
-npx playwright test --debug
-
-# 慢动作模式（观察执行过程）
-npx playwright test --headed --slow-mo=1000
+# 检查开发服务器是否运行
+if ! pgrep -f "npm run dev" > /dev/null; then
+  echo "启动开发服务器..."
+  npm run dev &
+  sleep 5
+fi
 ```
 
-### 第四步：查看报告
+### 第二步：并发运行测试
 
 ```bash
-# 生成 HTML 报告
-npx playwright test --reporter=html
+# 并发运行后端和前端测试
+echo "🚀 开始并发运行所有测试..."
 
-# 打开报告
-npx playwright show-report
+# 后端测试
+npm test > backend-results.txt 2>&1 &
+BACKEND_PID=$!
+
+# 前端 E2E 测试
+npx playwright test > frontend-results.txt 2>&1 &
+FRONTEND_PID=$!
+
+# 等待两个测试完成
+echo "⏳ 等待测试完成..."
+wait $BACKEND_PID
+BACKEND_EXIT_CODE=$?
+
+wait $FRONTEND_PID
+FRONTEND_EXIT_CODE=$?
+```
+
+### 第三步：收集结果
+
+```bash
+# 显示后端测试结果
+echo ""
+echo "📦 后端测试结果："
+cat backend-results.txt
+
+# 显示前端测试结果
+echo ""
+echo "🎨 前端 E2E 测试结果："
+cat frontend-results.txt
+
+# 生成总结
+echo ""
+echo "═══════════════════════════════════════"
+echo "📊 测试总结"
+echo "═══════════════════════════════════════"
+
+if [ $BACKEND_EXIT_CODE -eq 0 ]; then
+  echo "✅ 后端测试：通过"
+else
+  echo "❌ 后端测试：失败"
+fi
+
+if [ $FRONTEND_EXIT_CODE -eq 0 ]; then
+  echo "✅ 前端 E2E 测试：通过"
+else
+  echo "❌ 前端 E2E 测试：失败"
+fi
+
+echo "═══════════════════════════════════════"
+
+# 清理临时文件
+rm -f backend-results.txt frontend-results.txt
+
+# 返回退出码
+if [ $BACKEND_EXIT_CODE -ne 0 ] || [ $FRONTEND_EXIT_CODE -ne 0 ]; then
+  exit 1
+fi
+
+exit 0
 ```
 
 ---
 
-## 功能测试场景
+## 使用方式
 
-### 1. 用户注册流程
+### 方式 1：直接运行
 
-```javascript
-test('用户注册完整流程', async ({ page }) => {
-  // 访问注册页
-  await page.goto('/register');
+```bash
+你：/e2e
 
-  // 填写注册表单
-  await page.fill('#username', 'newuser');
-  await page.fill('#email', 'newuser@example.com');
-  await page.fill('#password', 'password123');
-  await page.fill('#confirm-password', 'password123');
-
-  // 同意条款
-  await page.check('#terms');
-
-  // 提交表单
-  await page.click('button[type="submit"]');
-
-  // 验证：显示成功消息
-  await expect(page.locator('.success-message')).toHaveText('注册成功');
-
-  // 验证：跳转到登录页
-  await expect(page).toHaveURL('/login');
-});
+# Claude 会：
+# 1. 并发运行所有测试
+# 2. 等待所有测试完成
+# 3. 显示完整报告
 ```
 
-### 2. 购物车流程
+### 方式 2：带过滤
 
-```javascript
-test('购物车完整流程', async ({ page }) => {
-  // 浏览商品
-  await page.goto('/products');
-  await page.click('[data-testid="product-1"]');
+```bash
+你：/e2e "只运行测试套件中包含 'login' 的测试"
 
-  // 添加到购物车
-  await page.click('button:has-text("Add to Cart")');
-
-  // 验证：购物车数量更新
-  await expect(page.locator('.cart-count')).toHaveText('1');
-
-  // 继续购物
-  await page.goto('/products');
-  await page.click('[data-testid="product-2"]');
-  await page.click('button:has-text("Add to Cart")');
-
-  // 验证：购物车数量更新
-  await expect(page.locator('.cart-count')).toHaveText('2');
-
-  // 查看购物车
-  await page.click('[data-testid="cart-icon"]');
-
-  // 验证：购物车有 2 个商品
-  await expect(page.locator('.cart-item')).toHaveCount(2);
-
-  // 修改数量
-  await page.fill('.cart-item:first-child .quantity', '3');
-
-  // 验证：总价更新
-  const totalPrice = await page.locator('.total-price').textContent();
-  expect(totalPrice).toContain('更新后的价格');
-});
-```
-
-### 3. 多步骤表单
-
-```javascript
-test('多步骤表单流程', async ({ page }) => {
-  await page.goto('/checkout');
-
-  // 第一步：收货地址
-  await page.fill('#shipping-name', 'John Doe');
-  await page.fill('#shipping-address', '123 Main St');
-  await page.fill('#shipping-city', 'New York');
-  await page.fill('#shipping-zip', '10001');
-
-  // 点击下一步
-  await page.click('button:has-text("Next")');
-
-  // 验证：进入第二步
-  await expect(page.locator('.step-2')).toBeVisible();
-
-  // 第二步：支付方式
-  await page.click('input[value="credit-card"]');
-  await page.fill('#card-number', '4111111111111111');
-  await page.fill('#card-expiry', '12/25');
-  await page.fill('#card-cvc', '123');
-
-  // 点击下一步
-  await page.click('button:has-text("Next")');
-
-  // 验证：进入第三步（确认）
-  await expect(page.locator('.step-3')).toBeVisible();
-
-  // 验证：显示所有信息
-  await expect(page.locator('.summary-name')).toHaveText('John Doe');
-  await expect(page.locator('.summary-address')).toHaveText('123 Main St');
-
-  // 提交订单
-  await page.click('button:has-text("Place Order")');
-
-  // 验证：显示成功页面
-  await expect(page).toHaveURL('/order-success');
-  await expect(page.locator('.order-id')).toBeVisible();
-});
-```
-
-### 4. 搜索和过滤
-
-```javascript
-test('搜索和过滤功能', async ({ page }) => {
-  await page.goto('/products');
-
-  // 搜索商品
-  await page.fill('#search', 'iPhone');
-  await page.click('button:has-text("Search")');
-
-  // 验证：搜索结果
-  await expect(page.locator('.product-item')).toHaveCountGreaterThan(0);
-
-  // 应用过滤器
-  await page.selectOption('#sort', 'price-asc');
-
-  // 验证：排序正确
-  const prices = await page.locator('.product-price').allTextContents();
-  const sortedPrices = [...prices].sort();
-  expect(prices).toEqual(sortedPrices);
-
-  // 应用分类过滤
-  await page.click('input[name="category"][value="electronics"]');
-
-  // 验证：过滤结果
-  await expect(page.locator('.product-category')).toHaveText('Electronics');
-});
-```
-
-### 5. 用户设置
-
-```javascript
-test('用户设置流程', async ({ page }) => {
-  // 登录
-  await login(page, 'testuser', 'password123');
-
-  // 进入设置页面
-  await page.goto('/settings');
-
-  // 修改个人信息
-  await page.click('tab:has-text("Profile")');
-  await page.fill('#display-name', 'New Name');
-  await page.fill('#bio', 'This is my bio');
-
-  // 保存
-  await page.click('button:has-text("Save")');
-
-  // 验证：保存成功
-  await expect(page.locator('.toast-success')).toHaveText('保存成功');
-
-  // 修改密码
-  await page.click('tab:has-text("Security")');
-  await page.fill('#current-password', 'password123');
-  await page.fill('#new-password', 'newpassword123');
-  await page.fill('#confirm-password', 'newpassword123');
-
-  // 保存
-  await page.click('button:has-text("Update Password")');
-
-  // 验证：密码更新成功
-  await expect(page.locator('.toast-success')).toHaveText('密码已更新');
-
-  // 退出登录
-  await page.click('#logout-button');
-
-  // 使用新密码登录
-  await page.goto('/login');
-  await page.fill('#username', 'testuser');
-  await page.fill('#password', 'newpassword123');
-  await page.click('button[type="submit"]');
-
-  // 验证：登录成功
-  await expect(page).toHaveURL('/dashboard');
-});
+# Claude 会：
+# 1. 后端：npm test -- --grep "login"
+# 2. 前端：npx playwright test -g "login"
+# 3. 并发执行
 ```
 
 ---
 
-## 使用示例
-
-### 示例 1：测试用户注册
+## 输出示例
 
 ```bash
-/e2e "测试用户注册完整流程"
-```
+你：/e2e
 
-**生成测试**：
-```javascript
-test('用户注册流程', async ({ page }) => {
-  await page.goto('/register');
-  await page.fill('#username', 'newuser');
-  await page.fill('#email', 'newuser@example.com');
-  await page.fill('#password', 'password123');
-  await page.click('button[type="submit"]');
-  await expect(page).toHaveURL('/login');
-});
-```
+🚀 开始并发运行所有测试...
+⏳ 等待测试完成...
 
-### 示例 2：测试订单流程
+📦 后端测试结果：
+PASS  src/auth/login.test.js
+PASS  src/api/users.test.js
+✓ 20 tests passed (2.3s)
 
-```bash
-/e2e "测试从浏览到下单的完整流程"
-```
+🎨 前端 E2E 测试结果:
+PASS  e2e/tests/login.spec.js
+PASS  e2e/tests/checkout.spec.js
+✓ 15 tests passed (8.5s)
 
-**生成测试**：
-```javascript
-test('订单完整流程', async ({ page }) => {
-  // 浏览商品
-  await page.goto('/products');
-  await page.click('[data-testid="product-1"]');
+═══════════════════════════════════════
+📊 测试总结
+═══════════════════════════════════════
+✅ 后端测试：通过
+✅ 前端 E2E 测试：通过
+═══════════════════════════════════════
 
-  // 添加到购物车
-  await page.click('button:has-text("Add to Cart")');
-
-  // 结账
-  await page.click('[data-testid="cart-icon"]');
-  await page.click('button:has-text("Checkout")');
-
-  // 填写信息
-  await page.fill('#shipping-name', 'John Doe');
-  await page.fill('#shipping-address', '123 Main St');
-
-  // 提交订单
-  await page.click('button:has-text("Place Order")');
-
-  // 验证成功
-  await expect(page.locator('.success-message')).toBeVisible();
-});
-```
-
-### 示例 3：测试数据更新
-
-```bash
-/e2e "测试用户资料更新流程"
-```
-
-**生成测试**：
-```javascript
-test('资料更新流程', async ({ page }) => {
-  // 登录
-  await login(page, 'testuser', 'password123');
-
-  // 进入设置
-  await page.goto('/settings');
-
-  // 修改资料
-  await page.fill('#display-name', 'New Name');
-  await page.click('button:has-text("Save")');
-
-  // 验证更新
-  await expect(page.locator('.toast-success')).toHaveText('保存成功');
-
-  // 验证显示
-  await page.goto('/profile');
-  await expect(page.locator('.user-name')).toHaveText('New Name');
-});
+✅ 所有测试通过！
 ```
 
 ---
 
-## 页面对象模式
+## Playwright 配置
+
+确保 `playwright.config.js` 配置正确：
 
 ```javascript
-// pages/BasePage.js
-class BasePage {
-  constructor(page) {
-    this.page = page;
-  }
-
-  async goto(path) {
-    await this.page.goto(path);
-    await this.page.waitForLoadState('networkidle');
-  }
-
-  async screenshot(name) {
-    await this.page.screenshot({ path: `screenshots/${name}.png` });
-  }
-}
-
-// pages/LoginPage.js
-class LoginPage extends BasePage {
-  constructor(page) {
-    super(page);
-    this.usernameInput = page.locator('#username');
-    this.passwordInput = page.locator('#password');
-    this.submitButton = page.locator('button[type="submit"]');
-  }
-
-  async login(username, password) {
-    await this.goto('/login');
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
-    await this.submitButton.click();
-    await this.page.waitForURL('/dashboard');
-  }
-}
-
-// 测试中使用
-test('用户登录', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.login('testuser', 'password123');
-  await expect(page).toHaveURL('/dashboard');
-});
-```
-
----
-
-## 测试数据
-
-```javascript
-// test-data/users.json
-{
-  "validUser": {
-    "username": "testuser",
-    "password": "password123",
-    "email": "test@example.com"
+module.exports = {
+  testDir: './e2e/tests',
+  timeout: 10000,
+  retries: 2,
+  use: {
+    baseURL: 'http://localhost:3000',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
-  "newUser": {
-    "username": "newuser",
-    "password": "password123",
-    "email": "new@example.com"
-  }
-}
-
-// 测试中使用
-const { validUser, newUser } = require('./test-data/users.json');
-
-test('使用测试数据登录', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.login(validUser.username, validUser.password);
-  await expect(page).toHaveURL('/dashboard');
-});
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }]
+  ],
+};
 ```
 
 ---
 
-## 失败处理
+## 常见问题
 
-```javascript
-test('失败时截图', async ({ page }) => {
-  try {
-    await page.goto('/risky-page');
-    await page.click('#risky-button');
-  } catch (error) {
-    // 失败时截图
-    await page.screenshot({
-      path: `screenshots/failure-${Date.now()}.png`,
-      fullPage: true
-    });
+### Q: 如何只运行前端测试？
 
-    // 失败时保存视频
-    await page.close();
-    throw error;
-  }
-});
+```bash
+你：/test "测试登录页面"
+```
+
+### Q: 如何只运行后端测试？
+
+```bash
+你：/test "测试登录 API"
+```
+
+### Q: 测试失败怎么办？
+
+```bash
+你：/debug "前端测试失败"
+
+# Claude 会：
+# 1. 启动 Playwright 调试模式
+# 2. 帮助你定位问题
 ```
 
 ---
@@ -492,8 +216,8 @@ test('失败时截图', async ({ page }) => {
 ## CI/CD 集成
 
 ```yaml
-# .github/workflows/e2e.yml
-name: E2E Tests
+# .github/workflows/test.yml
+name: All Tests
 
 on: [push, pull_request]
 
@@ -505,24 +229,63 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npx playwright test
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Start dev server
+        run: npm run dev &
+        # 等待服务器启动
+        - sleep 10
+
+      - name: Run all tests
+        run: |
+          # 并发运行后端和前端测试
+          npm test &
+          BACKEND_PID=$!
+          npx playwright test &
+          FRONTEND_PID=$!
+          wait $BACKEND_PID $FRONTEND_PID
+
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+          name: test-results
+          path: |
+            playwright-report/
+            coverage/
 ```
 
 ---
 
 ## 注意事项
 
-1. **测试环境**：E2E 测试需要运行在完整的应用环境中
-2. **测试数据**：使用专门的测试数据，避免污染生产数据
-3. **测试隔离**：每个测试应该独立，不依赖其他测试
-4. **性能考虑**：E2E 测试较慢，只测试关键路径
-5. **维护成本**：E2E 测试维护成本较高，需要精心设计
-6. **功能测试**：本命令专注于功能测试，安全测试请使用 `/security-audit`
+1. **并发执行**：前端和后端测试同时运行，节省时间
+2. **环境要求**：需要运行中的应用环境
+3. **测试隔离**：前端测试不应依赖后端测试的结果
+4. **失败处理**：任一测试失败，整体返回失败
+5. **性能考虑**：并发运行可能增加资源消耗
+
+---
+
+## 测试覆盖
+
+### 后端测试（自动检测）
+
+- Jest 测试
+- Mocha 测试
+- Jasmine 测试
+- 单元测试
+- 集成测试
+- API 测试
+
+### 前端 E2E 测试
+
+- 页面交互测试
+- 表单提交测试
+- 用户流程测试
+- 导航测试
+- 状态管理测试
