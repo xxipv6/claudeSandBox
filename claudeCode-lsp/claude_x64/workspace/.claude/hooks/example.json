@@ -1,0 +1,15 @@
+{
+  "PostToolUse": [
+    {
+      "matcher": "Edit",
+      "pattern": "*.{js,ts,jsx,tsx,py,rs,go}",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo 'File edited. Consider running tests/lint.'",
+          "statusMessage": "Reminder: Run verification"
+        }
+      ]
+    }
+  ]
+}
