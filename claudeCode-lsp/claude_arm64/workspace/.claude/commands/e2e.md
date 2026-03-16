@@ -1,21 +1,23 @@
 ---
-description: 生成和运行 E2E 测试，使用 Playwright
+description: 生成和运行前端 E2E 功能测试，使用 Playwright
 ---
 
-# E2E 测试
+# E2E 功能测试
 
 ## 何时使用
 
 - 测试完整的用户流程
 - 验证前端到后端的集成
-- 测试认证和授权流程
-- 安全相关的端到端测试
+- 测试多页面交互
+- 测试复杂表单流程
+
+**注意**：安全测试请使用 `/security-audit` 或 `/vuln-scan`
 
 ---
 
 ## 测试类型
 
-### 1. 流程测试
+### 1. 用户流程测试
 
 ```bash
 /e2e "测试用户注册和登录流程"
@@ -27,28 +29,29 @@ description: 生成和运行 E2E 测试，使用 Playwright
 - 首次登录
 - 完善个人信息
 
-### 2. 安全测试
+### 2. 购物流程测试
 
 ```bash
-/e2e "测试登录安全（SQL 注入、暴力破解）"
+/e2e "测试购物车完整流程"
 ```
 
 **测试内容**：
-- SQL 注入防护
-- 暴力破解防护
-- 会话固定防护
-- CSRF 防护
+- 浏览商品
+- 添加到购物车
+- 修改数量
+- 结账支付
 
-### 3. 性能测试
+### 3. 表单流程测试
 
 ```bash
-/e2e "测试页面加载性能"
+/e2e "测试多步骤表单"
 ```
 
 **测试内容**：
-- 页面加载时间
-- API 响应时间
-- 资源加载优化
+- 表单验证
+- 步骤导航
+- 数据保存
+- 提交成功
 
 ---
 
@@ -57,10 +60,10 @@ description: 生成和运行 E2E 测试，使用 Playwright
 ### 第一步：理解需求
 
 **明确测试目标**：
-- 要测试什么功能？
+- 要测试什么功能流程？
 - 涉及哪些页面？
 - 需要什么测试数据？
-- 有哪些安全考虑？
+- 关键验证点是什么？
 
 ### 第二步：生成测试
 
@@ -118,57 +121,188 @@ npx playwright show-report
 
 ---
 
-## 安全测试场景
+## 功能测试场景
 
-### 认证安全
+### 1. 用户注册流程
 
 ```javascript
-test('密码错误次数限制', async ({ page }) => {
+test('用户注册完整流程', async ({ page }) => {
+  // 访问注册页
+  await page.goto('/register');
+
+  // 填写注册表单
+  await page.fill('#username', 'newuser');
+  await page.fill('#email', 'newuser@example.com');
+  await page.fill('#password', 'password123');
+  await page.fill('#confirm-password', 'password123');
+
+  // 同意条款
+  await page.check('#terms');
+
+  // 提交表单
+  await page.click('button[type="submit"]');
+
+  // 验证：显示成功消息
+  await expect(page.locator('.success-message')).toHaveText('注册成功');
+
+  // 验证：跳转到登录页
+  await expect(page).toHaveURL('/login');
+});
+```
+
+### 2. 购物车流程
+
+```javascript
+test('购物车完整流程', async ({ page }) => {
+  // 浏览商品
+  await page.goto('/products');
+  await page.click('[data-testid="product-1"]');
+
+  // 添加到购物车
+  await page.click('button:has-text("Add to Cart")');
+
+  // 验证：购物车数量更新
+  await expect(page.locator('.cart-count')).toHaveText('1');
+
+  // 继续购物
+  await page.goto('/products');
+  await page.click('[data-testid="product-2"]');
+  await page.click('button:has-text("Add to Cart")');
+
+  // 验证：购物车数量更新
+  await expect(page.locator('.cart-count')).toHaveText('2');
+
+  // 查看购物车
+  await page.click('[data-testid="cart-icon"]');
+
+  // 验证：购物车有 2 个商品
+  await expect(page.locator('.cart-item')).toHaveCount(2);
+
+  // 修改数量
+  await page.fill('.cart-item:first-child .quantity', '3');
+
+  // 验证：总价更新
+  const totalPrice = await page.locator('.total-price').textContent();
+  expect(totalPrice).toContain('更新后的价格');
+});
+```
+
+### 3. 多步骤表单
+
+```javascript
+test('多步骤表单流程', async ({ page }) => {
+  await page.goto('/checkout');
+
+  // 第一步：收货地址
+  await page.fill('#shipping-name', 'John Doe');
+  await page.fill('#shipping-address', '123 Main St');
+  await page.fill('#shipping-city', 'New York');
+  await page.fill('#shipping-zip', '10001');
+
+  // 点击下一步
+  await page.click('button:has-text("Next")');
+
+  // 验证：进入第二步
+  await expect(page.locator('.step-2')).toBeVisible();
+
+  // 第二步：支付方式
+  await page.click('input[value="credit-card"]');
+  await page.fill('#card-number', '4111111111111111');
+  await page.fill('#card-expiry', '12/25');
+  await page.fill('#card-cvc', '123');
+
+  // 点击下一步
+  await page.click('button:has-text("Next")');
+
+  // 验证：进入第三步（确认）
+  await expect(page.locator('.step-3')).toBeVisible();
+
+  // 验证：显示所有信息
+  await expect(page.locator('.summary-name')).toHaveText('John Doe');
+  await expect(page.locator('.summary-address')).toHaveText('123 Main St');
+
+  // 提交订单
+  await page.click('button:has-text("Place Order")');
+
+  // 验证：显示成功页面
+  await expect(page).toHaveURL('/order-success');
+  await expect(page.locator('.order-id')).toBeVisible();
+});
+```
+
+### 4. 搜索和过滤
+
+```javascript
+test('搜索和过滤功能', async ({ page }) => {
+  await page.goto('/products');
+
+  // 搜索商品
+  await page.fill('#search', 'iPhone');
+  await page.click('button:has-text("Search")');
+
+  // 验证：搜索结果
+  await expect(page.locator('.product-item')).toHaveCountGreaterThan(0);
+
+  // 应用过滤器
+  await page.selectOption('#sort', 'price-asc');
+
+  // 验证：排序正确
+  const prices = await page.locator('.product-price').allTextContents();
+  const sortedPrices = [...prices].sort();
+  expect(prices).toEqual(sortedPrices);
+
+  // 应用分类过滤
+  await page.click('input[name="category"][value="electronics"]');
+
+  // 验证：过滤结果
+  await expect(page.locator('.product-category')).toHaveText('Electronics');
+});
+```
+
+### 5. 用户设置
+
+```javascript
+test('用户设置流程', async ({ page }) => {
+  // 登录
+  await login(page, 'testuser', 'password123');
+
+  // 进入设置页面
+  await page.goto('/settings');
+
+  // 修改个人信息
+  await page.click('tab:has-text("Profile")');
+  await page.fill('#display-name', 'New Name');
+  await page.fill('#bio', 'This is my bio');
+
+  // 保存
+  await page.click('button:has-text("Save")');
+
+  // 验证：保存成功
+  await expect(page.locator('.toast-success')).toHaveText('保存成功');
+
+  // 修改密码
+  await page.click('tab:has-text("Security")');
+  await page.fill('#current-password', 'password123');
+  await page.fill('#new-password', 'newpassword123');
+  await page.fill('#confirm-password', 'newpassword123');
+
+  // 保存
+  await page.click('button:has-text("Update Password")');
+
+  // 验证：密码更新成功
+  await expect(page.locator('.toast-success')).toHaveText('密码已更新');
+
+  // 退出登录
+  await page.click('#logout-button');
+
+  // 使用新密码登录
   await page.goto('/login');
-
-  // 尝试 5 次错误登录
-  for (let i = 0; i < 5; i++) {
-    await page.fill('#username', 'testuser');
-    await page.fill('#password', 'wrongpassword');
-    await page.click('button[type="submit"]');
-  }
-
-  // 第 6 次应该被锁定
   await page.fill('#username', 'testuser');
-  await page.fill('#password', 'wrongpassword');
+  await page.fill('#password', 'newpassword123');
   await page.click('button[type="submit"]');
 
-  await expect(page.locator('.error')).toHaveText('Account locked');
-});
-```
-
-### 输入验证
-
-```javascript
-test('表单防止 XSS', async ({ page }) => {
-  await page.goto('/search');
-
-  // 尝试 XSS 攻击
-  await page.fill('#search', '<script>alert("XSS")</script>');
-  await page.click('button[type="submit"]');
-
-  // 验证：脚本不应该执行
-  await expect(page.locator('body')).not.toContainText('XSS');
-});
-```
-
-### 权限验证
-
-```javascript
-test('普通用户无法访问管理员页面', async ({ page }) => {
-  // 普通用户登录
-  await login(page, 'normaluser', 'password123');
-
-  // 尝试访问管理员页面
-  await page.goto('/admin');
-
-  // 验证：被拒绝访问
-  await expect(page).toHaveURL('/403');
+  // 验证：登录成功
+  await expect(page).toHaveURL('/dashboard');
 });
 ```
 
@@ -176,78 +310,81 @@ test('普通用户无法访问管理员页面', async ({ page }) => {
 
 ## 使用示例
 
-### 示例 1：测试购物车流程
+### 示例 1：测试用户注册
 
 ```bash
-/e2e "测试购物车完整流程"
+/e2e "测试用户注册完整流程"
 ```
 
 **生成测试**：
 ```javascript
-test('购物车流程', async ({ page }) => {
+test('用户注册流程', async ({ page }) => {
+  await page.goto('/register');
+  await page.fill('#username', 'newuser');
+  await page.fill('#email', 'newuser@example.com');
+  await page.fill('#password', 'password123');
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL('/login');
+});
+```
+
+### 示例 2：测试订单流程
+
+```bash
+/e2e "测试从浏览到下单的完整流程"
+```
+
+**生成测试**：
+```javascript
+test('订单完整流程', async ({ page }) => {
   // 浏览商品
   await page.goto('/products');
   await page.click('[data-testid="product-1"]');
+
+  // 添加到购物车
   await page.click('button:has-text("Add to Cart")');
 
-  // 查看购物车
-  await page.click('[data-testid="cart-icon"]');
-  await expect(page.locator('.cart-item')).toHaveCount(1);
-
   // 结账
+  await page.click('[data-testid="cart-icon"]');
   await page.click('button:has-text("Checkout")');
+
+  // 填写信息
   await page.fill('#shipping-name', 'John Doe');
   await page.fill('#shipping-address', '123 Main St');
+
+  // 提交订单
   await page.click('button:has-text("Place Order")');
 
-  // 验证订单成功
+  // 验证成功
   await expect(page.locator('.success-message')).toBeVisible();
 });
 ```
 
-### 示例 2：测试支付安全
+### 示例 3：测试数据更新
 
 ```bash
-/e2e "测试支付页面的安全性"
+/e2e "测试用户资料更新流程"
 ```
 
 **生成测试**：
 ```javascript
-test('支付页面安全', async ({ page }) => {
-  await page.goto('/checkout');
+test('资料更新流程', async ({ page }) => {
+  // 登录
+  await login(page, 'testuser', 'password123');
 
-  // 验证使用 HTTPS
-  const url = page.url();
-  expect(url).toStartWith('https://');
+  // 进入设置
+  await page.goto('/settings');
 
-  // 验证没有硬编码的敏感信息
-  const html = await page.content();
-  expect(html).not.toContain('api_key');
-  expect(html).not.toContain('secret');
+  // 修改资料
+  await page.fill('#display-name', 'New Name');
+  await page.click('button:has-text("Save")');
 
-  // 验证 CSRF token 存在
-  const csrfToken = await page.locator('input[name="csrf_token"]').inputValue();
-  expect(csrfToken).toBeTruthy();
-});
-```
+  // 验证更新
+  await expect(page.locator('.toast-success')).toHaveText('保存成功');
 
-### 示例 3：测试 API 安全
-
-```bash
-/e2e "测试 API 端点的安全性"
-```
-
-**生成测试**：
-```javascript
-test('API 安全测试', async ({ page, request }) => {
-  // 测试未授权访问
-  const response = await request.get('/api/admin/users', {
-    headers: {
-      'Authorization': ''
-    }
-  });
-
-  expect(response.status()).toBe(401);
+  // 验证显示
+  await page.goto('/profile');
+  await expect(page.locator('.user-name')).toHaveText('New Name');
 });
 ```
 
@@ -294,6 +431,7 @@ class LoginPage extends BasePage {
 test('用户登录', async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.login('testuser', 'password123');
+  await expect(page).toHaveURL('/dashboard');
 });
 ```
 
@@ -309,18 +447,20 @@ test('用户登录', async ({ page }) => {
     "password": "password123",
     "email": "test@example.com"
   },
-  "adminUser": {
-    "username": "admin",
-    "password": "admin123",
-    "email": "admin@example.com"
+  "newUser": {
+    "username": "newuser",
+    "password": "password123",
+    "email": "new@example.com"
   }
 }
 
 // 测试中使用
-const { validUser } = require('./test-data/users.json');
+const { validUser, newUser } = require('./test-data/users.json');
 
 test('使用测试数据登录', async ({ page }) => {
-  await login(page, validUser.username, validUser.password);
+  const loginPage = new LoginPage(page);
+  await loginPage.login(validUser.username, validUser.password);
+  await expect(page).toHaveURL('/dashboard');
 });
 ```
 
@@ -385,3 +525,4 @@ jobs:
 3. **测试隔离**：每个测试应该独立，不依赖其他测试
 4. **性能考虑**：E2E 测试较慢，只测试关键路径
 5. **维护成本**：E2E 测试维护成本较高，需要精心设计
+6. **功能测试**：本命令专注于功能测试，安全测试请使用 `/security-audit`

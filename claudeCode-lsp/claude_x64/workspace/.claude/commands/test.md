@@ -1,8 +1,21 @@
 ---
-description: 运行测试，自动识别前端/后端并使用相应的测试工具
+description: 运行功能测试，自动识别前端/后端并使用相应的测试工具
 ---
 
-# 测试
+# 功能测试
+
+## 测试目标
+
+**功能测试**关注应用是否按预期工作：
+- ✅ 逻辑是否正确
+- ✅ 参数是否对齐
+- ✅ 点击是否响应
+- ✅ 接口是否返回正确数据
+- ✅ 数据库操作是否正确
+
+**注意**：安全测试请使用 `/security-audit` 或 `/vuln-scan`
+
+---
 
 ## 自动识别：前端 vs 后端
 
@@ -12,14 +25,16 @@ description: 运行测试，自动识别前端/后端并使用相应的测试工
 - 涉及浏览器、页面、UI 组件
 - 提到"页面"、"按钮"、"表单"、"组件"、"样式"
 - 提到"用户界面"、"交互"
+- 测试：逻辑、参数、点击、导航
 
 **后端任务特征**：
 - 涉及 API、数据库、服务器逻辑
 - 提到"接口"、"查询"、"服务"、"后端"
+- 测试：业务逻辑、数据处理、API 返回
 
 ---
 
-## 前端测试（自动识别）
+## 前端功能测试（自动识别）
 
 ### 触发条件
 
@@ -28,10 +43,10 @@ description: 运行测试，自动识别前端/后端并使用相应的测试工
 ```javascript
 // 用户输入示例
 "测试登录页面"
-"运行前端测试"
-"测试用户注册流程"
-"测试购物车功能"
-"测试 React 组件"
+"测试按钮点击是否正常"
+"测试表单提交"
+"测试页面跳转逻辑"
+"测试 React 组件交互"
 ```
 
 ### 前端测试流程
@@ -89,15 +104,15 @@ npx playwright show-report
 
 ---
 
-## 后端测试（常规方法）
+## 后端功能测试（常规方法）
 
 ### 触发条件
 
 ```bash
 # 用户输入示例
 "测试 API 接口"
-"运行单元测试"
 "测试数据库查询"
+"测试业务逻辑"
 "测试后端服务"
 ```
 
@@ -135,59 +150,159 @@ fi
 
 ---
 
-## 测试类型
+## 前端功能测试类型
 
-### 前端测试（使用 Playwright）
+### 1. 页面交互测试
 
-**1. 功能测试**
 ```javascript
-test('用户可以登录', async ({ page }) => {
+test('按钮点击正常', async ({ page }) => {
   await page.goto('/login');
+
+  // 点击按钮
+  await page.click('#login-button');
+
+  // 验证：按钮有响应
+  await expect(page.locator('.loading')).toBeVisible();
+});
+
+test('表单提交正常', async ({ page }) => {
+  await page.goto('/register');
+
+  // 填写表单
+  await page.fill('#username', 'testuser');
+  await page.fill('#email', 'test@example.com');
+  await page.fill('#password', 'password123');
+
+  // 提交表单
+  await page.click('button[type="submit"]');
+
+  // 验证：跳转到成功页面
+  await expect(page).toHaveURL('/success');
+});
+```
+
+### 2. 逻辑测试
+
+```javascript
+test('表单验证逻辑', async ({ page }) => {
+  await page.goto('/register');
+
+  // 测试：邮箱格式验证
+  await page.fill('#email', 'invalid-email');
+  await page.click('#submit-button');
+
+  // 验证：显示错误提示
+  await expect(page.locator('.error')).toHaveText('Invalid email format');
+});
+
+test('页面跳转逻辑', async ({ page }) => {
+  await page.goto('/home');
+
+  // 点击导航链接
+  await page.click('a[href="/about"]');
+
+  // 验证：跳转到正确页面
+  await expect(page).toHaveURL('/about');
+  await expect(page.locator('h1')).toHaveText('About Us');
+});
+```
+
+### 3. 参数对齐测试
+
+```javascript
+test('API 请求参数正确', async ({ page }) => {
+  await page.goto('/login');
+
+  // 监听 API 请求
+  let requestData;
+  page.on('request', request => {
+    if (request.url().includes('/api/login')) {
+      requestData = request.postData();
+    }
+  });
+
+  // 提交表单
   await page.fill('#username', 'testuser');
   await page.fill('#password', 'password123');
   await page.click('button[type="submit"]');
-  await expect(page).toHaveURL('/dashboard');
+
+  // 验证：参数正确传递
+  expect(requestData).toContain('username=testuser');
+  expect(requestData).toContain('password=password123');
+});
+
+test('查询参数正确传递', async ({ page }) => {
+  // 访问带参数的 URL
+  await page.goto('/search?q=test&page=1');
+
+  // 验证：参数正确显示
+  await expect(page.locator('#search-query')).toHaveValue('test');
+  await expect(page.locator('.current-page')).toHaveText('1');
 });
 ```
 
-**2. 安全测试**
+### 4. 状态管理测试
+
 ```javascript
-test('防止 SQL 注入', async ({ page }) => {
-  await page.goto('/login');
-  await page.fill('#username', "admin' OR '1'='1");
-  await page.fill('#password', 'anything');
-  await page.click('button[type="submit"]');
-  await expect(page).not.toHaveURL('/dashboard');
+test('组件状态更新', async ({ page }) => {
+  await page.goto('/counter');
+
+  // 初始状态
+  await expect(page.locator('#count')).toHaveText('0');
+
+  // 点击增加
+  await page.click('#increment');
+
+  // 验证：状态更新
+  await expect(page.locator('#count')).toHaveText('1');
+});
+
+test('购物车状态', async ({ page }) => {
+  await page.goto('/products');
+
+  // 添加商品
+  await page.click('[data-testid="add-to-cart-1"]');
+
+  // 验证：购物车数量更新
+  await expect(page.locator('.cart-count')).toHaveText('1');
+
+  // 查看购物车
+  await page.click('.cart-icon');
+
+  // 验证：商品在购物车中
+  await expect(page.locator('.cart-item')).toHaveCount(1);
 });
 ```
 
-**3. 性能测试**
-```javascript
-test('页面加载性能', async ({ page }) => {
-  await page.goto('/dashboard');
-  await page.waitForLoadState('networkidle');
+---
 
-  const metrics = await page.evaluate(() => {
-    const navigation = performance.getEntriesByType('navigation')[0];
-    return navigation.loadEventEnd - navigation.fetchStart;
-  });
+## 后端功能测试类型
 
-  expect(metrics).toBeLessThan(3000);
-});
-```
+### 1. 单元测试
 
-### 后端测试（常规）
-
-**1. 单元测试**
 ```javascript
 test('应该返回用户对象', () => {
   const user = getUserById(1);
   expect(user).toBeDefined();
   expect(user.name).toBe('Alice');
+  expect(user.email).toBe('alice@example.com');
+});
+
+test('应该计算订单总价', () => {
+  const order = {
+    items: [
+      { price: 100, quantity: 2 },
+      { price: 50, quantity: 1 }
+    ]
+  };
+
+  const total = calculateOrderTotal(order);
+  expect(total).toBe(250);
 });
 ```
 
-**2. 集成测试**
+### 2. 集成测试
+
 ```javascript
 test('应该创建订单并返回', async () => {
   const order = await createOrder({
@@ -197,18 +312,81 @@ test('应该创建订单并返回', async () => {
 
   expect(order.id).toBeDefined();
   expect(order.status).toBe('pending');
+  expect(order.items).toHaveLength(1);
+});
+
+test('应该更新库存', async () => {
+  // 创建订单
+  await createOrder({ productId: 1, quantity: 5 });
+
+  // 检查库存
+  const product = await getProductById(1);
+  expect(product.stock).toBe(originalStock - 5);
 });
 ```
 
-**3. API 测试**
+### 3. API 测试
+
 ```javascript
-test('POST /api/login 应该认证成功', async () => {
+test('POST /api/login 应该返回 token', async () => {
   const response = await request(app)
     .post('/api/login')
     .send({ username: 'test', password: 'password' });
 
   expect(response.status).toBe(200);
   expect(response.body.token).toBeDefined();
+  expect(response.body.user.username).toBe('test');
+});
+
+test('GET /api/users/:id 应该返回用户数据', async () => {
+  const response = await request(app)
+    .get('/api/users/1')
+    .set('Authorization', `Bearer ${token}`);
+
+  expect(response.status).toBe(200);
+  expect(response.body.id).toBe(1);
+  expect(response.body.name).toBeDefined();
+});
+
+test('API 应该正确处理分页参数', async () => {
+  const response = await request(app)
+    .get('/api/products')
+    .query({ page: 1, limit: 10 });
+
+  expect(response.status).toBe(200);
+  expect(response.body.data).toHaveLength(10);
+  expect(response.body.page).toBe(1);
+  expect(response.body.total).toBeDefined();
+});
+```
+
+### 4. 数据库测试
+
+```javascript
+test('应该正确插入数据', async () => {
+  const user = await db.users.create({
+    username: 'testuser',
+    email: 'test@example.com'
+  });
+
+  expect(user.id).toBeDefined();
+  expect(user.username).toBe('testuser');
+});
+
+test('应该正确查询数据', async () => {
+  const users = await db.users.findAll({
+    where: { status: 'active' }
+  });
+
+  expect(users.length).toBeGreaterThan(0);
+  expect(users[0].status).toBe('active');
+});
+
+test('应该正确更新数据', async () => {
+  await db.users.update(1, { status: 'inactive' });
+
+  const user = await db.users.findById(1);
+  expect(user.status).toBe('inactive');
 });
 ```
 
@@ -216,10 +394,10 @@ test('POST /api/login 应该认证成功', async () => {
 
 ## 使用示例
 
-### 示例 1：测试前端登录
+### 示例 1：测试前端登录功能
 
 ```bash
-/test "测试用户登录页面"
+/test "测试登录按钮点击是否正常"
 ```
 
 **自动执行**：
@@ -230,10 +408,21 @@ test('POST /api/login 应该认证成功', async () => {
 ✅ 运行测试
 ```
 
-### 示例 2：测试 API
+**生成测试**：
+```javascript
+test('登录按钮点击正常', async ({ page }) => {
+  await page.goto('/login');
+  await page.fill('#username', 'testuser');
+  await page.fill('#password', 'password123');
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL('/dashboard');
+});
+```
+
+### 示例 2：测试后端 API
 
 ```bash
-/test "测试用户登录 API"
+/test "测试用户登录 API 返回数据是否正确"
 ```
 
 **自动执行**：
@@ -266,6 +455,7 @@ test('POST /api/login 应该认证成功', async () => {
 // 前端关键词
 const frontendKeywords = [
   '页面', '按钮', '表单', '组件', '样式', 'UI', '界面',
+  '点击', '跳转', '导航', '交互',
   'browser', 'frontend', 'React', 'Vue', 'Angular',
   'DOM', 'HTML', 'CSS', 'JavaScript'
 ];
@@ -273,7 +463,8 @@ const frontendKeywords = [
 // 后端关键词
 const backendKeywords = [
   'API', '接口', '数据库', '服务', '后端', 'backend',
-  '查询', '存储', '业务逻辑', '单元测试'
+  '查询', '存储', '业务逻辑',
+  '单元测试', '集成测试'
 ];
 
 // 自动判断
@@ -357,26 +548,31 @@ DEBUG=* npm test
 
 ## 注意事项
 
-1. **自动识别**：系统会自动判断是前端还是后端任务
-2. **Playwright 安装**：首次运行前端测试时会自动安装
-3. **测试隔离**：每个测试应该独立，不依赖其他测试
-4. **环境要求**：前端测试需要运行中的应用环境
-5. **性能考虑**：E2E 测试较慢，只测试关键路径
+1. **功能测试 vs 安全测试**：本命令专注于功能测试，安全测试请使用 `/security-audit`
+2. **自动识别**：系统会自动判断是前端还是后端任务
+3. **Playwright 安装**：首次运行前端测试时会自动安装
+4. **测试隔离**：每个测试应该独立，不依赖其他测试
+5. **环境要求**：前端测试需要运行中的应用环境
+6. **性能考虑**：E2E 测试较慢，只测试关键路径
 
 ---
 
-## 测试检查清单
+## 功能测试检查清单
 
-### 前端测试
+### 前端功能测试
 - [ ] 页面加载正常
-- [ ] 元素交互正常
-- [ ] 表单提交正常
-- [ ] 路由跳转正常
+- [ ] 按钮点击有响应
+- [ ] 表单提交成功
+- [ ] 参数正确传递
+- [ ] 页面跳转正确
+- [ ] 组件状态更新
 - [ ] 样式显示正确
 
-### 后端测试
+### 后端功能测试
 - [ ] 单元测试通过
 - [ ] 集成测试通过
-- [ ] API 测试通过
+- [ ] API 返回正确数据
+- [ ] 数据库操作正确
+- [ ] 业务逻辑正确
 - [ ] 测试覆盖率达标
 - [ ] 无明显性能问题
