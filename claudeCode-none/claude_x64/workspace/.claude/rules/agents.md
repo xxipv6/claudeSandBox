@@ -8,6 +8,7 @@
 |-------|---------|-------------|------|
 | system-architect | 系统架构设计 | 新系统设计、模块边界规划、架构风险评估 | sonnet |
 | planner | 任务规划 | 复杂功能实现、重构规划、需求拆解 | sonnet |
+| tdd-guide | 测试驱动开发 | 新功能、Bug 修复、代码重构 | sonnet |
 | research | 安全研究 | PoC 开发、漏洞复现、协议分析、代码安全审计 | sonnet |
 | dev | 日常开发 | Web/API/工具开发、工程规范遵守 | sonnet |
 | reviewer | 代码审查 | 逻辑正确性、架构边界、代码质量检查 | sonnet |
@@ -21,11 +22,12 @@
 ### 必须调用 (MUST)
 1. **系统设计** - 使用 **system-architect** 智能体
 2. **复杂功能实现** - 使用 **planner** 智能体制定计划
-3. **安全研究/PoC** - 使用 **research** 智能体
-4. **代码安全审计** - 使用 **research** 智能体
-5. **日常开发** - 使用 **dev** 智能体
-6. **代码质量审查** - 使用 **reviewer** 智能体（不含安全问题）
-7. **运维任务** - 使用 **ops** 智能体
+3. **新功能/Bug 修复/重构** - 使用 **tdd-guide** 智能体（测试先行）
+4. **安全研究/PoC** - 使用 **research** 智能体
+5. **代码安全审计** - 使用 **research** 智能体
+6. **日常开发** - 使用 **dev** 智能体
+7. **代码质量审查** - 使用 **reviewer** 智能体（不含安全问题）
+8. **运维任务** - 使用 **ops** 智能体
 
 ### 自动触发 (Auto-Trigger)
 智能体描述中包含 **"应主动（PROACTIVELY）使用"** 时，Claude 应在识别到相关场景时自动调用该智能体，无需等待用户明确指示。
@@ -47,12 +49,14 @@
 
 ## 智能体协作模式 (Agent Collaboration Patterns)
 
-### 1. 规划 → 开发 → 审查流程
+### 1. 规划 → TDD → 审查流程
 ```
-planner → dev → reviewer → doc-updater
+planner → tdd-guide → dev → reviewer → doc-updater
 ```
 
 适用于：新功能开发、重大重构
+
+**关键**：tdd-guide 确保测试先行，80%+ 覆盖率
 
 ### 2. 研究分离流程
 ```
@@ -85,6 +89,8 @@ dev → ops → doc-updater
 │   └── system-architect
 ├── 复杂功能规划
 │   └── planner
+├── 新功能/Bug 修复/重构
+│   └── tdd-guide（测试先行，80%+ 覆盖率）
 ├── 安全研究/PoC/代码审计
 │   └── research
 ├── 日常开发（遵守工程规范）
