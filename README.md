@@ -81,6 +81,11 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 **开发命令**：
 - `/tdd` - 测试驱动开发工作流（RED → GREEN → REFACTOR）
 
+**实用命令**：
+- `/debug` - 系统化调试流程，定位问题根因并修复
+- `/test` - 运行测试套件，检查代码覆盖率
+- `/deploy` - 部署应用到目标环境
+
 ### 🛡️ 规则系统（Rules）
 
 **编排规则**：
@@ -597,8 +602,45 @@ paths:
 
 ---
 
+## 🔧 维护工具
+
+### 同步所有变体
+
+修改源文件后，运行：
+
+```bash
+./sync-variants.sh
+```
+
+或直接提交（pre-commit hook 自动同步）：
+
+```bash
+git add .
+git commit -m "feat: ..."
+# 自动同步 4 个变体
+```
+
+### 检查流程一致性
+
+```bash
+./check-workflow-consistency.sh
+```
+
+检查项目流程定义是否一致，包括：
+- ✅ 完整开发流程是否包含 tdd-guide
+- ✅ Bug 修复流程是否包含 tdd-guide
+- ✅ doc-updater 位置是否正确
+- ✅ brainstorming 排除场景是否一致
+- ✅ 所有变体是否同步
+
+---
+
 ## 📖 文档
 
+### 快速开始
+- [QUICKSTART.md](QUICKSTART.md) - **5 分钟上手指南** ⚡
+
+### 完整文档
 - [CHANGELOG.md](CHANGELOG.md) - 版本历史
 - [ARCHITECTURE.md](ARCHITECTURE.md) - 架构设计
 - [CLAUDE.md](workspace/.claude/CLAUDE.md) - 项目约定
