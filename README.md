@@ -607,31 +607,21 @@ paths:
 
 ### 同步所有变体
 
-修改源文件后，运行：
+修改 `claudeCode-none/claude_arm64/workspace/.claude/` 中的文件后，Claude Code 会自动同步到其他 3 个变体。
 
-```bash
-./sync-variants.sh
-```
+**使用方式**：
+- 修改源文件
+- 说 `/save` 或 `git commit`
+- Claude Code 自动完成同步
 
-或直接提交（pre-commit hook 自动同步）：
+### 保持流程一致性
 
-```bash
-git add .
-git commit -m "feat: ..."
-# 自动同步 4 个变体
-```
-
-### 检查流程一致性
-
-```bash
-./check-workflow-consistency.sh
-```
-
-检查项目流程定义是否一致，包括：
-- ✅ 完整开发流程是否包含 tdd-guide
-- ✅ Bug 修复流程是否包含 tdd-guide
-- ✅ doc-updater 位置是否正确
-- ✅ brainstorming 排除场景是否一致
+Claude Code 会自动维护流程一致性：
+- ✅ 完整开发流程包含 tdd-guide
+- ✅ Bug 修复流程包含 tdd-guide
+- ✅ doc-updater 位置正确（reviewer → doc-updater）
+- ✅ brainstorming 排除场景一致
+- ✅ 所有变体保持同步
 - ✅ 所有变体是否同步
 
 ---

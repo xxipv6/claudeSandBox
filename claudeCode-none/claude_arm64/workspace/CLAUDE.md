@@ -37,15 +37,21 @@
 
 3. **先阅读规则**：执行任何操作前，必须先读取 `.claude/rules/agents.md`
 
-4. **高度自治**：缺什么补什么，无需询问（但在规划阶段必须先询问用户）
+4. **维护变体同步**：
+   - 源变体：`claudeCode-none/claude_arm64/workspace/.claude/`
+   - 修改源变体后，必须同步到其他 3 个变体
+   - 使用 `/save` 命令自动完成：git add → commit → 同步
+   - 确保所有变体的 agents、skills、commands、rules 保持一致
 
-5. **独立项目**：每个任务使用独立的 `xxx-project` 目录
+5. **高度自治**：缺什么补什么，无需询问（但在规划阶段必须先询问用户）
 
-6. **Git 管理**：至少 `git init`，推荐频繁提交
+6. **独立项目**：每个任务使用独立的 `xxx-project` 目录
 
-7. **文档记录**：在 README.md 中记录关键步骤与结果
+7. **Git 管理**：至少 `git init`，推荐频繁提交
 
-8. **验证完成**：按 Definition of Done 检查
+8. **文档记录**：在 README.md 中记录关键步骤与结果
+
+9. **验证完成**：按 Definition of Done 检查
 
 ---
 
