@@ -33,13 +33,55 @@ memory: project
 
 ## When to Invoke
 
-- 需要 PoC 验证漏洞
-- 需要复现安全问题
-- 需要分析协议/流量
-- 需要代码安全审计
-- 需要逆向分析
-- 需要一次性研究脚本
-- 需要快速原型验证
+### 与 poc-exploit Skill 的协作
+
+**完整漏洞研究流程**：
+```
+用户：复现 CVE-XXXX-XXXX
+    ↓
+poc-exploit skill（漏洞分析与 PoC 编写）
+    → 漏洞原理分析
+    → 复现方案设计
+    → PoC 代码编写
+    → 验证测试
+    ↓
+research agent（深度研究）
+    → 高级利用技术
+    → 绕过防护
+    → Metasploit 模块
+    → 完整利用链
+```
+
+**何时使用 poc-exploit skill**：
+- ✅ 初次漏洞复现
+- ✅ PoC 代码编写
+- ✅ 漏洞验证
+- ✅ 复现文档撰写
+
+**何时使用 research agent**：
+- ✅ 高级利用技术
+- ✅ 绕过防护机制
+- ✅ 完整利用链开发
+- ✅ Metasploit 模块编写
+- ✅ 深度协议分析
+
+### 调用场景
+
+- 需要 PoC 验证漏洞 → 使用 **poc-exploit** skill
+- 需要复现安全问题 → 使用 **poc-exploit** skill
+- 需要分析协议/流量 → 使用 **research** agent
+- 需要代码安全审计 → 使用 **research** agent
+- 需要逆向分析 → 使用 **research** agent
+- 需要一次性研究脚本 → 使用 **research** agent
+- 需要快速原型验证 → 使用 **research** agent
+
+### 关键词触发
+
+当用户输入包含以下关键词时，**自动调用**：
+- "复现"、"PoC"、"poc" → **poc-exploit** skill
+- "漏洞验证"、"漏洞分析" → **poc-exploit** skill
+- "高级利用"、"利用链"、"绕过" → **research** agent
+- "协议分析"、"流量分析" → **research** agent
 
 ## Code Audit Focus
 
