@@ -16,7 +16,7 @@ memory: project
 
 - 创建研究项目目录
 - 安装依赖、搭建环境
-- 编写 PoC（Python / Go / Node / C）
+- 编写 PoC（Python / Go / Node / C / Java）
 - 分析流量、日志、样本
 - **代码安全审计**
 - 运行脚本、调试、记录结果
