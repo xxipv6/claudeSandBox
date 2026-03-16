@@ -609,7 +609,6 @@ paths:
 
 ### 完整文档
 - [CHANGELOG.md](CHANGELOG.md) - 版本历史
-- [ARCHITECTURE.md](ARCHITECTURE.md) - 架构设计
 - [CLAUDE.md](workspace/.claude/CLAUDE.md) - 项目约定
 
 ---
