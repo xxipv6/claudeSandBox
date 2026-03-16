@@ -1,430 +1,432 @@
-# 多 Agent 团队架构流程图（v2.0.0）
+# claudeSandBox 架构设计（v2.1.0）
 
-## 系统协议
+## 系统定位
 
-claudeSandBox 是一个**人为定义的智能任务执行系统**，采用配置驱动的流程编排架构。
+claudeSandBox 是一个**命令驱动**的 Claude Code 沙箱环境，专为**安全研究、安全开发和日常开发**设计。
 
-### 核心协议
-
-- **唯一真理源**：CLAUDE.md 是唯一入口
-- **显式引用**：所有配置文件必须显式读取
-- **状态驱动**：状态只能来自文件，支持崩溃恢复
-- **支持阶段内并发**：按依赖关系并发执行 agents
-
-详见 `.claude/PROTOCOL.md`
+**核心特点**：
+- 🚀 **命令驱动** - 快捷命令，按需执行
+- 🧠 **技能库** - 按需加载的知识库
+- 🤖 **智能体** - 专门任务，按需调用
+- 🛡️ **规则系统** - 强制约束（安全、编码、测试）
 
 ---
 
-## 双模式决策系统
+## 核心架构
 
-```mermaid
-flowchart TD
-    Start([用户输入]) --> ModeDecision{MODE DECISION}
+### 命令驱动系统
 
-    ModeDecision -->|多文件操作 OR 代码分析 OR 不确定| StandardMode[标准模式<br/>默认]
-    ModeDecision -->|架构级任务 + 明确请求 + 环境变量| FullMode[完整模式<br/>CLAUDE_FULL_MODE=1]
-
-    subgraph StandardMode["🟦 标准模式（轻量级）"]
-        Std1[可选 task-planner 预规划]
-        Std2[3 阶段并发执行]
-        Std3[简洁报告 ≤500 行]
-    end
-
-    subgraph FullMode["🟩 完整模式（重量级）"]
-        Full1[强制 task-planner 预规划]
-        Full2[6 个执行阶段]
-        Full3[3 阶段并发执行]
-        Full4[详细状态追踪 + 日志]
-        Full5[完整验证闭环]
-    end
-
-    StandardMode --> StdEnd([完成])
-    FullMode --> FullEnd([完成])
-
-    style StandardMode fill:#e3f2fd
-    style FullMode fill:#e8f5e9
-    style ModeDecision fill:#fff9c4
+```
+用户输入 → 命令执行 → 完成任务
 ```
 
-### 模式对比
+**核心命令**：
+```bash
+/security-audit     # 安全审计
+/code-review        # 代码审查（前后端）
+/debug              # 调试问题
+/test               # 功能测试
+/e2e                # 全部测试（前端 + 后端，并发）
+```
 
-| 特性 | 标准模式 | 完整模式 |
-|------|----------|----------|
-| **触发条件** | 默认模式 | `CLAUDE_FULL_MODE=1` |
-| **Task Planner** | 可选 | 强制执行 |
-| **执行阶段** | 简化流程 | 6 个完整阶段 |
-| **并发策略** | 3 阶段并发 | 3 阶段并发 |
-| **Agent 超时** | 600 秒 | 600 秒 |
-| **状态追踪** | 无 | 完整状态文件 + 日志 |
-| **Git 分支** | 不创建 | 自动创建任务分支 |
-| **质量门禁** | 可选 | 强制执行 |
-| **修复循环** | 建议 | 最多 3 次 + 完整验证闭环 |
-| **执行报告** | 简洁报告 | 详细执行报告 |
-| **崩溃恢复** | 不支持 | 支持中断恢复 |
+**设计原则**：
+- ✅ 简洁直观 - 直接使用命令，无需模式选择
+- ✅ 按需调用 - 根据任务选择合适的命令/skill/agent
+- ✅ 专注安全 - 所有命令都针对安全场景优化
 
 ---
 
-## 3 阶段并发执行策略
+### 四大组件
 
-```mermaid
-flowchart TD
-    Start([任务开始]) --> Stage1[Stage 1<br/>task-planner<br/>必须最先执行]
+#### 1. 命令（Commands）
 
-    Stage1 --> Stage2[Stage 2<br/>分析类 agents 并发]
+**定义位置**：`.claude/commands/{command-name}.md`
 
-    subgraph Stage2["分析层并发执行"]
-        PM[product-manager<br/>需求分析]
-        BE[backend-engineer<br/>架构分析]
-        FE[frontend-engineer<br/>前端分析]
-        ST[security-tester<br/>安全分析]
-    end
+**可用命令**：
+- `/security-audit` - 安全审计（Web 白盒 + IoT）
+- `/code-review` - 代码审查（前后端）
+- `/debug` - 调试问题
+- `/test` - 功能测试
+- `/e2e` - 全部测试（并发）
 
-    Stage2 --> Stage3[Stage 3<br/>执行层 agent]
+#### 2. 技能库（Skills）
 
-    subgraph Stage3["执行层"]
-        DC[dev-coder<br/>代码开发]
-    end
+**定义位置**：`.claude/skills/{category}/{skill-name}/SKILL.md`
 
-    Stage3 --> End([完成])
+**安全技能**：
+- `security/whitebox-audit` - Web 白盒安全审计（8 阶段流程）
+- `security/iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
 
-    style Stage1 fill:#e0f2f1
-    style Stage2 fill:#e3f2fd
-    style Stage3 fill:#fff3e0
-```
+**开发技能**：
+- `development/debugging` - 调试方法论
+- `development/code-review` - 代码审查清单
+- `development/tdd-workflow` - TDD 工作流
 
-### 并发规则
+**测试技能**：
+- `testing/e2e-testing` - E2E 测试（Playwright）
 
-**Stage 1**（必须最先）：
-- `task-planner`：任务拆解、依赖识别、模式选择、资源规划
+**分析技能**：
+- `analysis/domains` - 10 个分析维度
 
-**Stage 2**（并发执行）：
-- `product-manager`：需求与业务目标分析
-- `backend-engineer`：系统结构与后端分析
-- `frontend-engineer`：前端与用户界面分析
-- `security-tester`：安全测试、漏洞扫描、质量验证
+#### 3. 智能体（Agents）
 
-**Stage 3**（等分析完成）：
-- `dev-coder`：所有代码开发（前端、后端、全栈、API、组件、数据库）
+**定义位置**：`.claude/agents/{agent-name}.md`
 
----
+**规划类**：
+- `task-planner` - 任务规划与分解
 
-## Agent 架构总览
+**分析类**（可并发）：
+- `product-manager` - 产品需求分析
+- `backend-engineer` - 后端架构分析（使用 `code-review` skill）
+- `frontend-engineer` - 前端实现分析（使用 `code-review` skill）
+- `security-tester` - 安全测试与漏洞分析（使用 `whitebox-audit` + `iot-audit` skills）
 
-```mermaid
-graph TB
-    subgraph Planning["📋 前置规划（1 个 Agent）"]
-        TP[task-planner<br/>任务拆解/依赖识别/模式选择]
-    end
+**执行类**：
+- `dev-coder` - 代码实现（使用 `tdd-workflow` skill）
 
-    subgraph Analysis["🔍 分析层（4 个 Agents）"]
-        PM[product-manager<br/>需求分析]
-        BE[backend-engineer<br/>架构分析]
-        FE[frontend-engineer<br/>前端分析]
-        ST[security-tester<br/>安全分析]
-    end
+#### 4. 规则（Rules）
 
-    subgraph Execution["💻 执行层（1 个 Agent）"]
-        DC[dev-coder<br/>代码开发]
-    end
+**定义位置**：`.claude/rules/{rule-name}.md`
 
-    Planning --> Stage1[Stage 1]
-    Stage1 --> Stage2[Stage 2 并发]
-    Stage2 --> Analysis
-    Analysis --> Stage3[Stage 3]
-    Stage3 --> Execution
-
-    style Planning fill:#e0f2f1
-    style Analysis fill:#e3f2fd
-    style Execution fill:#fff3e0
-    style Stage1 fill:#fff9c4
-    style Stage2 fill:#fff9c4
-    style Stage3 fill:#fff9c4
-```
-
-### Agent 职责详解
-
-**前置规划（1 个）**：
-- `task-planner`：任务拆解、依赖识别、模式选择、资源规划
-
-**分析层（4 个）**：
-- `product-manager`：需求与业务目标分析
-- `backend-engineer`：系统结构与后端分析
-- `frontend-engineer`：前端与用户界面分析
-- `security-tester`：安全测试、漏洞扫描、质量验证
-
-**执行层（1 个）**：
-- `dev-coder`：所有代码开发（前端、后端、全栈、API、组件、数据库）
+- `security.md` - 安全规则（禁止硬编码密钥、SQL 注入、XSS 等）
+- `coding-style.md` - 代码风格
+- `testing.md` - 测试要求
 
 ---
 
-## 完整模式：6 个执行阶段
+## 工作流程
 
-```mermaid
-flowchart TD
-    Start([用户输入]) --> Stage0[Stage 00<br/>Planning<br/>task-planner 规划任务]
+### 标准工作流程
 
-    Stage0 --> Stage1[Stage 01<br/>Task Init<br/>创建状态文件和日志]
-    Stage1 --> Stage2[Stage 02<br/>Git Prepare<br/>创建任务分支 task-xxx]
-    Stage2 --> Stage3[Stage 03<br/>Mode Execution<br/>读取知识库 + 启动 agents]
-    Stage3 --> Stage4[Stage 04<br/>Quality Gate<br/>静态分析 + 安全扫描 + 测试]
-    Stage4 --> Stage5[Stage 05<br/>Completion<br/>合并分支 + 生成执行报告]
-
-    Stage3 --> Concurrent[3 阶段并发执行]
-
-    Stage5 --> End([完成])
-
-    style Stage0 fill:#e1f5fe
-    style Stage1 fill:#e8f5e9
-    style Stage2 fill:#fff3e0
-    style Stage3 fill:#f3e5f5
-    style Stage4 fill:#e0f2f1
-    style Stage5 fill:#fce4ec
-    style Concurrent fill:#fff9c4
+```
+用户输入 → 任务规划 → 用户确认 → 执行任务 → 完成反馈
+   ↓           ↓          ↓          ↓          ↓
+ 理解意图    调用 planner  等待确认   执行操作   输出结果
 ```
 
-### 阶段职责
+### 工作流程示例
 
-| 阶段 | ID | 名称 | 主要职责 |
-|------|----|----|---------|
-| **任务规划** | 00 | Planning | task-planner 规划任务、拆解、依赖识别 |
-| **任务初始化** | 01 | Task Init | 创建状态文件、日志、检查前置条件 |
-| **Git 准备** | 02 | Git Prepare | 创建任务分支 task-xxx、初始化 Git |
-| **模式执行** | 03 | Mode Execution | 读取知识库、3 阶段并发启动 agents |
-| **质量门禁** | 04 | Quality Gate | 静态分析、安全扫描、自动测试、修复循环 |
-| **完成管理** | 05 | Completion | 合并分支、生成执行报告、清理临时文件 |
+```bash
+# 用户输入
+你：帮我实现用户登录功能
+
+# 第一步：任务规划
+Claude：让我先规划一下这个任务...
+
+## 任务规划
+### 1. 任务理解
+**目标**：实现用户登录功能
+**边界**：前端登录页面 + 后端登录 API
+**成功标准**：用户可以使用邮箱密码登录
+
+### 2. 任务拆解
+- 子任务 1：设计数据库表结构
+- 子任务 2：实现后端登录 API
+- 子任务 3：实现前端登录页面
+- 子任务 4：集成前后端
+
+### 3. 依赖关系
+T1（数据库）→ T2（后端 API）→ T3（前端页面）→ T4（集成）
+
+### 4. 执行顺序
+1. T1 → T2 → T3 → T4（串行）
+2. 预估时间：30 分钟
+
+### 5. 命令选择
+**选择的命令**：不使用命令，直接实现
+**理由**：这是完整的功能实现任务
+
+### 6. 资源规划
+- backend-engineer：设计数据库和 API
+- frontend-engineer：设计登录页面
+- dev-coder：实现代码
 
 ---
 
-## 任务生命周期
+# 第二步：等待用户确认
+是否开始执行？请确认。
 
-```mermaid
-stateDiagram-v2
-    [*] --> pending: 任务创建
-    pending --> running: 依赖满足 + 启动执行
-    pending --> paused: 依赖不满足
-    running --> completed: 任务成功
-    running --> failed: 任务失败（最多3次重试）
-    running --> cancelled: 用户取消
-    running --> paused: 等待依赖/人工介入
-    paused --> running: 恢复执行
-    paused --> cancelled: 用户取消
-    failed --> pending: 用户重试
-    completed --> [*]
-    failed --> [*]
-    cancelled --> [*]
-```
+# 第三步：用户确认后执行
+你：确认，开始执行。
 
-### 状态定义
-
-| 状态 | 说明 | 触发条件 |
-|------|------|---------|
-| **pending** | 等待执行 | 任务创建、依赖未满足 |
-| **running** | 正在执行 | 依赖满足、启动执行 |
-| **paused** | 暂停等待 | 等待依赖、等待人工介入 |
-| **completed** | 执行成功 | 所有阶段完成、质量检查通过 |
-| **failed** | 执行失败 | 达到最大重试次数、不可恢复错误 |
-| **cancelled** | 用户取消 | 用户主动取消任务 |
-
----
-
-## 状态文件结构
-
-```
-.claude/
-├── PROTOCOL.md                    # 协议声明
-├── workflow/                      # 流程编排配置
-│   ├── standard-mode.md           # 标准模式流程
-│   ├── full-mode.md               # 完整模式流程
-│   ├── stages/                    # 各阶段配置
-│   │   ├── 00-planning.md
-│   │   ├── 01-task-init.md
-│   │   ├── 02-git-prepare.md
-│   │   ├── 03-mode-execution.md
-│   │   ├── 04-quality-gate.md
-│   │   ├── 05-completion.md
-│   │   └── templates/             # 状态文件模板
-│   └── agents/                    # Agent 定义
-│       ├── task-planner.md
-│       ├── product-manager.md
-│       ├── backend-engineer.md
-│       ├── frontend-engineer.md
-│       ├── dev-coder.md
-│       └── security-tester.md
-├── agent-memory/                  # Agent 持久记忆
-│   ├── task-planner/
-│   ├── product-manager/
-│   ├── backend-engineer/
-│   ├── frontend-engineer/
-│   ├── dev-coder/
-│   └── security-tester/
-├── task_logs/                     # 执行日志
-│   └── task-{id}.log
-├── task_states/                   # 任务状态文件
-│   └── task-{id}.json
-├── task_plans/                    # 任务规划存储
-│   └── task-{id}.json
-├── subtask_queues/                # 子任务队列存储
-│   └── task-{id}.json
-└── task_reports/                  # 执行报告
-    └── task-{id}.md
+# 第四步：执行并反馈
+Claude：开始执行...
+[执行过程]
+完成！登录功能已实现。
 ```
 
 ---
 
-## 质量门禁与修复循环
+## 命令详解
 
-```mermaid
-flowchart TD
-    Code[代码生成] --> QA[Quality Gate<br/>质量门禁]
+### /security-audit - 安全审计
 
-    QA --> Static[静态分析<br/>语法/风格/结构]
-    QA --> Security[安全扫描<br/>漏洞/依赖/敏感信息]
-    QA --> Test[自动测试<br/>单元/集成/功能]
+**功能**：完整的安全审计，支持 Web 应用和 IoT 设备
 
-    Static --> Check{检查通过?}
-    Security --> Check
-    Test --> Check
+**支持类型**：
+- **Web 白盒审计**（`whitebox-audit` skill）
+  - 8 阶段流程：执行模型 → 依赖分析 → 执行链 → 路由枚举 → 业务流程 → 越权审计 → 状态机 → 攻击路径
+  - 重点：越权作为主线、跨接口联动、状态机建模
 
-    Check -->|是| Pass[质量通过]
-    Check -->|否| FixLoop[修复循环<br/>最多 3 次]
+- **IoT 审计**（`iot-audit` skill）
+  - 自动识别资产形态（仅固件/仅源码/混合）
+  - 统一模型：入口 → 权限 → 状态 → 副作用
 
-    subgraph FixLoop["完整验证闭环"]
-        Fix1[识别问题]
-        Fix2[搜索类似问题]
-        Fix3[影响范围评估]
-        Fix4[dev-coder 修复]
-        Fix5[security-tester 验证]
-        Fix6[重新检查]
-    end
+**使用示例**：
+```bash
+# Web 应用审计
+/security-audit
+/security-audit src/auth/
 
-    FixLoop --> Check
-    Pass --> End([继续下一阶段])
-
-    style QA fill:#e0f2f1
-    style FixLoop fill:#fff9c4
-    style Pass fill:#e8f5e9
+# IoT 设备审计
+/security-audit firmware.bin
+/security-audit src/
 ```
 
-### 完整验证闭环
+**输出**：
+- 漏洞清单（高/中/低风险）
+- 攻击路径
+- 修复建议
 
-**修复前分析**：
-1. 问题模式识别（这个问题属于什么类型？）
-2. 类似问题搜索（项目中是否有相同模式？）
-3. 影响范围评估（修复会影响哪些功能？）
+### /code-review - 代码审查
 
-**执行修复**：
-4. 修复所有相关问题（不只是单个问题）
-5. 确保修复的一致性
+**功能**：前后端代码审查（6 维度）
 
-**修复后验证**（security-tester）：
-6. ✅ 确认原始问题已修复
-7. ✅ 确认所有类似问题已修复
-8. ✅ 确认未引入新问题（回归检查）
-9. ✅ 确认未破坏现有功能
+**审查维度**：
+- 功能性、性能、可读性、可维护性、测试、安全性（基础安全）
+
+**使用示例**：
+```bash
+/code-review
+/code-review src/auth/login.js
+```
+
+**输出**：
+- 问题清单
+- 修复建议
+- 优先级排序
+
+### /debug - 调试问题
+
+**功能**：系统化调试
+
+**特点**：
+- 自动识别前端/后端
+- 前端：自动使用 Playwright
+
+**使用示例**：
+```bash
+/debug "登录按钮点击没反应"
+/debug "API 返回 500 错误"
+```
+
+### /test - 功能测试
+
+**功能**：功能测试（前端或后端）
+
+**特点**：
+- 自动识别前端/后端
+- 前端：自动使用 Playwright
+
+**使用示例**：
+```bash
+/test "测试登录按钮"
+/test "测试 API 返回"
+```
+
+### /e2e - 全部测试
+
+**功能**：并发运行所有测试
+
+**执行内容**：
+- 后端测试（npm test）
+- 前端 E2E 测试（Playwright）
+
+**使用示例**：
+```bash
+/e2e
+/e2e "只运行包含 login 的测试"
+```
 
 ---
 
-## Knowledge 共享知识库
+## Agents ↔ Skills 对齐
 
-```
-knowledge/
-├── patterns.md      # 系统性失败模式（状态、边界、信任、时间、资源、组合）
-├── domains.md       # 统一安全问题空间（入侵链、漏洞分类、控制基线）
-├── tools.md         # 工具视角认知（选用决策、能力边界、组合工作流）
-└── corrections.md   # 错误学习库（常见错误模式与正确修复流程）
-```
-
-### 知识库使用规则
-
-**标准模式**：
-- 建议读取 relevant knowledge 文件
-- 如不读需说明原因
-
-**完整模式**：
-- 必须先读取 knowledge 文件再启动 agents
-- 禁止跳过知识库读取
+| Agent | 使用 Skill | 职责 |
+|-------|-----------|------|
+| **security-tester** | `whitebox-audit` + `iot-audit` | 安全测试与漏洞分析 |
+| **backend-engineer** | `code-review`（后端） | 后端架构分析 |
+| **frontend-engineer** | `code-review`（前端） | 前端实现分析 |
+| **dev-coder** | `tdd-workflow` | 代码实现（TDD） |
+| **task-planner** | 无 | 任务规划与分解 |
+| **product-manager** | 无 | 产品需求分析 |
 
 ---
 
-## Git 分支管理策略
+## 强制要求
 
-```mermaid
-flowchart LR
-    Main[main 分支] --> Create[创建 task-xxx 分支]
-    Create --> Execute[执行任务]
-    Execute --> Success{成功?}
-    Success -->|是| Merge[合并到 main]
-    Success -->|否| Rollback[回滚到 main]
-    Merge --> Report[生成执行报告]
-    Rollback --> Report
-    Report --> Clean[删除临时分支]
-    Clean --> End([完成])
-```
+### 规划优先
 
-### Git 操作
+**所有任务都必须先规划**：
+1. ✅ 简单任务：快速规划（1-2 分钟）
+2. ✅ 复杂任务：详细规划（使用 task-planner agent）
+3. ✅ 规划内容包括：任务拆解、依赖关系、执行顺序、所需资源
 
-| 操作 | 命令 | 说明 |
-|------|------|------|
-| **创建分支** | `git checkout -b task-{id}` | 每个任务独立分支 |
-| **提交代码** | `git commit -m "Stage {id}: {name}"` | 按阶段提交 |
-| **合并分支** | `git merge --no-ff task-{id}` | 完成后合并到主分支 |
-| **回滚** | `git reset --hard {commit}` | 失败时回滚 |
+### 必须等待确认
+
+1. ✅ 规划完成后必须等待用户确认
+2. ✅ 展示规划结果
+3. ✅ 说明预期耗时和影响范围
+4. ✅ 等待用户明确确认后再执行
+
+### 规划未确认不得执行
+
+1. ❌ 不得跳过规划直接执行
+2. ❌ 不得假设用户会同意
+3. ❌ 不得在规划阶段就开始修改代码
 
 ---
 
-## Agent 超时配置
+## 全局禁止
 
-| Agent | 超时时间 | 说明 |
-|-------|----------|------|
-| **所有 Agents** | 600 秒（10 分钟） | 包括分析和执行层 |
+1. ❌ **跳过规划直接执行任务**（最严重的违规）
+2. ❌ 跳过用户确认就执行大规模修改
+3. ❌ 违反安全规则（硬编码密钥、缺少输入验证等）
+4. ❌ 过度形式化（输出冗长的分析报告）
+5. ❌ 忽略用户的安全研究授权范围
 
-**超时处理**：
-- 超时后记录日志
-- 询问用户是否继续
-- 可选择延长超时或终止任务
+---
+
+## 文件结构
+
+```
+claudeSandBox/
+├── claudeCode-none/          # 无 LSP 变体（推荐）
+│   ├── claude_arm64/         # ARM64 架构
+│   └── claude_x64/           # x64 架构
+├── claudeCode-lsp/           # 有 LSP 变体
+│   ├── claude_arm64/
+│   └── claude_x64/
+│
+└── workspace/                # 工作目录
+    └── .claude/
+        ├── CLAUDE.md         # 项目约定
+        ├── commands/         # 命令定义
+        │   ├── security-audit.md
+        │   ├── code-review.md
+        │   ├── debug.md
+        │   ├── test.md
+        │   └── e2e.md
+        ├── skills/           # 技能库
+        │   ├── security/     # 安全技能
+        │   │   ├── whitebox-audit/
+        │   │   └── iot-audit/
+        │   ├── development/  # 开发技能
+        │   │   ├── debugging/
+        │   │   ├── code-review/
+        │   │   └── tdd-workflow/
+        │   ├── testing/      # 测试技能
+        │   │   └── e2e-testing/
+        │   └── analysis/     # 分析技能
+        │       └── domains/
+        ├── agents/           # 智能体定义
+        │   ├── task-planner.md
+        │   ├── product-manager.md
+        │   ├── backend-engineer.md
+        │   ├── frontend-engineer.md
+        │   ├── security-tester.md
+        │   └── dev-coder.md
+        ├── agent-memory/     # Agent 持久记忆
+        │   ├── task-planner/
+        │   ├── product-manager/
+        │   ├── backend-engineer/
+        │   ├── frontend-engineer/
+        │   ├── security-tester/
+        │   └── dev-coder/
+        └── rules/            # 强制规则
+            ├── security.md
+            ├── coding-style.md
+            └── testing.md
+```
 
 ---
 
 ## 版本历史
 
-### v2.0.0 (2026-03-15)
+### v2.1.0 (2026-03-16)
 
-**重大更新**：
-- ✅ 配置驱动的流程编排（6 个执行阶段）
-- ✅ 双模式系统（标准模式 + 完整模式）
-- ✅ 添加 task-planner 前置规划
-- ✅ 3 阶段并发执行策略
-- ✅ Agent 超时从 120 秒调整为 600 秒
-- ✅ 完整验证闭环（类似问题检查 + 回归检查 + 完整性检查）
-- ✅ 任务生命周期管理（pending → running → completed/failed/cancelled/paused）
-- ✅ Git 分支管理（每个任务独立分支）
-- ✅ 质量门禁（静态分析 + 安全扫描 + 自动测试）
-- ✅ Agent 持久记忆（6 个 agent 各自拥有独立的记忆目录）
-- ✅ 协议声明（PROTOCOL.md）
-- ✅ 移除快速模式（简化为双模式）
+**重大更新**：从模式驱动重构为命令驱动
 
 **核心变化**：
-- 从快速模式 + 标准模式 → 标准模式 + 完整模式
-- 从 7 个 agents → 6 个 agents（移除 script-coder 和 ops-engineer）
-- 从顺序执行 → 3 阶段并发执行
-- 从无状态管理 → 完整的状态持久化
-- 从无 Git 管理 → 完整的 Git 分支管理
-- 从简单修复 → 完整验证闭环
+- ✅ 删除双模式系统（标准模式/完整模式）
+- ✅ 删除 6 阶段流程系统
+- ✅ 删除状态管理系统
+- ✅ 添加命令驱动系统
+- ✅ 添加技能库（按需加载）
+- ✅ 创建 whitebox-audit 和 iot-audit skills
+- ✅ 对齐 Agents 和 Skills
+- ✅ 添加"所有任务都必须先规划"的强制要求
 
-### v1.1.0 (2026-03-12)
+**删除的功能**：
+- ❌ 快速模式
+- ❌ 标准模式
+- ❌ 完整模式
+- ❌ 6 个执行阶段
+- ❌ 任务状态管理
+- ❌ Git 分支管理
+- ❌ 质量门禁
+- ❌ Knowledge 系统（改为 Skills）
 
-**更新内容**：
-- ✅ 移除 "Agent tool" 机制描述
-- ✅ 强调并发/并行执行
-- ✅ 明确分级调度
-- ✅ 添加行动决策框架
-- ✅ 添加迭代循环流程
+**新增的功能**：
+- ✅ 命令驱动（5 个核心命令）
+- ✅ 技能库（7 个 skills）
+- ✅ 强制规划要求
+- ✅ 自动识别（前端/后端，固件/源码）
 
-### v1.0.0 (2026-03-11)
+### v2.0.0 (2026-03-15)
 
-**初始版本**：
-- 多 Agent 编排系统
-- 双模式架构
-- 5 个分析层 agents
-- 2 个执行层 coder agents
-- 1 个支持层 agent
+**重大更新**：配置驱动的流程编排系统
+
+详见旧版本文档。
+
+---
+
+## 适用场景
+
+- ✅ 安全研究（漏洞分析、PoC 开发、渗透测试）
+- ✅ 安全开发（安全编码、威胁建模、代码审查）
+- ✅ 日常开发（调试、测试、重构）
+
+---
+
+## 版本对比
+
+### v2.1.0（当前）- 命令驱动
+
+```bash
+# 直接使用命令
+/security-audit
+/code-review
+/debug
+/test
+/e2e
+```
+
+**特点**：
+- ✅ 简洁直观
+- ✅ 按需调用
+- ✅ 无模式选择
+- ✅ 专注安全场景
+
+### v2.0.0 - 模式驱动
+
+```bash
+# 先选择模式
+标准模式 → 3-4 步流程
+完整模式 → 6 步流程 + 质量门禁
+```
+
+**特点**：
+- ⚠️ 需要选择模式
+- ⚠️ 流程较重
+- ⚠️ 6 个阶段
