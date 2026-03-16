@@ -83,6 +83,20 @@ Claude：[自动识别关键词"审计"]
 ### 自动触发 (Auto-Trigger)
 智能体描述中包含 **"应主动（PROACTIVELY）使用"** 时，Claude 应在识别到相关场景时自动调用该智能体，无需等待用户明确指示。
 
+### Skills 自动触发
+
+**开发 Skills**（应主动（PROACTIVELY）使用）：
+- `brainstorming` - **所有创造性工作必须先使用**
+  - 创建功能、构建组件、添加行为、修改行为时必须先调用
+  - 在调用任何 agent 之前，先使用 brainstorming 探索设计
+- `frontend-patterns` - React/Next.js 前端开发
+- `backend-patterns` - 后端开发模式
+- `tdd-workflow` - 测试驱动开发
+- `debugging` - 调试问题
+- `code-review` - 代码审查
+
+**关键词自动触发（Keyword Auto-Trigger）**：
+
 ## 并行任务执行 (Parallel Task Execution)
 
 对于相互独立的操作，**务必**使用并行任务执行：
@@ -97,6 +111,96 @@ Claude：[自动识别关键词"审计"]
 # 避忌：在不必要时采用串行执行
 先启动智能体 1，等待完成后再启动智能体 2
 ```
+
+## 智能体协作模式 (Agent Collaboration Patterns)
+
+### 🎨 完整开发流程（新功能开发）
+
+```
+用户请求
+    ↓
+brainstorming skill（设计探索）
+    → 理解需求
+    → 探索方案
+    → 呈现设计
+    → 撰写设计文档
+    → 用户批准
+    ↓
+planner agent（任务规划）
+    → 拆解任务
+    → 识别依赖
+    → 生成执行计划
+    → 指定"执行智能体：dev"
+    ↓
+tdd-guide agent（TDD）
+    → RED：编写测试
+    → GREEN：编写代码
+    → REFACTOR：重构代码
+    ↓
+dev agent（实现）
+    → 按计划实现
+    → 运行测试
+    → 提交代码
+    ↓
+reviewer agent（审查）
+    → 代码质量审查
+    → 修复问题
+```
+
+### 🔄 快速修复流程（Bug 修复）
+
+```
+用户报告 Bug
+    ↓
+debugging skill（调试）
+    → 理解问题
+    → 定位根因
+    ↓
+planner agent（规划修复方案）
+    → 制定修复计划
+    → 指定"执行智能体：dev"
+    ↓
+dev agent（修复）
+    → 实施修复
+    → 验证修复
+    ↓
+reviewer agent（审查）
+    → 确认修复正确
+```
+
+### 🔒 安全研究流程
+
+```
+用户请求安全审计
+    ↓
+research agent（安全研究）
+    → 代码安全审计
+    → 漏洞分析
+    → PoC 开发
+    ↓
+[并行]
+reviewer agent（质量审查）
+    → 逻辑正确性
+    → 架构边界
+    → 代码质量
+```
+
+### 🚀 部署流程
+
+```
+用户请求部署
+    ↓
+ops agent（运维）
+    → 部署配置
+    → 执行部署
+    → 验证部署
+    ↓
+doc-updater agent（文档更新）
+    → 更新文档
+    → 更新 API 文档
+```
+
+---
 
 ## 智能体协作模式 (Agent Collaboration Patterns)
 
