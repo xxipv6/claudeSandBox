@@ -1,6 +1,6 @@
 ---
 name: frontend-patterns
-description: React、Next.js、状态管理（State Management）、性能优化（Performance Optimization）及 UI 最佳实践的前端开发模式。
+description: React、Next.js、状态管理（State Management）、性能优化（Performance Optimization）及 UI 最佳实践的前端开发模式。当进行前端开发、React 组件设计或性能优化时，应主动（PROACTIVELY）使用此 skill。
 disable-model-invocation: false
 ---
 

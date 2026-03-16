@@ -1,6 +1,6 @@
 ---
 name: debugging
-description: 系统化调试方法论、工具使用、问题定位和解决技巧。
+description: 系统化调试方法论、工具使用、问题定位和解决技巧。当代码行为不符合预期、出现错误需要诊断或性能问题需要分析时，应主动（PROACTIVELY）使用此 skill。
 disable-model-invocation: false
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: backend-patterns
-description: 后端开发模式，包括 API 设计、数据库模式、服务架构、缓存策略、消息队列、微服务等。
+description: 后端开发模式，包括 API 设计、数据库模式、服务架构、缓存策略、消息队列、微服务等。当进行后端开发、API 设计、数据库建模或微服务架构时，应主动（PROACTIVELY）使用此 skill。
 disable-model-invocation: false
 ---
 

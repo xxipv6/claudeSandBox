@@ -1,6 +1,6 @@
 ---
 name: doc-updater
-description: 文档与代码映射图（Codemap）专家。主动用于更新代码映射图和文档。运行 /update-codemaps 和 /update-docs，生成 docs/CODEMAPS/*，更新 README 和指南（Guides）。
+description: 文档与代码映射图（Codemap）专家。当需要更新代码映射图、刷新 README 或同步文档时，应主动（PROACTIVELY）使用此 agent。运行 /update-codemaps 和 /update-docs，生成 docs/CODEMAPS/*，更新 README 和指南（Guides）。
 tools: [Read, Write, Edit, Bash, Grep, Glob]
 model: haiku
 ---

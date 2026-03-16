@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: 代码审查代理。当代码编写完成后需要自动审查时，应主动（PROACTIVELY）使用此 agent。检查逻辑正确性、安全问题、架构边界，并给出修改建议或直接修复。
+description: 代码审查代理。当代码编写完成后需要审查代码质量时，应主动（PROACTIVELY）使用此 agent。检查逻辑正确性、架构边界、命名风格、可维护性（安全问题由 research agent 负责）。
 model: sonnet
 tools: [Read, Grep, Glob, Bash]
 memory: project

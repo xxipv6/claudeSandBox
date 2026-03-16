@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: 代码审查方法论、审查清单、常见问题和最佳实践。
+description: 代码审查方法论、审查清单、常见问题和最佳实践。当需要审查代码质量、检查架构边界、识别潜在问题时，应主动（PROACTIVELY）使用此 skill。
 disable-model-invocation: false
 ---
 

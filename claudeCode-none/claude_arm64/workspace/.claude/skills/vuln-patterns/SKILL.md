@@ -1,6 +1,6 @@
 ---
 name: vuln-patterns
-description: OWASP Top 10 和常见 CWE 漏洞模式、识别方法、利用场景和修复方案。
+description: OWASP Top 10 和常见 CWE 漏洞模式、识别方法、利用场景和修复方案。进行安全代码审计、编写安全测试或修复漏洞时，应主动（PROACTIVELY）使用此 skill。
 disable-model-invocation: false
 ---
 
