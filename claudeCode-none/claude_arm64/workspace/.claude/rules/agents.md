@@ -84,23 +84,6 @@
 | "测试"、"TDD" | **tdd-guide** |
 | "规划"、"设计"、"架构" | **planner** 或 **system-architect** |
 
-### 条件自动触发（Condition Auto-Trigger）
-
-**当满足以下条件时，自动触发**：
-
-| 条件 | 自动调用 Skill |
-|------|----------------|
-| 上下文使用率 > 80% | **context-management** skill |
-| 对话轮次 > 20 轮 | **context-management** skill |
-| 完成重要功能/阶段 | **context-management** skill |
-| 准备切换任务前 | **context-management** skill |
-
-**context-management skill 会自动**：
-- 提炼核心上下文（任务状态、关键决策、代码变更、项目结构）
-- 写入 `agent-memory/` 持久化
-- 通知用户压缩结果
-- 确保无缝衔接
-
 **示例**：
 ```
 用户：帮我开发登录功能
@@ -181,13 +164,13 @@ dev agent（实现）
     → 运行测试
     → 提交代码
     ↓
-doc-updater agent（文档更新）
-    → 更新文档
-    → 更新 API 文档
-    ↓
 reviewer agent（审查）
     → 代码质量审查
     → 修复问题
+    ↓
+doc-updater agent（文档更新）
+    → 更新文档
+    → 更新 API 文档
 ```
 
 ### 🔄 快速修复流程（Bug 修复）
@@ -202,6 +185,10 @@ debugging skill（调试）
 planner agent（规划修复方案）
     → 制定修复计划
     → 指定"执行智能体：dev"
+    ↓
+tdd-guide agent（TDD）
+    → RED：编写失败测试（复现 Bug）
+    → GREEN：修复 Bug 使测试通过
     ↓
 dev agent（修复）
     → 实施修复
@@ -265,17 +252,12 @@ research (安全审计) + reviewer (质量审查) → 并行
 
 ### 3. 架构驱动流程
 ```
-system-architect → planner → dev → reviewer
+system-architect → planner → tdd-guide → dev → reviewer → doc-updater
 ```
 
 适用于：新系统设计、复杂模块
 
-### 4. 运维集成流程
-```
-dev → ops → doc-updater
-```
-
-适用于：部署、监控、配置管理
+**关键**：system-architect 负责架构设计，之后仍需完整的 TDD 开发流程
 
 ## 智能体选择决策树 (Agent Selection Decision Tree)
 
