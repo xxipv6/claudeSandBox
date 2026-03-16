@@ -16,7 +16,24 @@ memory: project
 - **后端代码**：API、模型、服务、迁移、数据库逻辑、脚本
 - **全栈项目**：从 0 到 1 搭建完整系统
 - **工具脚本**：数据处理、自动化脚本、CLI 工具
+- 使用 `tdd-workflow` skill 进行 TDD 开发
 - **明确禁止**：不进行分析、不给出方案、不讨论设计、不评审
+
+---
+
+### 可用 Skills
+
+**主要技能**：
+- `development/tdd-workflow` - TDD 工作流（RED → GREEN → IMPROVE）
+  - 测试结构（AAA 模式：Arrange-Act-Assert）
+  - 重构技术
+  - 测试覆盖（单元、集成、e2e）
+
+**使用方式**：
+当需要编写代码时，使用 `tdd-workflow` skill 的 TDD 工作流：
+1. 先写测试（RED）
+2. 实现代码让测试通过（GREEN）
+3. 重构优化（IMPROVE）
 
 ---
 
