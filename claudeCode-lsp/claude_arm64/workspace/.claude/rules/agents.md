@@ -84,6 +84,23 @@
 | "测试"、"TDD" | **tdd-guide** |
 | "规划"、"设计"、"架构" | **planner** 或 **system-architect** |
 
+### 条件自动触发（Condition Auto-Trigger）
+
+**当满足以下条件时，自动触发**：
+
+| 条件 | 自动调用 Skill |
+|------|----------------|
+| 上下文使用率 > 80% | **context-management** skill |
+| 对话轮次 > 20 轮 | **context-management** skill |
+| 完成重要功能/阶段 | **context-management** skill |
+| 准备切换任务前 | **context-management** skill |
+
+**context-management skill 会自动**：
+- 提炼核心上下文（任务状态、关键决策、代码变更、项目结构）
+- 写入 `agent-memory/` 持久化
+- 通知用户压缩结果
+- 确保无缝衔接
+
 **示例**：
 ```
 用户：帮我开发登录功能
