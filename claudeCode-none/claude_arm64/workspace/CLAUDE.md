@@ -42,7 +42,6 @@
 
 **安全分析**：
 - `skills/security/whitebox-audit/` - Web 白盒安全审计（8 阶段流程）
-- `skills/security/binary-reverse/` - 二进制逆向安全审计（IDA MCP，8 阶段流程）
 
 **开发辅助**：
 - `skills/development/debugging/` - 调试方法论
