@@ -283,15 +283,11 @@ Claude：[开始完整安全审计流程]
 
 ## 🛠️ 工具集
 
-### ArvinENV 工具
+### 命令行工具
 
 容器内预装的命令行工具：
 
 ```bash
-mode          # 查看当前模式
-mode full     # 切换到完整模式
-mode standard # 切换到标准模式
-
 nc -nv <IP> <PORT>     # Netcat 端口扫描
 curl -X POST <URL>     # HTTP 请求
 sqlite3 <db>           # SQLite 数据库
