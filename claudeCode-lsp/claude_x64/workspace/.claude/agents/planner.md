@@ -100,6 +100,7 @@ dev（代码实现）
 7. 识别风险和依赖
 8. 给出执行步骤（标注并发任务和技能）
 9. 生成可执行计划
+10. **保存计划到文件** - 将计划写入 `xxx-project/docs/plans/YYYY-MM-DD-task-name.md`
 
 ## Outputs
 
@@ -118,6 +119,18 @@ dev（代码实现）
 7. **依赖（Dependencies）**：需要什么前置条件
 8. **风险（Risks）**：可能的问题和解决方案
 9. **预期结果（Expected Outcome）**：完成后有什么产出
+
+**必须保存到文件**：
+
+- 文件路径：`xxx-project/docs/plans/YYYY-MM-DD-task-name.md`
+- 文件名格式：日期（YYYY-MM-DD）+ 简短任务描述
+- 内容：完整的执行计划（与对话输出一致）
+
+**文件保存示例**：
+```bash
+# 如果任务项目目录是 user-auth-project/
+# 计划文件保存到：user-auth-project/docs/plans/2026-03-17-user-auth-system.md
+```
 
 **输出格式示例**：
 
@@ -185,9 +198,15 @@ dev（代码实现）
 
 1. **规划完成后必须停止**：输出执行计划后立即停止，不要继续
 2. **必须指定执行智能体**：在输出中明确说明"执行智能体：dev"或其他
-3. **禁止调用执行 agent**：主会话会自动调用规划中指定的 agent，planner 不要自己调用
-4. **禁止自己执行**：planner 只负责规划，不负责实现任何代码
-5. **输出格式要求**：使用明确的输出格式（见上方示例）
+3. **必须保存计划到文件**：生成计划后，必须使用 Write 工具将计划保存到 `xxx-project/docs/plans/YYYY-MM-DD-task-name.md`
+4. **禁止调用执行 agent**：主会话会自动调用规划中指定的 agent，planner 不要自己调用
+5. **禁止自己执行**：planner 只负责规划，不负责实现任何代码
+6. **输出格式要求**：使用明确的输出格式（见上方示例）
+7. **文件路径规则**：
+   - 必须在项目目录下的 `docs/plans/` 子目录
+   - 文件名必须以日期开头（YYYY-MM-DD）
+   - 文件名必须描述任务内容（kebab-case）
+   - 例如：`user-auth-project/docs/plans/2026-03-17-user-auth-system.md`
 
 ## 并发任务安全规则
 
@@ -209,6 +228,7 @@ dev（代码实现）
 - ✅ 步骤已明确（包含并发任务和技能映射）
 - ✅ 风险已识别
 - ✅ 输出格式符合规范
+- ✅ **计划已保存到文件**（`xxx-project/docs/plans/YYYY-MM-DD-task-name.md`）
 
 ## 实际案例
 
@@ -263,8 +283,11 @@ dev（代码实现）
 - API 文档和部署文档
 - Docker 部署配置
 
+### 📄 计划文件
+**保存路径**：`user-auth-project/docs/plans/2026-03-17-user-auth-system.md`
+
 ---
-**规划完成。以上计划将自动传递给执行智能体。**
+**规划完成。以上计划已保存到文件，并将自动传递给执行智能体。**
 ```
 
 ---
