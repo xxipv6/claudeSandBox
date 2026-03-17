@@ -116,9 +116,11 @@
 **项目目录结构**：
 ```
 xxx-project/              ← 项目根目录（所有东西都在这里）
-  ├── docs/              ← 设计文档、规格说明
-  │   └── specs/
-  │       └── YYYY-MM-DD-<topic>-design.md
+  ├── docs/              ← 文档目录
+  │   ├── plans/         ← 执行计划（planner 生成）
+  │   │   └── YYYY-MM-DD-task-name.md
+  │   └── specs/         ← 设计规格（brainstorming 生成）
+  │       └── YYYY-MM-DD-topic-design.md
   ├── src/               ← 源代码
   ├── tests/             ← 测试
   ├── scripts/           ← 辅助脚本
@@ -128,7 +130,9 @@ xxx-project/              ← 项目根目录（所有东西都在这里）
 ```
 
 **重要**：
-- 设计文档保存到 `xxx-project/docs/specs/`
+- **所有任务都会创建项目目录**（不只是编程任务）
+- 执行计划保存到 `xxx-project/docs/plans/YYYY-MM-DD-task-name.md`
+- 设计文档保存到 `xxx-project/docs/specs/YYYY-MM-DD-topic-design.md`
 - 代码保存到 `xxx-project/src/`
 - 不要在 `/workspace` 根目录下创建任务相关文件
 - 一个项目 = 一次任务的完整容器
