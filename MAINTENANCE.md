@@ -8,7 +8,7 @@
 
 ### 版本信息
 - **当前版本**：v2.2.0
-- **架构类型**：命令驱动 + Skills 按需加载 + Agents 自动触发
+- **架构类型**：智能体驱动 + Skills 按需加载 + Commands 快捷执行
 - **适用场景**：安全研究、安全开发、日常开发
 
 ### 核心组件
@@ -16,9 +16,7 @@
 claudeSandBox/
 ├── README.md              # 项目主文档（根目录唯一 README）
 ├── CHANGELOG.md           # 版本历史
-├── QUICKSTART.md          # 快速开始
 ├── MAINTENANCE.md         # 本文档（维护手册）
-├── ARCHITECTURE.md        # 架构设计（如需要）
 │
 └── [4 个变体目录]
     ├── claudeCode-none/claude_arm64/   ← 主变体（修改源）
@@ -56,15 +54,16 @@ CLAUDE.md (主契约 - 单一真相源)
     │   ├── dev.md              │
     │   ├── reviewer.md         │
     │   ├── ops.md              │
-    │   └── doc-updater.md      │
+    │   ├── doc-updater.md      │
+    │   └── tdd-guide.md        │
     │                            │
     ├── brainstorming/SKILL.md ──┤
     │                            │
-    └── [其他 agents]            │
+    └── [其他 skills]            │
                                  │
                           交叉引用：
                           ├─ 复杂度判断 (CLAUDE.md)
-                          ├─ 技能清单 (skills/README.md)
+                          ├─ 技能清单 (planner.md)
                           └─ 输出格式 (CLAUDE.md 项目目录结构)
 ```
 
@@ -166,16 +165,21 @@ CLAUDE.md (主契约 - 单一真相源)
 
 | 文件 | 作用 | 依赖 | 被依赖 |
 |------|------|------|--------|
+| **system-architect.md** | 系统架构设计 | agents.md | planner.md |
 | **planner.md** | 任务规划 | CLAUDE.md, agents.md, skills/ | dev.md, research.md |
-| **dev.md** | 日常开发 | CLAUDE.md, agents.md | planner.md |
 | **research.md** | 安全研究 | agents.md | planner.md |
-| **system-architect.md** | 系统架构 | agents.md | planner.md |
+| **dev.md** | 日常开发 | CLAUDE.md, agents.md | planner.md |
+| **reviewer.md** | 代码质量审查 | agents.md | planner.md |
+| **ops.md** | 运维自动化 | agents.md | planner.md |
+| **doc-updater.md** | 文档维护 | agents.md | planner.md |
+| **tdd-guide.md** | 测试驱动开发 | agents.md | planner.md |
 
 ### 技能层（按需加载）
 
 | 目录 | 作用 | 触发条件 |
 |------|------|---------|
 | **brainstorming/** | 设计探索 | 高复杂度任务 + 用户批准 |
+| **auto-fix-monitor/** | 日志监控和自动修复 | 开发环境监控 |
 | **security/*** | 安全技能 | 安全研究相关任务 |
 | **frontend-patterns/** | 前端开发 | React/Next.js 开发 |
 | **backend-patterns/** | 后端开发 | API/服务开发 |
@@ -464,9 +468,8 @@ git log --oneline -10
 ## 📚 相关文档
 
 - **README.md**：项目主文档
-- **QUICKSTART.md**：快速开始
 - **CHANGELOG.md**：版本历史
-- **ARCHITECTURE.md**：架构设计（如需要）
+- **CLAUDE.md**：项目约定（统一协作契约）
 
 ---
 
