@@ -16,17 +16,11 @@
    - 性能优化：需要深入分析
    - 安全审计：完整的代码审计
    - 集成工作：整合多个系统/服务
-   → **询问用户**是否需要 `brainstorming` 辅助（设计探索）
-   → 如果用户选择需要 → `brainstorming` → 用户批准 → `planner` → 执行
-   → 如果用户选择不需要 → 直接 `planner` → 执行
 
    **中低复杂度任务**：
    - 单个功能/模块开发
    - Bug 修复
    - 简单重构
-   → **询问用户**是否需要 `brainstorming` 辅助
-   → 如果用户选择需要 → `brainstorming` → 用户批准 → `planner` → 执行
-   → 如果用户选择不需要 → 直接 `planner` → 执行
 
    **简单任务**（无需询问，直接执行）：
    - 文件操作：解压、复制、移动、删除
@@ -35,28 +29,47 @@
    - 信息查看：git status, git log, ps aux
    → 直接执行
 
-   **第二步：创造性任务流程**
+   **第二步：主动询问（高/中低复杂度任务）**
 
-   **场景 A：用户选择需要 brainstorming（主动询问后）**
+   对于高复杂度和中低复杂度任务，**主动询问用户**是否需要 brainstorming：
 
+   **询问方式**（使用 AskUserQuestion 工具）：
+   ```xml
+   <tool_calls>
+   <invoke name="AskUserQuestion">
+   <parameter name="questions">[{
+     "question": "检测到这是一个[高/中低]复杂度任务：[任务描述]。是否需要使用 brainstorming 进行设计探索？",
+     "header": "设计探索",
+     "options": [
+       {
+         "label": "需要 brainstorming",
+         "description": "进行设计探索，探索多种方案后再实现"
+       },
+       {
+         "label": "不需要，直接规划",
+         "description": "跳过设计探索，直接进入任务规划阶段"
+       }
+     ],
+     "multiSelect": false
+   }]</parameter>
+   </invoke>
+   </tool_calls>
+   ```
+
+   **第三步：根据用户选择执行**
+
+   **路径 A：用户选择需要 brainstorming**
    1. 使用 brainstorming skill 进行设计探索
    2. 呈现设计方案
-   3. **必须调用 AskUserQuestion 工具**等待用户批准（不是等待用户自然语言回复）
-   4. ⚠️ **输出设计方案后，必须立即调用 AskUserQuestion 工具！**
-   5. ⚠️ **禁止创建任何文件！禁止执行任何代码！**
-   6. ⚠️ **禁止等待用户自然语言回复，必须使用工具调用！**
+   3. **必须调用 AskUserQuestion 工具**等待用户批准设计方案
+   4. ⚠️ **输出设计方案后，必须立即停止！禁止创建文件、执行代码！**
+   5. 用户批准后，**必须**调用 `planner` 智能体
+   6. ⚠️ **禁止跳过 planner！禁止自己规划任务！**
 
-   **场景 B：用户选择不需要 brainstorming（主动询问后）**
-
-   1. 直接调用 planner 智能体
-   2. 生成执行计划
+   **路径 B：用户选择不需要 brainstorming**
+   1. 直接调用 `planner` 智能体
+   2. Planner 生成执行计划
    3. 按计划执行
-
-   **第三步：调用 planner（必须！）**
-   - 用户批准后，**必须**调用 `planner` 智能体
-   - ⚠️ **禁止跳过 planner！**
-   - ⚠️ **禁止自己规划任务！**
-   - ⚠️ **禁止在没有 planner 计划的情况下执行代码！**
 
    **第四步：planner 指定执行智能体**
    - Planner 生成执行计划
