@@ -27,7 +27,7 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 
 ### 🤖 智能体驱动（Agent-Driven）
 
-**9 个专业智能体，主动触发**：
+**8 个专业智能体，主动触发**：
 
 **架构类**：
 - `system-architect` - 系统架构设计、模块边界规划
@@ -52,23 +52,27 @@ claudeSandBox 是一个基于 Docker 的隔离开发环境，预配置了 Claude
 **特点**：
 - ✅ **主动触发** - "应主动（PROACTIVELY）使用"机制，自动识别场景
 - ✅ **职责清晰** - research 负责安全，reviewer 负责质量
-- ✅ **模型优化** - haiku（文档）、sonnet（大部分）、opus（极复杂）
+- ✅ **模型优化** - haiku（文档）、sonnet（大部分）
 
 ### 🧠 技能库（Skills）
 
 按需加载的知识库：
 
+**设计技能**：
+- `brainstorming` - 高复杂度任务的设计探索
+
 **安全技能**：
-- `web-whitebox-audit` - Web 白盒安全审计（8 阶段流程）
-- `iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
-- `vuln-patterns` - OWASP Top 10 漏洞模式
+- `security/web-whitebox-audit` - Web 白盒安全审计（8 阶段流程）
+- `security/iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
+- `security/vuln-patterns` - OWASP Top 10 漏洞模式
+- `security/poc-exploit` - PoC 开发和漏洞利用
 
 **开发技能**：
 - `frontend-patterns` - React/Next.js 前端模式
 - `backend-patterns` - 后端开发模式
 - `debugging` - 调试方法论
 - `code-review` - 代码审查清单
-- `tdd-workflow` - TDD 工作流
+- `auto-fix-monitor` - 开发环境日志监控和自动修复
 
 ### 💬 命令系统（Commands）
 
@@ -139,9 +143,9 @@ docker run -it --rm \
 # 容器内启动 Claude Code
 claude
 
-# 尝试一个命令
-你：/security-audit
-Claude：[开始完整安全审计流程]
+# 开始对话
+你：帮我审计这个登录模块的安全问题
+Claude：[自动识别安全审计场景，调用 research agent]
 ```
 
 ---
@@ -156,37 +160,15 @@ Claude：[开始完整安全审计流程]
 **功能**：
 - 自动识别会话中的代码模式、问题解决方法、最佳实践
 - 将提取的模式保存为 `.claude/skills/learned/{pattern-name}/SKILL.md`
-- 模式会被命名为描述性名称（如 `react-form-handling`、`api-error-handling`）
 
 **使用示例**：
 ```bash
-# 从当前会话提取模式
 /learn
-
-# 提取特定主题的模式
 /learn "React form validation patterns"
 ```
 
-**输出**：
-- 创建新的技能文件
-- 包含模式描述、示例代码、使用场景
-
 #### /learn-eval
 评估已学习模式的质量，提供改进建议。
-
-**功能**：
-- 检查模式的完整性
-- 验证示例代码的正确性
-- 提供优化建议
-
-**使用示例**：
-```bash
-# 评估所有已学习的模式
-/learn-eval
-
-# 评估特定模式
-/learn-eval "react-form-handling"
-```
 
 ### 开发命令
 
@@ -198,19 +180,9 @@ Claude：[开始完整安全审计流程]
 2. **GREEN** - 编写最小代码使测试通过
 3. **REFACTOR** - 重构代码，保持测试通过
 
-**使用示例**：
-```bash
-# 启动 TDD 工作流
-/tdd
-
-# 为特定功能启动 TDD
-/tdd "user authentication"
-```
-
 **特点**：
 - 80%+ 测试覆盖率要求
 - 自动使用 tdd-guide 智能体
-- 集成代码审查流程
 
 ---
 
@@ -235,10 +207,11 @@ sqlite3 <db>           # SQLite 数据库
   └── memory/           # 自动记忆
 
 .claude/                # 项目级配置
-  ├── CLAUDE.md         # 项目约定
+  ├── CLAUDE.md         # 项目约定（统一协作契约）
   ├── commands/         # 命令定义
   ├── skills/           # 技能库
   ├── agents/           # 智能体定义
+  ├── agent-memory/     # Agent 持久记忆
   ├── rules/            # 强制规则
   └── settings.json     # 项目设置
 ```
@@ -256,54 +229,6 @@ sqlite3 <db>           # SQLite 数据库
 }
 ```
 
-### 代理配置
-
-```bash
-# 方式 1：环境变量
-export HTTP_PROXY=http://127.0.0.1:7890
-export HTTPS_PROXY=http://127.0.0.1:7890
-
-# 方式 2：settings.json
-{
-  "env": {
-    "HTTP_PROXY": "http://127.0.0.1:7890",
-    "HTTPS_PROXY": "http://127.0.0.1:7890"
-  }
-}
-
-# 方式 3：启动容器时
-docker run -it --rm \
-  -e HTTP_PROXY=http://127.0.0.1:7890 \
-  -e HTTPS_PROXY=http://127.0.0.1:7890 \
-  claude-sandbox:latest
-```
-
-### 预装工具集
-
-**开发工具**：
-- git, vim, nano, jq
-- curl, wget, netcat-openbsd
-- sqlite3, postgresql-client
-
-**编程语言环境**：
-- Node.js (nvm)
-- Python (pip)
-- Go
-
-**使用示例**：
-```bash
-# 端口扫描
-nc -nv 192.168.1.1 80
-
-# HTTP 请求
-curl -X POST https://api.example.com/users \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Alice"}'
-
-# SQLite 数据库
-sqlite3 /path/to/database.db "SELECT * FROM users;"
-```
-
 ---
 
 ## 📁 项目结构
@@ -317,54 +242,60 @@ claudeSandBox/
 │   ├── claude_arm64/
 │   └── claude_x64/
 │
-└── workspace/                # 工作目录
-    └── .claude/
-        ├── CLAUDE.md         # 项目约定（统一协作契约）
-        ├── commands/         # 命令定义
-        │   ├── learn.md
-        │   ├── learn-eval.md
-        │   └── tdd.md
-        ├── skills/           # 技能库
-        │   ├── security/     # 安全技能
-        │   │   ├── web-whitebox-audit/
-        │   │   └── iot-audit/
-        │   ├── development/  # 开发技能
-        │   │   ├── frontend-patterns/
-        │   │   ├── backend-patterns/
-        │   │   ├── debugging/
-        │   │   ├── code-review/
-        │   │   └── tdd-workflow/
-        │   └── vuln-patterns/
-        ├── agents/           # 智能体定义
-        │   ├── system-architect.md
-        │   ├── planner.md
-        │   ├── tdd-guide.md
-        │   ├── research.md
-        │   ├── dev.md
-        │   ├── reviewer.md
-        │   ├── ops.md
-        │   └── doc-updater.md
-        ├── agent-memory/     # Agent 持久记忆
-        │   ├── system-architect/
-        │   ├── planner/
-        │   ├── tdd-guide/
-        │   ├── research/
-        │   ├── dev/
-        │   ├── reviewer/
-        │   ├── ops/
-        │   └── doc-updater/
-        └── rules/            # 强制规则
-            ├── agents.md
-            ├── security.md
-            ├── git-workflow.md
-            ├── python/
-            │   └── coding-style.md
-            ├── javascript/
-            │   └── coding-style.md
-            ├── go/
-            │   └── coding-style.md
-            └── java/
-                └── coding-style.md
+├── README.md                 # 主项目文档
+├── CHANGELOG.md              # 版本历史
+├── MAINTENANCE.md            # 维护手册
+└── LICENSE                   # MIT 许可证
+
+# 每个变体内部结构（claudeCode-none/claude_arm64/）
+workspace/                    # 工作目录
+└── .claude/
+    ├── CLAUDE.md             # 项目约定（统一协作契约）
+    ├── commands/             # 命令定义（6 个）
+    │   ├── debug.md
+    │   ├── deploy.md
+    │   ├── learn.md
+    │   ├── learn-eval.md
+    │   ├── tdd.md
+    │   └── test.md
+    ├── skills/               # 技能库（10 个）
+    │   ├── auto-fix-monitor/
+    │   ├── brainstorming/
+    │   ├── backend-patterns/
+    │   ├── code-review/
+    │   ├── debugging/
+    │   ├── frontend-patterns/
+    │   └── security/
+    │       ├── web-whitebox-audit/
+    │       ├── iot-audit/
+    │       ├── vuln-patterns/
+    │       └── poc-exploit/
+    ├── agents/               # 智能体定义（8 个）
+    │   ├── system-architect.md
+    │   ├── planner.md
+    │   ├── research.md
+    │   ├── dev.md
+    │   ├── reviewer.md
+    │   ├── ops.md
+    │   ├── doc-updater.md
+    │   └── tdd-guide.md
+    ├── agent-memory/         # Agent 持久记忆（8 个）
+    │   ├── system-architect/
+    │   ├── planner/
+    │   ├── research/
+    │   ├── dev/
+    │   ├── reviewer/
+    │   ├── ops/
+    │   ├── doc-updater/
+    │   └── tdd-guide/
+    └── rules/                # 强制规则
+        ├── agents.md
+        ├── security.md
+        ├── git-workflow.md
+        ├── python/coding-style.md
+        ├── javascript/coding-style.md
+        ├── go/coding-style.md
+        └── java/coding-style.md
 ```
 
 ---
@@ -391,7 +322,7 @@ claudeSandBox/
 
 ```
 你：帮我审计这个登录模块的安全问题
-Claude：[自动识别安全审计场景，调用 research]
+Claude：[自动识别安全审计场景，调用 research agent]
 [执行完整安全审计]
 - 执行模型还原
 - 越权专项审计
@@ -403,7 +334,7 @@ Claude：[自动识别安全审计场景，调用 research]
 
 ```
 你：帮我审查这段代码的质量
-Claude：[自动识别代码审查场景，调用 reviewer]
+Claude：[自动识别代码审查场景，调用 reviewer agent]
 [执行代码质量审查]
 - 检查逻辑正确性
 - 检查架构边界
@@ -415,7 +346,7 @@ Claude：[自动识别代码审查场景，调用 reviewer]
 
 ```
 你：帮我实现用户登录功能
-Claude：[自动识别新功能开发，调用 planner]
+Claude：[自动识别新功能开发，调用 planner agent]
 [规划任务]
 - 调用 tdd-guide（测试先行）
 - 调用 dev（实现代码）
@@ -427,63 +358,13 @@ Claude：[自动识别新功能开发，调用 planner]
 
 ```
 你：帮我设计一个微服务架构
-Claude：[自动识别系统设计，调用 system-architect]
+Claude：[自动识别系统设计，调用 system-architect agent]
 [执行系统架构设计]
 - 模块边界规划
 - 技术选型
 - 架构风险评估
 - 生成架构文档
 ```
-
----
-
-## 🆚 新旧架构对比
-
-### v2.2.0（当前）- 智能体驱动
-
-```bash
-# 自动触发智能体
-你：帮我审查这段代码
-Claude：[自动识别场景，调用 reviewer]
-
-你：分析这个安全问题
-Claude：[自动识别场景，调用 research]
-```
-
-**特点**：
-- ✅ 智能体主动触发
-- ✅ 职责边界清晰
-- ✅ 模型选择优化
-- ✅ 渐进式披露
-
-### v2.1.0 - 命令驱动
-
-```bash
-# 手动使用命令
-/security-audit
-/code-review
-/debug
-/test
-/e2e
-```
-
-**特点**：
-- ⚠️ 需要手动选择命令
-- ⚠️ 职责边界不够清晰
-- ⚠️ 没有模型选择优化
-
-### v2.0.0 - 模式驱动
-
-```bash
-# 先选择模式
-标准模式 → 3-4 步流程
-完整模式 → 6 步流程 + 质量门禁
-```
-
-**特点**：
-- ⚠️ 需要选择模式
-- ⚠️ 流程较重
-- ⚠️ 6 个阶段
 
 ---
 
@@ -561,55 +442,14 @@ disable-model-invocation: false
 代码示例...
 ```
 
-### 添加自定义命令
-
-在 `.claude/commands/` 创建新的 `.md` 文件：
-
-```markdown
----
-description: 命令描述
----
-
-# 命令名称
-
-## 执行流程
-1. 第一步
-2. 第二步
-3. 第三步
-
-## 使用示例
-```bash
-/command-name "参数"
-```
-```
-
-### 添加自定义规则
-
-在 `.claude/rules/` 创建新的规则文件：
-
-```markdown
----
-paths:
-  - "**/*.{js,ts}"
----
-
-# 规则名称
-
-## 禁止项
-## 必须项
-## 检查清单
-```
-
 ---
 
 ## 📖 文档
 
-### 快速开始
-- [QUICKSTART.md](QUICKSTART.md) - **5 分钟上手指南** ⚡
-
 ### 完整文档
 - [CHANGELOG.md](CHANGELOG.md) - 版本历史
-- [CLAUDE.md](workspace/.claude/CLAUDE.md) - 项目约定
+- [MAINTENANCE.md](MAINTENANCE.md) - 维护手册
+- [CLAUDE.md](claudeCode-none/claude_arm64/workspace/.claude/CLAUDE.md) - 项目约定
 
 ---
 
