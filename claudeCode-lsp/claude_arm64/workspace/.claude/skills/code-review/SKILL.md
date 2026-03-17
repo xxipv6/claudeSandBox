@@ -226,7 +226,7 @@ def d(u):
 
 #### ✅ 好的命名
 ```python
-def calculate_total_age(user):
+def extract_user_name_and_age(user):
     name = user['name']
     age = user['age']
     return name, age
