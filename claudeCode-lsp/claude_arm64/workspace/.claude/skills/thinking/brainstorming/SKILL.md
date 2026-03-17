@@ -162,27 +162,54 @@ A: [用户回答]
 
 ---
 
-### ⛔ 使用 AskUserQuestion 等待用户批准
+### ⛔ 工具调用强制要求（CRITICAL）
 
-**⚠️ 关键：呈现设计方案后，必须使用 AskUserQuestion 等待用户选择！**
+**呈现设计方案后，必须立即执行以下操作**：
 
-**使用 AskUserQuestion 工具**：
+**步骤 1：调用 AskUserQuestion 工具**
 
-- 问题："设计方案已完成，请选择下一步操作"
-- 选项：
-  - "批准并开始规划"
-  - "需要修改方案"
-  - "跳过设计阶段"
+```xml
+<tool_calls>
+<invoke name="AskUserQuestion">
+<parameter name="questions">[{
+  "question": "设计方案已完成，请选择下一步操作",
+  "header": "设计批准",
+  "options": [
+    {
+      "label": "批准并开始规划",
+      "description": "批准设计方案，进入 planner 任务规划阶段"
+    },
+    {
+      "label": "需要修改方案",
+      "description": "对设计方案提出修改意见"
+    },
+    {
+      "label": "跳过设计阶段",
+      "description": "跳过设计，直接开始实现"
+    }
+  ],
+  "multiSelect": false
+}]</parameter>
+</invoke>
+</tool_calls>
+```
 
-- multiSelect: false
+**步骤 2：工具调用后立即停止**
 
-**调用 AskUserQuestion 后，立即完全停止**：
-- 禁止继续输出任何内容
-- 禁止执行任何代码
-- 禁止创建任何文件
-- 禁止调用任何工具
+- ✅ 调用 AskUserQuestion 工具
+- ❌ 禁止输出任何后续文本
+- ❌ 禁止创建任何文件
+- ❌ 禁止执行任何代码
+- ❌ 禁止调用任何其他工具
 
-**等待用户在选项中选择**
+**步骤 3：等待系统返回用户选择**
+
+系统会显示 UI 让用户选择，然后将用户选择返回给你。
+
+**收到用户选择后**：
+- 如果选择"批准并开始规划" → 撰写设计文档 → 调用 planner
+- 如果选择"需要修改方案" → 根据意见修改 → 再次调用 AskUserQuestion
+- 如果选择"跳过设计阶段" → 直接调用 planner
 
 **示例对话**：
 ```
