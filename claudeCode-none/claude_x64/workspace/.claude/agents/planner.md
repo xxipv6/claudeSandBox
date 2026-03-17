@@ -126,10 +126,32 @@ dev（代码实现）
 - 文件名格式：日期（YYYY-MM-DD）+ 简短任务描述
 - 内容：完整的执行计划（与对话输出一致）
 
+**项目目录结构**（所有任务都会创建）：
+```
+xxx-project/              # 项目根目录（所有东西都在这里）
+  ├── docs/              # 文档目录
+  │   ├── plans/         # 执行计划（planner 生成）
+  │   │   └── YYYY-MM-DD-task-name.md
+  │   └── specs/         # 设计规格（brainstorming 生成）
+  │       └── YYYY-MM-DD-topic-design.md
+  ├── src/               # 源代码（编程任务）
+  ├── tests/             # 测试（编程任务）
+  ├── scripts/           # 辅助脚本
+  ├── data/              # 数据、样本、流量、日志
+  ├── README.md          # 项目说明
+  └── .git/              # Git 历史
+```
+
 **文件保存示例**：
 ```bash
-# 如果任务项目目录是 user-auth-project/
-# 计划文件保存到：user-auth-project/docs/plans/2026-03-17-user-auth-system.md
+# 编程任务：user-auth-project/
+user-auth-project/docs/plans/2026-03-17-user-auth-system.md
+
+# 研究任务：cve-analysis-project/
+cve-analysis-project/docs/plans/2026-03-17-cve-2024-xxxx-analysis.md
+
+# 审计任务：web-audit-project/
+web-audit-project/docs/plans/2026-03-17-target-app-audit.md
 ```
 
 **输出格式示例**：
@@ -203,10 +225,12 @@ dev（代码实现）
 5. **禁止自己执行**：planner 只负责规划，不负责实现任何代码
 6. **输出格式要求**：使用明确的输出格式（见上方示例）
 7. **文件路径规则**：
-   - 必须在项目目录下的 `docs/plans/` 子目录
+   - **所有任务都会创建项目目录**（xxx-project/），不只是编程任务
+   - 计划文件必须保存在项目目录下的 `docs/plans/` 子目录
    - 文件名必须以日期开头（YYYY-MM-DD）
    - 文件名必须描述任务内容（kebab-case）
    - 例如：`user-auth-project/docs/plans/2026-03-17-user-auth-system.md`
+   - 研究任务示例：`cve-analysis-project/docs/plans/2026-03-17-cve-2024-xxxx-analysis.md`
 
 ## 并发任务安全规则
 
