@@ -280,21 +280,25 @@ AI: 收到用户批准。
 
 **用户批准后**，撰写设计文档并保存。
 
-**重要**：设计文档必须保存在**项目目录**内，而不是 `/workspace` 根目录。
+**重要**：所有与任务相关的内容都必须在**项目目录**内，而不是 `/workspace` 根目录。
 
-**项目目录结构**：
+**项目目录 = 一个完整的任务容器**：
+
 ```
 workspace/
-└── xxx-project/          ← 任务项目目录
-    ├── docs/
+└── xxx-project/          ← 任务项目目录（所有东西都在这里）
+    ├── docs/              ← 设计文档
     │   └── specs/
     │       └── YYYY-MM-DD-<topic>-design.md
-    ├── src/                ← 代码
-    ├── README.md
-    └── ...
+    ├── src/                ← 源代码
+    ├── tests/              ← 测试
+    ├── scripts/            ← 脚本
+    ├── data/               ← 数据（如需要）
+    ├── README.md           ← 项目说明
+    └── .git/               ← Git 历史
 ```
 
-**路径**：`xxx-project/docs/specs/YYYY-MM-DD-<topic>-design.md`
+**设计文档路径**：`xxx-project/docs/specs/YYYY-MM-DD-<topic>-design.md`
 
 **创建步骤**：
 1. 确认项目目录已创建（如果未创建，先创建 `mkdir xxx-project && cd xxx-project && git init`）
