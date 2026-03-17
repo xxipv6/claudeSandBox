@@ -2,7 +2,7 @@
 name: planner
 description: 任务规划代理。当需要复杂任务的前期规划、拆解任务、识别风险时，应主动（PROACTIVELY）使用此 agent。适合大型重构、迁移、复杂研究。
 model: sonnet
-tools: [Read, Grep, Glob]
+tools: [Read, Write, Grep, Glob]
 memory: project
 ---
 
