@@ -1,6 +1,6 @@
 ---
 name: auto-fix-monitor
-description: 开发环境日志监控和自动修复。监控现有日志输出（浏览器控制台、终端日志、Docker logs），检测错误并自动触发修复。持续运行直到人工停止。
+description: 开发环境日志监控和自动修复技能。当用户启动开发服务器、进行功能测试或需要持续监控错误时，应主动（PROACTIVELY）使用此 skill。监控现有日志输出（浏览器控制台、终端日志、Docker logs），检测错误并自动触发修复，持续运行直到人工停止。
 disable-model-invocation: false
 ---
 
