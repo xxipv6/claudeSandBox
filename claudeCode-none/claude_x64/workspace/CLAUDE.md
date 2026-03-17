@@ -16,11 +16,20 @@
    - 性能优化：需要深入分析
    - 安全审计：完整的代码审计
    - 集成工作：整合多个系统/服务
+   → **主动询问**是否需要 `brainstorming` 辅助（设计探索）
 
    **中低复杂度任务**：
    - 单个功能/模块开发
    - Bug 修复
    - 简单重构
+   → 直接调用 `planner` → 执行（不询问）
+
+   **简单任务**（直接执行）：
+   - 文件操作：解压、复制、移动、删除
+   - 查询操作：查看文件、搜索代码、查看日志
+   - 简单命令：ls, cat, grep, find
+   - 信息查看：git status, git log, ps aux
+   → 直接执行
 
    **简单任务**（无需询问，直接执行）：
    - 文件操作：解压、复制、移动、删除
@@ -29,16 +38,16 @@
    - 信息查看：git status, git log, ps aux
    → 直接执行
 
-   **第二步：主动询问（高/中低复杂度任务）**
+   **第二步：主动询问（仅高复杂度任务）**
 
-   对于高复杂度和中低复杂度任务，**主动询问用户**是否需要 brainstorming：
+   对于高复杂度任务，**主动询问用户**是否需要 brainstorming：
 
    **询问方式**（使用 AskUserQuestion 工具）：
    ```xml
    <tool_calls>
    <invoke name="AskUserQuestion">
    <parameter name="questions">[{
-     "question": "检测到这是一个[高/中低]复杂度任务：[任务描述]。是否需要使用 brainstorming 进行设计探索？",
+     "question": "检测到这是一个高复杂度任务：[任务描述]。是否需要使用 brainstorming 进行设计探索？",
      "header": "设计探索",
      "options": [
        {
@@ -56,9 +65,11 @@
    </tool_calls>
    ```
 
+   对于中低复杂度任务和简单任务，**跳过询问**，直接进入第三步。
+
    **第三步：根据用户选择执行**
 
-   **路径 A：用户选择需要 brainstorming**
+   **路径 A（高复杂度 + 用户选择需要 brainstorming）**
    1. 使用 brainstorming skill 进行设计探索
    2. 呈现设计方案
    3. **必须调用 AskUserQuestion 工具**等待用户批准设计方案
@@ -66,10 +77,19 @@
    5. 用户批准后，**必须**调用 `planner` 智能体
    6. ⚠️ **禁止跳过 planner！禁止自己规划任务！**
 
-   **路径 B：用户选择不需要 brainstorming**
+   **路径 B（高复杂度 + 用户选择不需要 brainstorming）**
    1. 直接调用 `planner` 智能体
    2. Planner 生成执行计划
    3. 按计划执行
+
+   **路径 C（中低复杂度任务）**
+   1. 直接调用 `planner` 智能体
+   2. Planner 生成执行计划
+   3. 按计划执行
+
+   **路径 D（简单任务）**
+   1. 直接执行
+   2. 无需 planner
 
    **第四步：planner 指定执行智能体**
    - Planner 生成执行计划
