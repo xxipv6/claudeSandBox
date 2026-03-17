@@ -52,7 +52,7 @@
 **核心架构变化**：
 
 1. **智能体驱动系统**
-   - **新增**：9 个专业智能体（system-architect, planner, tdd-guide, research, dev, reviewer, ops, doc-updater）
+   - **新增**：8 个专业智能体（system-architect, planner, research, dev, reviewer, ops, doc-updater, tdd-guide）
    - **新增**：主动触发机制 - "应主动（PROACTIVELY）使用"
    - **优化**：职责边界清晰化
      - research：负责安全问题（SQL 注入、XSS、权限绕过等）
@@ -60,92 +60,107 @@
    - **新增**：模型选择策略
      - haiku：文档任务（doc-updater）- 成本优化
      - sonnet：大部分智能体 - 平衡性能与成本
-     - opus：极复杂安全研究 - 最高性能
 
 2. **技能库扩展**
+   - **新增**：`auto-fix-monitor` skill - 开发环境日志监控和自动修复
+   - **新增**：`brainstorming` skill - 高复杂度任务的设计探索
    - **新增**：`frontend-patterns` skill - React/Next.js 前端开发模式
    - **新增**：`backend-patterns` skill - 后端开发模式（API 设计、数据库、缓存等）
    - **新增**：`code-review` skill - 代码审查方法论
-   - **新增**：`vuln-patterns` skill - OWASP Top 10 漏洞模式
-   - **保留**：`web-whitebox-audit`（8 阶段）、`iot-audit`（自动识别）、`debugging`、`tdd-workflow`
+   - **新增**：`debugging` skill - 系统化调试方法论
+   - **保留**：`security/web-whitebox-audit`（8 阶段）、`security/iot-audit`（自动识别）
+   - **保留**：`security/vuln-patterns` - OWASP Top 10 漏洞模式
+   - **保留**：`security/poc-exploit` - PoC 开发和漏洞利用
 
 3. **命令系统优化**
-   - **新增**：`/save` - 自动 git commit 和 sync 命令 ⚡ 最常用
-     - 自动添加所有更改
-     - 自动生成提交信息
-     - 自动触发 pre-commit hook（同步所有变体）
-     - 使用：`/save`（容器内）
+   - **新增**：`/debug` - 系统化调试
+   - **新增**：`/deploy` - 部署和运维
    - **新增**：`/learn` - 从会话中提取模式并保存为技能
    - **新增**：`/learn-eval` - 评估已学习的模式质量
    - **新增**：`/tdd` - 测试驱动开发工作流（RED → GREEN → REFACTOR）
-   - **移除**：旧的通用命令（/security-audit, /code-review, /debug, /test, /e2e）
+   - **新增**：`/test` - 测试命令
 
 4. **规则系统完善**
-   - **新增**：`agents.md` - 智能体编排规则、职责边界、协作模式
-   - **新增**：`security.md` - 安全编码规范（输入验证、输出编码、认证授权、加密等）
-   - **新增**：`git-workflow.md` - Git 工作流（提交格式、PR 流程、分支管理）
+   - **新增**：`rules/agents.md` - 智能体编排规则、职责边界、协作模式
+   - **新增**：`rules/security.md` - 安全编码规范（输入验证、输出编码、认证授权、加密等）
+   - **新增**：`rules/git-workflow.md` - Git 工作流（提交格式、PR 流程、分支管理）
    - **新增**：语言特定编码规范
-     - `python/coding-style.md` - PEP 8、类型注解、安全要求
-     - `javascript/coding-style.md` - TypeScript、React、安全要求
-     - `go/coding-style.md` - 命名、错误处理、并发安全
-     - `java/coding-style.md` - Spring、异常处理、依赖注入
+     - `rules/python/coding-style.md` - PEP 8、类型注解、安全要求
+     - `rules/javascript/coding-style.md` - TypeScript、React、安全要求
+     - `rules/go/coding-style.md` - 命名、错误处理、并发安全
+     - `rules/java/coding-style.md` - Spring、异常处理、依赖注入
 
-5. **文档优化**
-   - **简化**：CLAUDE.md 优化为"统一协作契约"（119 行）
-   - **移除**：Available Resources 部分（保持简洁，专注于协作契约）
-   - **新增**：Compact Instructions（控制上下文压缩时的内容保留）
-   - **更新**：ARCHITECTURE.md - 反映 v2.2.0 智能体驱动架构
-   - **更新**：README.md - 更新到 v2.2.0
+5. **持久化记忆系统**
+   - **新增**：`agent-memory/` 目录结构，为每个 agent 提供持久化记忆空间
+   - **新增**：每个 agent 的 MEMORY.md 文件，包含记忆管理指南
+   - **新增**：在每个 agent 定义文件（.md）中添加 `Persistent Agent Memory` 部分
 
 6. **智能体协作模式**
    - **规划 → TDD → 审查流程**：planner → tdd-guide → dev → reviewer → doc-updater
    - **研究分离流程**：research（安全审计）+ reviewer（质量审查）→ 并行
-   - **架构驱动流程**：system-architect → planner → dev → reviewer
-   - **运维集成流程**：dev → ops → doc-updater
+   - **架构驱动流程**：system-architect → planner → tdd-guide → dev → reviewer
+
+7. **维护文档**
+   - **新增**：MAINTENANCE.md - 完整的维护手册
+     - 提示词关联关系图
+     - 维护流程和检查清单
+     - 常见陷阱和解决方案
+     - 快速参考和常用命令
 
 **文件结构变化**：
 
 ```
-workspace/
-├── CLAUDE.md                    # 主配置（简化为 119 行）
-├── .claude/
-│   ├── commands/                # 命令定义
-│   │   ├── learn.md            # 新增
-│   │   ├── learn-eval.md       # 新增
-│   │   └── tdd.md              # 新增
-│   ├── skills/                  # 技能库（扩展）
-│   │   ├── security/
-│   │   │   ├── web-whitebox-audit/
-│   │   │   └── iot-audit/
-│   │   ├── development/        # 重命名
-│   │   │   ├── frontend-patterns/  # 新增
-│   │   │   ├── backend-patterns/   # 新增
-│   │   │   ├── debugging/
-│   │   │   ├── code-review/        # 新增
-│   │   │   └── tdd-workflow/
-│   │   └── vuln-patterns/      # 新增
-│   ├── agents/                 # 智能体定义（新增到 9 个）
-│   │   ├── system-architect.md  # 新增
-│   │   ├── planner.md           # 新增
-│   │   ├── tdd-guide.md         # 新增
-│   │   ├── research.md          # 新增
-│   │   ├── dev.md               # 新增
-│   │   ├── reviewer.md          # 新增
-│   │   ├── ops.md               # 新增
-│   │   └── doc-updater.md       # 新增
-│   ├── agent-memory/           # Agent 持久记忆（对应 9 个智能体）
-│   └── rules/                  # 强制规则（完善）
-│       ├── agents.md           # 新增
-│       ├── security.md         # 新增
-│       ├── git-workflow.md     # 新增
-│       ├── python/
-│       │   └── coding-style.md # 新增
-│       ├── javascript/
-│       │   └── coding-style.md # 新增
-│       ├── go/
-│       │   └── coding-style.md # 新增
-│       └── java/
-│           └── coding-style.md # 新增
+workspace/.claude/
+├── CLAUDE.md                    # 主配置（统一协作契约）
+├── commands/                    # 命令定义（6 个）
+│   ├── debug.md                # 系统化调试
+│   ├── deploy.md               # 部署和运维
+│   ├── learn.md                # 提取模式保存为技能
+│   ├── learn-eval.md           # 评估学习模式质量
+│   ├── tdd.md                  # 测试驱动开发
+│   └── test.md                 # 测试命令
+├── skills/                      # 技能库（10 个）
+│   ├── auto-fix-monitor/       # 日志监控和自动修复
+│   ├── brainstorming/          # 设计探索
+│   ├── backend-patterns/       # 后端开发模式
+│   ├── code-review/            # 代码审查
+│   ├── debugging/              # 调试方法论
+│   ├── frontend-patterns/      # 前端开发模式
+│   └── security/
+│       ├── web-whitebox-audit/ # Web 白盒审计（8 阶段）
+│       ├── iot-audit/          # IoT 审计（自动识别）
+│       ├── vuln-patterns/      # OWASP Top 10 漏洞模式
+│       └── poc-exploit/        # PoC 开发和漏洞利用
+├── agents/                      # 智能体定义（8 个）
+│   ├── system-architect.md     # 系统架构设计
+│   ├── planner.md              # 任务规划
+│   ├── research.md             # 安全研究
+│   ├── dev.md                  # 日常开发
+│   ├── reviewer.md             # 代码质量审查
+│   ├── ops.md                  # 运维自动化
+│   ├── doc-updater.md          # 文档维护
+│   └── tdd-guide.md            # 测试驱动开发
+├── agent-memory/               # Agent 持久记忆（对应 8 个智能体）
+│   ├── dev/
+│   ├── doc-updater/
+│   ├── ops/
+│   ├── planner/
+│   ├── research/
+│   ├── reviewer/
+│   ├── system-architect/
+│   └── tdd-guide/
+└── rules/                      # 强制规则
+    ├── agents.md               # 智能体编排规则
+    ├── security.md             # 安全编码规范
+    ├── git-workflow.md         # Git 工作流
+    ├── python/
+    │   └── coding-style.md
+    ├── javascript/
+    │   └── coding-style.md
+    ├── go/
+    │   └── coding-style.md
+    └── java/
+        └── coding-style.md
 ```
 
 **核心原则**：

@@ -113,6 +113,7 @@ Claude：[自动识别关键词"审计"]
 - `tdd-workflow` - 测试驱动开发
 - `debugging` - 调试问题
 - `code-review` - 代码审查
+- `auto-fix-monitor` - 开发环境日志监控和自动修复（持续运行直到人工停止）
 
 **设计 Skills**（复杂度驱动）：
 - `brainstorming` - 参见 `CLAUDE.md` 中的复杂度判断规则
