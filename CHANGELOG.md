@@ -70,6 +70,11 @@
    - **保留**：`web-whitebox-audit`（8 阶段）、`iot-audit`（自动识别）、`debugging`、`tdd-workflow`
 
 3. **命令系统优化**
+   - **新增**：`/save` - 自动 git commit 和 sync 命令 ⚡ 最常用
+     - 自动添加所有更改
+     - 自动生成提交信息
+     - 自动触发 pre-commit hook（同步所有变体）
+     - 使用：`/save`（容器内）
    - **新增**：`/learn` - 从会话中提取模式并保存为技能
    - **新增**：`/learn-eval` - 评估已学习的模式质量
    - **新增**：`/tdd` - 测试驱动开发工作流（RED → GREEN → REFACTOR）
