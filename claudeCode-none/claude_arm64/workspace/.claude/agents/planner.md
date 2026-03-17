@@ -166,6 +166,8 @@ dev（代码实现）
 
 ## 可用技能参考
 
+> **注意**：以下为常用技能参考列表，**非穷尽**。根据任务需要，可使用其他已注册的 skill。
+
 **开发类 Skills**：
 - `frontend-patterns` - React/Next.js 前端开发
 - `backend-patterns` - 后端开发模式
