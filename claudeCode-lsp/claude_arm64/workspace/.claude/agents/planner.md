@@ -95,10 +95,11 @@ dev（代码实现）
 2. 分析现有代码库（如适用）
 3. 拆解任务为子任务
 4. **识别并发机会** - 找出可以并行执行的任务
-5. 明确每个子任务的边界
-6. 识别风险和依赖
-7. 给出执行步骤（标注并发任务）
-8. 生成可执行计划
+5. **识别技能需求** - 确定每个步骤需要使用的 skill
+6. 明确每个子任务的边界
+7. 识别风险和依赖
+8. 给出执行步骤（标注并发任务和技能）
+9. 生成可执行计划
 
 ## Outputs
 
@@ -112,9 +113,11 @@ dev（代码实现）
    - 系统设计 → **system-architect** agent
    - 运维任务 → **ops** agent
 4. **执行步骤（Steps）**：具体执行计划
-5. **依赖（Dependencies）**：需要什么前置条件
-6. **风险（Risks）**：可能的问题和解决方案
-7. **预期结果（Expected Outcome）**：完成后有什么产出
+5. **并发任务（Concurrency）**：标注可并发的任务组（可选）
+6. **技能使用（Skills）**：列出每个步骤需要使用的 skill
+7. **依赖（Dependencies）**：需要什么前置条件
+8. **风险（Risks）**：可能的问题和解决方案
+9. **预期结果（Expected Outcome）**：完成后有什么产出
 
 **输出格式示例**：
 
@@ -158,6 +161,45 @@ dev（代码实现）
 - 列出可以并发执行的任务组
 - 使用 `T1 | T2` 格式表示可并发的任务
 - 如果任务必须串行执行，留空此字段
+
+### 🛠️ 技能使用
+
+**可用技能清单**：
+
+**开发类 Skills**：
+- `frontend-patterns` - React/Next.js 前端开发
+- `backend-patterns` - 后端开发模式
+- `debugging` - 调试方法论
+- `code-review` - 代码审查
+
+**安全类 Skills**：
+- `security/web-whitebox-audit` - Web 白盒审计
+- `security/iot-audit` - IoT 审计
+- `security/poc-exploit` - PoC 开发和漏洞利用
+- `security/vuln-patterns` - OWASP Top 10 + CWE 漏洞模式
+
+**设计类 Skills**：
+- `brainstorming` - 设计探索（设计阶段使用，规划阶段已完成）
+
+**步骤 → Skill 映射**：
+- T1 - 初始化项目结构 → 无需 skill
+- T2 - 创建后端 API → **backend-patterns**
+- T3 - 创建前端组件 → **frontend-patterns**
+- T4 - 编写单元测试 → 无需 skill
+- T5 - 安全审计 → **security/web-whitebox-audit**
+- T6 - 文档更新 → 无需 skill
+
+**当前任务技能清单**：
+| 步骤 | 使用的 Skill | 用途说明 |
+|------|-------------|---------|
+| T2 | backend-patterns | 后端 API 设计和实现模式 |
+| T3 | frontend-patterns | React 组件设计和状态管理 |
+| T5 | security/web-whitebox-audit | Web 安全审计（8 阶段流程） |
+
+**说明**：
+- 列出每个步骤需要使用的 skill
+- 如果步骤不需要特定 skill，标注"无需 skill"
+- 执行阶段应按此清单加载对应 skill
 
 ### 🔗 依赖
 - [依赖 1]
