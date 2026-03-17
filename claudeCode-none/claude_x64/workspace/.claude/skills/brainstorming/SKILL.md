@@ -280,7 +280,26 @@ AI: 收到用户批准。
 
 **用户批准后**，撰写设计文档并保存。
 
-**路径**：`docs/specs/YYYY-MM-DD-<topic>-design.md`
+**重要**：设计文档必须保存在**项目目录**内，而不是 `/workspace` 根目录。
+
+**项目目录结构**：
+```
+workspace/
+└── xxx-project/          ← 任务项目目录
+    ├── docs/
+    │   └── specs/
+    │       └── YYYY-MM-DD-<topic>-design.md
+    ├── src/                ← 代码
+    ├── README.md
+    └── ...
+```
+
+**路径**：`xxx-project/docs/specs/YYYY-MM-DD-<topic>-design.md`
+
+**创建步骤**：
+1. 确认项目目录已创建（如果未创建，先创建 `mkdir xxx-project && cd xxx-project && git init`）
+2. 在项目目录下创建 `docs/specs/` 目录（`mkdir -p docs/specs`）
+3. 撰写设计文档
 
 **内容**：
 ```markdown
@@ -325,7 +344,7 @@ AI: 收到用户批准。
 **撰写设计文档后**，调用 planner agent 生成执行计划：
 
 ```
-设计方案已获得用户批准，设计文档已保存到 docs/specs/。
+设计方案已获得用户批准，设计文档已保存到 xxx-project/docs/specs/。
 
 现在调用 planner agent 生成执行计划...
 ```
@@ -433,7 +452,7 @@ A: 暂时不需要
 用户选择：批准并开始规划
 
 # 6. 撰写设计文档
-保存到 docs/specs/2026-03-16-login-design.md
+保存到 login-project/docs/specs/2026-03-16-login-design.md
 
 # 7. 调用 planner
 设计方案已获得用户批准，设计文档已保存。
