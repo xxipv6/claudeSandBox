@@ -35,8 +35,9 @@ claudeSandBox/
 ```
 
 ### 变体同步策略
-- **主变体**：`claudeCode-none/claude_arm64/workspace/.claude/`
+- **主变体**：`claudeCode-none/claude_arm64/`
 - **同步工具**：`./sync-variants.sh` 或 pre-commit hook
+- **同步范围**：`workspace/.claude/` 目录（agents、skills、commands、rules 等）
 - **同步原则**：修改主变体 → 运行同步 → 提交
 
 ---
@@ -206,7 +207,8 @@ CLAUDE.md (主契约 - 单一真相源)
    - skill 修改 → 检查引用它的 agents
    ↓
 3. 在主变体中修改
-   路径：claudeCode-none/claude_arm64/workspace/.claude/
+   路径：claudeCode-none/claude_arm64/
+   修改位置：workspace/.claude/ 目录下
    ↓
 4. 检查一致性
    - 确认没有重复定义
@@ -242,17 +244,17 @@ CLAUDE.md (主契约 - 单一真相源)
 ### 任务 1：添加新的 skill
 
 **步骤**：
-1. 在主变体的 `skills/` 下创建新 skill 目录
+1. 在主变体的 `workspace/.claude/skills/` 下创建新 skill 目录
 2. 创建 `SKILL.md`，遵循标准格式
-3. 如果是常用 skill，在 `agents.md` 的 "Skills 自动触发" 中添加
-4. 在 `planner.md` 的 "可用技能参考" 中添加
+3. 如果是常用 skill，在 `workspace/.claude/rules/agents.md` 的 "Skills 自动触发" 中添加
+4. 在 `workspace/.claude/agents/planner.md` 的 "可用技能参考" 中添加
 5. 同步到所有变体
 6. 更新 CHANGELOG.md
 
 **关联文件**：
-- `skills/[new-skill]/SKILL.md`（新建）
-- `agents.md`（可能需要更新）
-- `planner.md`（需要更新）
+- `workspace/.claude/skills/[new-skill]/SKILL.md`（新建）
+- `workspace/.claude/rules/agents.md`（可能需要更新）
+- `workspace/.claude/agents/planner.md`（需要更新）
 
 ### 任务 2：修改 CLAUDE.md
 
@@ -260,43 +262,43 @@ CLAUDE.md (主契约 - 单一真相源)
 
 **步骤**：
 1. 识别所有引用 CLAUDE.md 的文件
-2. 在主变体中修改 CLAUDE.md
+2. 在主变体中修改 `workspace/.claude/CLAUDE.md`
 3. 检查所有依赖文件是否需要更新
 4. 同步到所有变体
 5. 提交前仔细检查一致性
 6. 更新 CHANGELOG.md 和 README.md
 
 **关联文件**：
-- 所有 `agents/*.md`
-- `skills/brainstorming/SKILL.md`
+- 所有 `workspace/.claude/agents/*.md`
+- `workspace/.claude/skills/brainstorming/SKILL.md`
 - 所有引用 CLAUDE.md 的文件
 
 ### 任务 3：添加新的 agent
 
 **步骤**：
-1. 在 `agents/` 下创建新的 agent 定义文件
-2. 在 `agents.md` 的可用智能体表中添加
+1. 在 `workspace/.claude/agents/` 下创建新的 agent 定义文件
+2. 在 `workspace/.claude/rules/agents.md` 的可用智能体表中添加
 3. 确定与现有 agents 的协作关系
-4. 在 `agents.md` 的协作模式中添加（如需要）
+4. 在 `workspace/.claude/rules/agents.md` 的协作模式中添加（如需要）
 5. 同步到所有变体
 6. 更新 CHANGELOG.md
 
 **关联文件**：
-- `agents/[new-agent].md`（新建）
-- `agents.md`（必须更新）
+- `workspace/.claude/agents/[new-agent].md`（新建）
+- `workspace/.claude/rules/agents.md`（必须更新）
 - 可能需要更新其他 agents
 
 ### 任务 4：修改智能体协作关系
 
 **步骤**：
-1. 在 `agents.md` 中修改协作模式
+1. 在 `workspace/.claude/rules/agents.md` 中修改协作模式
 2. 更新涉及的 agents 的 "When to Invoke" 部分
 3. 检查是否有循环依赖
 4. 同步到所有变体
 5. 更新 CHANGELOG.md
 
 **关联文件**：
-- `agents.md`（必须更新）
+- `workspace/.claude/rules/agents.md`（必须更新）
 - 涉及的所有 agents
 
 ---
@@ -424,8 +426,8 @@ grep -r "CLAUDE.md" claudeCode-none/claude_arm64/workspace/.claude/
 ### 关键文件位置
 
 ```
-主变体：
-claudeCode-none/claude_arm64/workspace/.claude/
+主变体目录：
+claudeCode-none/claude_arm64/
 
 主契约：
 claudeCode-none/claude_arm64/workspace/.claude/CLAUDE.md
