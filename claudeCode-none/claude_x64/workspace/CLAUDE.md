@@ -109,7 +109,29 @@
      2. brainstorming 设计方案：是否批准设计方案
      3. 其他情况：无需询问，直接自治处理
 
-5. **独立项目**：每个任务使用独立的 `xxx-project` 目录
+5. **项目目录结构**（单一真相源）：
+
+每个任务使用独立的项目目录，**所有与任务相关的内容都必须在项目目录内**。
+
+**项目目录结构**：
+```
+xxx-project/              ← 项目根目录（所有东西都在这里）
+  ├── docs/              ← 设计文档、规格说明
+  │   └── specs/
+  │       └── YYYY-MM-DD-<topic>-design.md
+  ├── src/               ← 源代码
+  ├── tests/             ← 测试
+  ├── scripts/           ← 辅助脚本
+  ├── data/              ← 数据、样本、流量、日志
+  ├── README.md          ← 项目说明
+  └── .git/              ← Git 历史
+```
+
+**重要**：
+- 设计文档保存到 `xxx-project/docs/specs/`
+- 代码保存到 `xxx-project/src/`
+- 不要在 `/workspace` 根目录下创建任务相关文件
+- 一个项目 = 一次任务的完整容器
 
 6. **Git 管理**：
    - 至少 `git init`
@@ -182,32 +204,6 @@
 - 工作空间为 `/workspace`
 - 可以随意安装依赖、工具、系统包
 - 不需要任何额外确认
-
----
-
-## Workspace Rules（工作空间规则）
-
-每个任务使用独立的项目目录：
-
-```bash
-mkdir xxx-project
-cd xxx-project
-git init
-```
-
----
-
-## Project Structure（统一项目结构）
-
-```
-xxx-project/
-  ├── src/        # 所有代码（PoC、脚本、服务、工具）
-  ├── scripts/    # 辅助脚本（可选）
-  ├── data/       # 样本、流量、日志（可选）
-  └── README.md   # 任务说明、步骤、结果、计划
-```
-
-Claude 根据任务自动决定如何组织代码。
 
 ---
 

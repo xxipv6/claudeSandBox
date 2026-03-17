@@ -282,21 +282,7 @@ AI: 收到用户批准。
 
 **重要**：所有与任务相关的内容都必须在**项目目录**内，而不是 `/workspace` 根目录。
 
-**项目目录 = 一个完整的任务容器**：
-
-```
-workspace/
-└── xxx-project/          ← 任务项目目录（所有东西都在这里）
-    ├── docs/              ← 设计文档
-    │   └── specs/
-    │       └── YYYY-MM-DD-<topic>-design.md
-    ├── src/                ← 源代码
-    ├── tests/              ← 测试
-    ├── scripts/            ← 脚本
-    ├── data/               ← 数据（如需要）
-    ├── README.md           ← 项目说明
-    └── .git/               ← Git 历史
-```
+**项目目录结构**：参见 `CLAUDE.md` 中的"项目目录结构"定义
 
 **设计文档路径**：`xxx-project/docs/specs/YYYY-MM-DD-<topic>-design.md`
 
