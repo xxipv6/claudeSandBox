@@ -173,6 +173,7 @@ dev（代码实现）
 - `backend-patterns` - 后端开发模式
 - `debugging` - 调试方法论
 - `code-review` - 代码审查
+- `auto-fix-monitor` - 开发环境日志监控和自动修复（持续运行直到人工停止）
 
 **安全类 Skills**：
 - `security/web-whitebox-audit` - Web 白盒审计
