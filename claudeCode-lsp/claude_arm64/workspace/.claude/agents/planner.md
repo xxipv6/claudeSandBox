@@ -207,10 +207,11 @@ web-audit-project/docs/plans/2026-03-17-target-app-audit.md
 1. **规划完成后必须停止**：输出执行计划后立即停止，不要继续
 2. **必须指定执行智能体**：在输出中明确说明"执行智能体：dev"或其他
 3. **必须保存计划到文件**：生成计划后，必须使用 Write 工具将计划保存到 `xxx-project/docs/plans/YYYY-MM-DD-task-name.md`
-4. **禁止调用执行 agent**：主会话会自动调用规划中指定的 agent，planner 不要自己调用
-5. **禁止自己执行**：planner 只负责规划，不负责实现任何代码
-6. **输出格式要求**：使用明确的输出格式（见上方示例）
-7. **文件路径规则**：
+4. **技能使用表**：强烈建议列出每个步骤（或步骤组）需要使用的 skill，如果没有合适的 skill 可以为空
+5. **禁止调用执行 agent**：主会话会自动调用规划中指定的 agent，planner 不要自己调用
+6. **禁止自己执行**：planner 只负责规划，不负责实现任何代码
+7. **输出格式要求**：使用明确的输出格式（见上方示例）
+8. **文件路径规则**：
    - **所有任务都会创建项目目录**（参见 CLAUDE.md 中的 `项目目录结构`）
    - 计划文件必须保存在项目目录下的 `docs/plans/` 子目录
    - 文件名必须以日期开头（YYYY-MM-DD）
@@ -235,6 +236,7 @@ web-audit-project/docs/plans/2026-03-17-target-app-audit.md
 - ✅ 计划已完整
 - ✅ 执行智能体已明确
 - ✅ 步骤已明确（包含并发任务和技能映射）
+- ✅ 技能使用表已填写（如有合适的 skill）
 - ✅ 风险已识别
 - ✅ 输出格式符合规范
 - ✅ **计划已保存到文件**（`xxx-project/docs/plans/YYYY-MM-DD-task-name.md`）
@@ -270,11 +272,13 @@ web-audit-project/docs/plans/2026-03-17-target-app-audit.md
 ### 🛠️ 技能使用
 | 步骤 | Skill | 用途 |
 |------|-------|------|
+| T1 | backend-patterns | 项目初始化和 TypeScript 配置 |
 | T2 | backend-patterns | 数据库设计和 API 设计 |
-| T3 | backend-patterns | 后端开发 |
+| T3 | backend-patterns | 后端 API 开发 |
 | T4 | frontend-patterns | React 组件开发 |
 | T5 | backend-patterns | JWT 集成 |
 | T6 | tdd-workflow | 测试驱动开发 |
+| T7 | ops | 部署配置 |
 
 ### 🔗 依赖
 - Node.js 18+ 环境
@@ -298,6 +302,45 @@ web-audit-project/docs/plans/2026-03-17-target-app-audit.md
 ---
 **规划完成。以上计划已保存到文件，并将自动传递给执行智能体。**
 ```
+
+**前端项目示例**：
+
+**任务**：Vue 3 前端项目开发
+
+```markdown
+## 📋 任务规划
+
+### 🎯 目标
+基于 Ant Design Vue，完整实现前端应用，包含管理端、选手端、裁判端。
+
+### 🤖 执行智能体
+**dev** - 前端开发
+
+### 📝 执行步骤
+1. T1 - TypeScript 迁移
+2. T2 - 类型系统完善
+3. T3 - Axios 封装
+4. T4 - Store 状态管理
+5. (T5 - 布局组件 | T6 - 表单组件 | T7 - 数据展示组件 | T8 - 业务组件)  # 并发
+6. T9-T12 - 登录模块
+7. T13-T22 - 管理端页面
+8. T23-T28 - 选手端页面
+9. T29-T31 - 裁判端页面
+
+### 🛠️ 技能使用
+| 步骤 | Skill | 用途 |
+|------|-------|------|
+| T1-T4 | frontend-patterns | 基础设施搭建（TypeScript、类型系统、Axios、Pinia） |
+| T5-T8 | frontend-patterns | 公共组件开发（布局、表单、数据展示、业务组件） |
+| T9-T12 | frontend-patterns | 登录模块（页面、守卫、验证） |
+| T13-T22 | frontend-patterns | 管理端 CRUD 页面和业务逻辑 |
+| T23-T28 | frontend-patterns | 选手端提交、展示、编辑功能 |
+| T29-T31 | frontend-patterns | 裁判端审核、统计功能 |
+
+**说明**：由于是纯前端项目，所有步骤都使用 `frontend-patterns` skill。
+```
+
+---
 
 ---
 
