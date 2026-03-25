@@ -155,4 +155,14 @@ RUN HTTP_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
 # ============================================
 COPY ./.claude /root/.claude
 
+# ============================================
+# 初始化 Git 仓库（支持子代理 worktree 隔离）
+# ============================================
+RUN cd /workspace && \
+    git init && \
+    git config user.email "claude@claude.ai" && \
+    git config user.name "Claude AI" && \
+    git add -A && \
+    git commit -m "Initial commit for multi-agent worktree isolation" --allow-empty
+
 CMD ["/bin/bash"]
