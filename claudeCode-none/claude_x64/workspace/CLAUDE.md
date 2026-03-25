@@ -185,9 +185,15 @@ xxx-research/
 **Specialist Agents**：
 - `reverse-analyst` - 逆向分析（二进制 / JS / Android / iOS）
 - `code-audit` - 代码审计（源码 / 逻辑漏洞 / 安全规范）
-- `poc-engineer` - PoC 开发
+- `poc-engineer` - 安全脚本开发（PoC / Frida / GDB / IDA / Burp 等）
 - `skeptic` - 怀疑论者审计
 - `research-recorder` - 研究记录（步骤记录 / 决策记录 / 文档编写）
+
+**流程分支并行分析**：
+- 🚀 **遇到流程分支时，可拉起多个子 Agent 后台并行分析**
+- 📊 **每个子 Agent 独立追踪一个分支路径**
+- 🔄 **分析完成后合并结果，汇总所有分支的发现**
+- ⚡ **适用于：状态机分析、多路径代码执行、并行逆向**
 
 ---
 
