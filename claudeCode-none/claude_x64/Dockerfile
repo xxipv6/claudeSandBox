@@ -1,4 +1,4 @@
-# x64 平台 - Claude Code 开发环境
+# ARM64 平台 - Claude Code 开发环境
 FROM ubuntu:22.04
 
 # ============================================
@@ -18,8 +18,9 @@ RUN sysctl -w net.ipv6.conf.all.disable_ipv6=1 && \
 # ============================================
 # 系统依赖安装
 # ============================================
-# 配置清华源
+# 配置清华源 (ARM64 使用 ubuntu-ports)
 RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list && \
+    sed -i 's@//.*ports.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn/ubuntu-ports@g' /etc/apt/sources.list && \
     sed -i 's@//.*security.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list
 
 # 安装基础工具和 VS Code 依赖
@@ -39,32 +40,32 @@ RUN apt-get update && apt-get install -y \
     fonts-wqy-microhei \
     fonts-wqy-zenhei \
     fonts-noto-cjk \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* 
+
+# 生成中文 locale
+RUN sed -i 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen
 
 # pip 国内源 (系统级)
 RUN mkdir -p /etc/xdg/pip && \
     echo "[global]" > /etc/xdg/pip/pip.conf && \
     echo "index-url = https://pypi.tuna.tsinghua.edu.cn/simple" >> /etc/xdg/pip/pip.conf
 
-# 生成中文 locale
-RUN sed -i 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen
-
 # ============================================
 # 编程语言安装
 # ============================================
 
-# Go
+# Go - 使用多个镜像源尝试
 ARG GO_VERSION=1.25.4
-RUN wget https://mirrors.aliyun.com/golang/go${GO_VERSION}.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
-    rm go${GO_VERSION}.linux-amd64.tar.gz
+RUN wget -4 https://mirrors.aliyun.com/golang/go${GO_VERSION}.linux-arm64.tar.gz && \
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-arm64.tar.gz && \
+    rm go${GO_VERSION}.linux-arm64.tar.gz
 
 # Node.js
 ARG NODE_VERSION=24.1.0
-RUN wget https://mirrors.aliyun.com/nodejs-release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz && \
-    tar -xzf node-v${NODE_VERSION}-linux-x64.tar.gz -C /usr/local --strip-components=1 && \
-    rm node-v${NODE_VERSION}-linux-x64.tar.gz
+RUN wget https://mirrors.aliyun.com/nodejs-release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.gz && \
+    tar -xzf node-v${NODE_VERSION}-linux-arm64.tar.gz -C /usr/local --strip-components=1 && \
+    rm node-v${NODE_VERSION}-linux-arm64.tar.gz
 
 # ============================================
 # 工作目录和环境变量
@@ -93,18 +94,42 @@ COPY ArvinENV/rms /root/ENV/ArvinENV/rms
 COPY ArvinENV/config /root/ENV/ArvinENV/config
 RUN chmod +x /root/ENV/ArvinENV/key && \
     chmod +x /root/ENV/ArvinENV/rms && \
-    chmod +x /root/ENV/ArvinENV/config && \
-    chmod +x /root/ENV/ArvinENV/config \
+    chmod +x /root/ENV/ArvinENV/config
 
 # tmux 配置 - 启用鼠标滚动和复制
 RUN printf 'set -g mouse on\nsetw -g mode-keys emacs\n' > /root/.tmux.conf
+# ============================================
+# Chromium 浏览器安装（用于 JavaScript 逆向和 MCP 工具）
+# ============================================
+# 安装 Chromium 及其依赖（ARM64 架构使用 Chromium）
+RUN apt-get update && apt-get install -y \
+    chromium-browser \
+    chromium-chromedriver \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libgbm1 \
+    libgtk-3-0 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libxss1 \
+    xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置 Chromium 可执行路径
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/bin/chromium-browser
 
 # ============================================
 # Node.js 和 Go 配置
 # ============================================
 RUN npm config set registry https://registry.npmmirror.com
 RUN npm config set prefix /usr/local
-
 # ============================================
 # Git 配置
 # ============================================
@@ -117,8 +142,8 @@ RUN git config --global http.proxy http://${PROXY_HOST}:${PROXY_PORT} && \
 # 安装 Claude Code CLI
 # ============================================
 # 下载安装脚本并执行（使用国内镜像地址）
-RUN curl -fSL https://claude.mcprotocol.cn/install.sh -o /tmp/install.sh && \
-    HTTP_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
+RUN curl -fSL https://claude.mcprotocol.cn/install.sh -o /tmp/install.sh
+RUN HTTP_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
     HTTPS_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
     http_proxy=http://${PROXY_HOST}:${PROXY_PORT} \
     https_proxy=http://${PROXY_HOST}:${PROXY_PORT} \

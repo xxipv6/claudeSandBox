@@ -99,6 +99,33 @@ RUN chmod +x /root/ENV/ArvinENV/key && \
 # tmux 配置 - 启用鼠标滚动和复制
 RUN printf 'set -g mouse on\nsetw -g mode-keys emacs\n' > /root/.tmux.conf
 # ============================================
+# Chromium 浏览器安装（用于 JavaScript 逆向和 MCP 工具）
+# ============================================
+# 安装 Chromium 及其依赖（ARM64 架构使用 Chromium）
+RUN apt-get update && apt-get install -y \
+    chromium-browser \
+    chromium-chromedriver \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libgbm1 \
+    libgtk-3-0 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libxss1 \
+    xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置 Chromium 可执行路径
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/bin/chromium-browser
+
+# ============================================
 # Node.js 和 Go 配置
 # ============================================
 RUN npm config set registry https://registry.npmmirror.com

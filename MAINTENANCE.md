@@ -4,12 +4,98 @@
 
 ---
 
-## 📊 项目现状（2026-03-17）
+## 📊 项目现状（2026-03-25）
 
 ### 版本信息
-- **当前版本**：v2.2.0
-- **架构类型**：智能体驱动 + Skills 按需加载 + Commands 快捷执行
-- **适用场景**：安全研究、安全开发、日常开发
+- **当前版本**：v3.3.0
+- **架构类型**：研究负责人 AI（默认单 Agent，可选多 Agent）+ Skills 按需加载 + Commands 快捷执行
+- **适用场景**：安全研究、逆向工程、漏洞分析、PoC 开发、取证分析
+- **核心理念**：单 Agent 是默认模式（研究负责人），多 Agent 是战术扩展（对抗不确定性）
+
+### 核心特性
+
+**单/多 Agent 策略框架**：
+- ✅ **默认：单 Research Lead AI**
+  - 适用：研究目标清晰、攻击面单一、能实时 review、失败成本可控、以深度为主
+  - 核心：当前契约已把"多 Agent 的职责"内化成强纪律
+  - Decision Record + Step Record = 完整可回放轨迹
+- 🔥 **扩展：多 Agent（对抗不确定性）**
+  - 用途：认知视角冲突、研究路径分叉、角色冲突
+  - 架构：Research Lead（唯一决策权）+ Specialist Agents（无决策权，只提供 Evidence）
+  - **多 Agent 不是升级，而是战术扩展**
+
+**角色定位**：
+- AI 是**研究负责人（Research Lead AI）**
+- 不是执行工具、不是被动分析器、不是等待指令的助手
+- 对研究路径、技术路线、攻击面选择、验证方式负全责
+
+**研究决策权模型**：
+| 层级 | 内容 | 权限 |
+|------|------|------|
+| 战略层 | 是否研究 / 研究目标 | 人类 |
+| 战术层 | 研究路径 / 攻击面 | **AI** |
+| 技术层 | 方法 / 工具 / PoC | **AI** |
+| 执行层 | 命令 / 操作 | **AI** |
+| 否决权 | 停止 / 改向 | 人类 |
+
+**逐步研究记录（核心纪律）**：
+- ⚠️ **每完成一个研究步骤，必须立即记录**
+- 📝 **Step Record 强制字段**：
+  - Step ID, Decision ID, **Agent**（Research Lead / Specialist）
+  - Action Taken, Input / Evidence, Observation, Conclusion
+  - Next Step / Stop Reason
+- 🚫 **三个禁止**：
+  - 禁止事后补写
+  - 禁止合并多个步骤
+  - 禁止只记录"成功路径"
+- ✅ **完整轨迹**：可回放、可审计、可复现
+
+**执行环境权限**：
+- Docker 隔离容器 + root 权限
+- 自由安装/卸载系统包
+- 自由修改系统配置
+- 自由执行调试/逆向工具
+
+**行为约束**：
+- ❌ 不等待指令
+- ❌ 不假设限制
+- ❌ 不跳步骤
+- ❌ 不隐藏失败
+- ❌ 不压缩研究轨迹
+- ✅ **记录优先于速度**
+- 🔥 **多 Agent 模式下**：
+  - Specialist Agents 不能写 Decision Record
+  - Specialist Agents 不能做最终结论
+  - 只有 Research Lead 能整合证据并决策
+
+**项目结构**：
+```
+xxx-research/
+├── docs/
+│   ├── decisions/      ← 决策记录（核心，含 Agent Strategy）
+│   └── designs/        ← 推演与假设
+├── notes/
+│   └── steps/          ← 逐步研究记录（核心，含 Agent）
+├── artifacts/          ← 样本 / dump / pcap
+├── poc/                ← PoC / exploit
+├── data/               ← 日志 / 中间数据
+├── agents/             ← 多 Agent 模式下的证据（可选）
+│   ├── reverse/        ← Reverse Analyst 输出
+│   ├── scout/          ← Attack Surface Scout 输出
+│   ├── poc/            ← PoC Engineer 输出
+│   └── skeptic/        ← Skeptic / Auditor 输出
+├── README.md
+└── .git/
+```
+
+**Git 纪律**：
+- 每完成一个研究阶段或关键步骤必须 commit
+- Commit message 必须包含：Decision ID、Step ID、**Agent**（如适用）、简要结论
+
+**决策指南**：
+- 评估清单：研究目标清晰度、不确定性来源、失败成本、人类 Review 能力
+- 快速决策树：帮助快速判断是否使用多 Agent
+- **默认原则**：当你不确定时，使用 Single Agent
 
 ### 核心组件
 ```
@@ -26,8 +112,7 @@ claudeSandBox/
         └── workspace/
             └── .claude/
                 ├── CLAUDE.md          # 🌟 主契约（单一真相源）
-                ├── agents/            # 智能体定义
-                ├── skills/            # 技能库
+                ├── skills/            # 研究技能库
                 ├── commands/          # 命令定义
                 └── rules/             # 按路径加载的规则
 ```
@@ -45,27 +130,86 @@ claudeSandBox/
 ### 核心依赖链
 
 ```
-CLAUDE.md (主契约 - 单一真相源)
+CLAUDE.md (Research Lead AI Contract - 单一真相源)
     ↓
-    ├── agents.md (智能体编排)
-    │   ├── system-architect.md
-    │   ├── planner.md ────────┐
-    │   ├── research.md        │
-    │   ├── dev.md              │
-    │   ├── reviewer.md         │
-    │   ├── ops.md              │
-    │   ├── doc-updater.md      │
-    │   └── tdd-guide.md        │
-    │                            │
-    ├── brainstorming/SKILL.md ──┤
-    │                            │
-    └── [其他 skills]            │
-                                 │
-                          交叉引用：
-                          ├─ 复杂度判断 (CLAUDE.md)
-                          ├─ 技能清单 (planner.md)
-                          └─ 输出格式 (CLAUDE.md 项目目录结构)
+    ├── 角色定义
+    │   ├── Authority Grant（研究主权）
+    │   └── Execution Environment Authority（执行环境权限）
+    │
+    ├── 研究决策模型
+    │   ├── Research Authority Model（5层决策）
+    │   └── Decision Record（决策记录）
+    │
+    ├── 逐步研究记录（核心）
+    │   ├── Step-Level Research Logging
+    │   ├── Step Record（步骤记录）
+    │   └── 三个禁止
+    │
+    ├── 行为约束
+    │   ├── 6 条明确约束
+    │   └── Git Discipline
+    │
+    ├── brainstorming/SKILL.md
+    │   └─ 研究设计探索（高复杂度任务）
+    │
+    ├── [研究 skills]
+    │   ├── security/web-whitebox-audit/SKILL.md
+    │   ├── security/iot-audit/SKILL.md
+    │   ├── security/vuln-patterns/SKILL.md
+    │   ├── security/poc-exploit/SKILL.md
+    │   ├── debugging/SKILL.md
+    │   └── code-review/SKILL.md
+    │
+    └── [研究 rules]
+        ├── security.md
+        ├── git-workflow.md
+        ├── python/coding-style.md
+        ├── javascript/coding-style.md
+        ├── go/coding-style.md
+        └── java/coding-style.md
 ```
+
+### 关键关联关系
+
+#### 1. **CLAUDE.md → Decision Record & Step Record**
+- **关系**：CLAUDE.md 定义两种记录格式
+- **数据流向**：CLAUDE.md → Decision Record（输出）→ Step Record（逐步输出）
+- **一致性要求**：
+  - CLAUDE.md 定义 Decision Record 和 Step Record 的强制字段
+  - AI 输出的记录必须符合格式
+  - 项目结构 `docs/decisions/` 和 `notes/steps/` 用于存储
+
+#### 2. **CLAUDE.md → brainstorming/SKILL.md**
+- **关系**：CLAUDE.md 定义何时使用 brainstorming
+- **数据流向**：CLAUDE.md → brainstorming/SKILL.md
+- **一致性要求**：
+  - CLAUDE.md 定义高复杂度研究任务进入 Research Decision Mode
+  - brainstorming 辅助生成 Decision Record
+  - 不重复定义项目结构
+
+#### 3. **CLAUDE.md → security/skills/**
+- **关系**：CLAUDE.md 定义研究任务分类和决策权
+- **数据流向**：CLAUDE.md → security skills
+- **一致性要求**：
+  - CLAUDE.md 定义 AI 拥有战术/技术层决策权
+  - security skills 在决策范围内执行
+  - 不重复定义决策流程
+
+#### 4. **CLAUDE.md → Git Workflow**
+- **关系**：CLAUDE.md 定义 Git 纪律要求
+- **数据流向**：CLAUDE.md → Git commit message
+- **一致性要求**：
+  - 每个研究步骤必须 commit
+  - Commit message 必须包含 Decision ID 和 Step ID
+  - Git 历史可审计、可回放
+
+#### 5. **CLAUDE.md → 所有文件**
+- **关系**：CLAUDE.md 是主契约，所有文件都必须遵守
+- **数据流向**：CLAUDE.md → 所有 .md 文件
+- **一致性要求**：
+  - 研究项目结构在 CLAUDE.md 定义
+  - 所有文件引用 CLAUDE.md，不重复定义
+  - 修改 CLAUDE.md 可能影响所有文件
 
 ### 关键关联关系
 

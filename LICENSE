@@ -1,0 +1,48 @@
+MIT License
+
+Copyright (c) 2026 claudeSandBox Project
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## 使用声明（Usage Declaration）
+
+本软件专为**安全研究、漏洞分析、渗透测试（需授权）**设计。
+
+**合法使用**：
+- ✅ 授权的安全研究
+- ✅ 授权的渗透测试
+- ✅ 代码审计
+- ✅ 安全开发
+- ✅ 教育学习
+
+**禁止使用**：
+- ❌ 未经授权的系统访问
+- ❌ 恶意攻击
+- ❌ 任何非法活动
+
+**使用者责任**：
+- 遵守当地法律法规
+- 获得明确授权后再进行测试
+- 对自己的行为负责
+- 负责任披露漏洞
+
+**免责声明**：
+作者不对使用本软件造成的任何后果负责。
