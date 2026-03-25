@@ -162,7 +162,9 @@ RUN cd /workspace && \
     git init && \
     git config user.email "claude@claude.ai" && \
     git config user.name "Claude AI" && \
-    git add -A && \
+    echo ".claude/" > .gitignore && \
+    echo "CLAUDE.md" >> .gitignore && \
+    git add .gitignore && \
     git commit -m "Initial commit for multi-agent worktree isolation" --allow-empty
 
 CMD ["/bin/bash"]
