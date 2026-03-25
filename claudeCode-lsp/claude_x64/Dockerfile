@@ -141,12 +141,12 @@ RUN git config --global http.proxy http://${PROXY_HOST}:${PROXY_PORT} && \
 # ============================================
 # 安装 Claude Code CLI
 # ============================================
-# 下载安装脚本并执行（使用国内镜像地址）
-RUN curl -fSL https://claude.mcprotocol.cn/install.sh -o /tmp/install.sh
+# 下载安装脚本并执行
 RUN HTTP_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
     HTTPS_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
     http_proxy=http://${PROXY_HOST}:${PROXY_PORT} \
     https_proxy=http://${PROXY_HOST}:${PROXY_PORT} \
+    curl -fsSL https://claude.ai/install.sh -o /tmp/install.sh && \
     bash /tmp/install.sh && \
     rm /tmp/install.sh
 
