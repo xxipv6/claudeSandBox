@@ -63,6 +63,74 @@
 
 ---
 
+> ## ⚠️ **流程分支并行分析（重点！）**
+>
+> ### 🚨 **核心原则：后台运行**
+>
+> **遇到流程分支时，应主动（PROACTIVELY）使用多个子 Agent 后台并行分析！**
+>
+> ### 工作机制
+> - 🚀 **后台运行**：多个子 Agent 在后台**同时**执行，互不阻塞
+> - 📊 **独立追踪**：每个子 Agent 独立追踪一个分支路径
+> - 🔄 **结果合并**：所有 Agent 完成后，合并结果并汇总所有分支的发现
+> - ⚡ **高效执行**：大幅缩短总体分析时间
+>
+> ### 适用场景
+> - 🎯 **代码审计**：多个 Agent 并行审计不同模块（鉴权 / 业务逻辑 / 数据访问 / API 接口）
+> - 🔍 **逆向分析**：多个 Agent 并行分析不同组件（加密流程 / 网络协议 / 文件格式 / 状态机）
+> - 🌐 **Web 审计**：多个 Agent 并行审计不同攻击面（认证 / 授权 / 注入 / 敏感信息）
+> - 📱 **移动安全**：多个 Agent 并行分析不同层（Native / JS / Java / Kotlin / 网络层）
+> - 🌐 **分布式分析**：多个 Agent 并行分析多个子系统或微服务
+>
+> ### 使用方式
+>
+> **单 Agent 工作流**（默认）：
+> ```
+> 开始分析
+>   ↓
+> 审计模块 A → 审计模块 B → 审计模块 C → 审计模块 D
+>   ↓              ↓              ↓              ↓
+> 串行完成（耗时长）
+> ```
+>
+> **多 Agent 并行工作流**（推荐）：
+> ```
+> 开始分析
+>   ↓
+> Agent 1 → 审计模块 A ─┐
+> Agent 2 → 审计模块 B ─┤
+> Agent 3 → 审计模块 C ─┼→ 后台并行执行 → 合并结果
+> Agent 4 → 审计模块 D ─┘
+>   ↓
+> 并行完成（耗时短）
+> ```
+>
+> ### 实现方式
+>
+> **使用 Agent 工具的 `run_in_background` 参数**：
+> ```
+> Agent(subagent_type="general-purpose",
+>       prompt="审计模块 A",
+>       run_in_background=true)
+>
+> Agent(subagent_type="general-purpose",
+>       prompt="审计模块 B",
+>       run_in_background=true)
+>
+> Agent(subagent_type="general-purpose",
+>       prompt="审计模块 C",
+>       run_in_background=true)
+>
+> # 等待所有后台 Agent 完成
+> # 合并结果
+> ```
+>
+> **记住：后台并行执行是提升效率的关键！**
+>
+> ---
+
+---
+
 ## 2️⃣ Research Authority Model
 
 | 层级 | 内容 | 权限 |
@@ -140,74 +208,6 @@ xxx-research/
 - `poc-engineer` - 安全脚本开发（PoC / Frida / GDB / IDA / Burp 等）
 - `skeptic` - 怀疑论者审计
 - `research-recorder` - 研究记录（步骤记录 / 决策记录 / 文档编写）
-
----
-
-> ## ⚠️ **流程分支并行分析（重点！）**
->
-> ### 🚨 **核心原则：后台运行**
->
-> **遇到流程分支时，应主动（PROACTIVELY）使用多个子 Agent 后台并行分析！**
->
-> ### 工作机制
-> - 🚀 **后台运行**：多个子 Agent 在后台**同时**执行，互不阻塞
-> - 📊 **独立追踪**：每个子 Agent 独立追踪一个分支路径
-> - 🔄 **结果合并**：所有 Agent 完成后，合并结果并汇总所有分支的发现
-> - ⚡ **高效执行**：大幅缩短总体分析时间
->
-> ### 适用场景
-> - 🎯 **代码审计**：多个 Agent 并行审计不同模块（鉴权 / 业务逻辑 / 数据访问 / API 接口）
-> - 🔍 **逆向分析**：多个 Agent 并行分析不同组件（加密流程 / 网络协议 / 文件格式 / 状态机）
-> - 🌐 **Web 审计**：多个 Agent 并行审计不同攻击面（认证 / 授权 / 注入 / 敏感信息）
-> - 📱 **移动安全**：多个 Agent 并行分析不同层（Native / JS / Java / Kotlin / 网络层）
-> - 🌐 **分布式分析**：多个 Agent 并行分析多个子系统或微服务
->
-> ### 使用方式
->
-> **单 Agent 工作流**（默认）：
-> ```
-> 开始分析
->   ↓
-> 审计模块 A → 审计模块 B → 审计模块 C → 审计模块 D
->   ↓              ↓              ↓              ↓
-> 串行完成（耗时长）
-> ```
->
-> **多 Agent 并行工作流**（推荐）：
-> ```
-> 开始分析
->   ↓
-> Agent 1 → 审计模块 A ─┐
-> Agent 2 → 审计模块 B ─┤
-> Agent 3 → 审计模块 C ─┼→ 后台并行执行 → 合并结果
-> Agent 4 → 审计模块 D ─┘
->   ↓
-> 并行完成（耗时短）
-> ```
->
-> ### 实现方式
->
-> **使用 Agent 工具的 `run_in_background` 参数**：
-> ```
-> Agent(subagent_type="general-purpose",
->       prompt="审计模块 A",
->       run_in_background=true)
->
-> Agent(subagent_type="general-purpose",
->       prompt="审计模块 B",
->       run_in_background=true)
->
-> Agent(subagent_type="general-purpose",
->       prompt="审计模块 C",
->       run_in_background=true)
->
-> # 等待所有后台 Agent 完成
-> # 合并结果
-> ```
->
-> **记住：后台并行执行是提升效率的关键！**
->
-> ---
 
 ---
 
