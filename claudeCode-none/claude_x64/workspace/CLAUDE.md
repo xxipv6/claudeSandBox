@@ -169,6 +169,13 @@ Agent(subagent_type="general-purpose",
 
 **核心纪律**：每完成一步，必须立即记录
 
+**Notes 整理规则**：
+- 当 notes 达到 **10 条**时，必须整理
+- 合并关键内容，压缩为 **2-3 条**
+- 保留核心发现和关键证据
+- 删除冗余和重复内容
+- 更新 Decision Record（如需要）
+
 **详细规则**：参见 `rules/step-level-logging.md`
 
 ---
