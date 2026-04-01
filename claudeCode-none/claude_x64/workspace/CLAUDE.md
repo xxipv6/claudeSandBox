@@ -212,7 +212,7 @@ xxx-research/
 **Specialist Agents 类型**：
 - `reverse-analyst` - 逆向分析（二进制 / JS / Android / iOS）
 - `code-audit` - 代码审计（源码 / 逻辑漏洞 / 安全规范）
-- `coder-engineer` - 通用开发（PoC / Frida / GDB / IDA / Burp 等）
+- `poc-engineer` - 通用开发（PoC / Frida / GDB / IDA / Burp 等）
 - `skeptic` - 怀疑论者审计
 - `research-recorder` - 研究记录（步骤记录 / 决策记录 / 文档编写）
 

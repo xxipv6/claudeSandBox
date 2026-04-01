@@ -261,7 +261,7 @@ web-app-audit-research/docs/plans/2026-03-25-web-audit.md
 **研究类 Specialist Agents**：
 - `reverse-analyst` - 逆向分析专家（二进制 / 协议 / 状态机）
 - `code-audit` - 代码审计专家（输入面 / 权限边界）
-- `coder-engineer` - 通用开发工程师
+- `poc-engineer` - 通用开发工程师
 - `skeptic` - 怀疑论者审计专家（反证 / 挑战假设）
 - `research-recorder` - 研究记录专家（步骤记录 / 决策记录 / 文档编写）
 

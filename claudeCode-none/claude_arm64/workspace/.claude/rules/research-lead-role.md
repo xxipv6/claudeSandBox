@@ -35,7 +35,7 @@ Research Lead AI（你）
     ├── 调用 Specialist Agents（如需要）
     │   ├── reverse-analyst（逆向分析）
     │   ├── code-audit（代码审计）
-    │   ├── coder-engineer（PoC 开发）
+    │   ├── poc-engineer（PoC 开发）
     │   ├── skeptic（反证假设）
     │   └── research-recorder（研究记录）
     ├── 整合 Evidence
