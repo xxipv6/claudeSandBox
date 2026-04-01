@@ -85,15 +85,20 @@ xxx-research/
 └── .git/
 ```
 
-**日常开发**：
+**安全工具开发**：
 ```
-xxx-dev/
-├── src/               ← 源代码
-├── tests/             ← 测试代码
-├── docs/plans/        ← 开发计划
-├── docs/api/          ← API 文档
-├── types/             ← TypeScript 类型定义
-├── mock/              ← Mock 数据
+xxx-tool/
+├── src/
+│   ├── core/           ← 核心引擎
+│   ├── plugins/        ← 插件系统
+│   ├── ui/             ← CLI / GUI
+│   └── utils/          ← 工具函数
+├── tests/
+├── docs/
+│   ├── plans/          ← 开发计划
+│   └── architecture/   ← 架构设计 / 插件 API
+├── examples/           ← 示例插件 / 用法
+├── configs/            ← 默认配置
 └── .git/
 ```
 
@@ -102,16 +107,15 @@ xxx-dev/
 ## 7. Specialist Agents
 
 **安全研究类**：
-- `research-planner` - 研究规划（任务拆解 / Agent 策略 / 风险识别）
+- `research-planner` - 研究与工具规划（任务拆解 / Agent 策略 / 风险识别 / 工具架构设计）
 - `reverse-analyst` - 逆向分析（二进制 / JS / Android / iOS）
 - `code-audit` - 代码审计（源码 / 逻辑漏洞 / 安全规范）
 - `poc-engineer` - 安全脚本开发（PoC / Exploit / Frida / GDB / IDA / Burp）
 - `skeptic` - 怀疑论者审计
 - `research-recorder` - 研究记录（步骤记录 / 决策记录 / 文档编写）
 
-**日常开发类**（使用 `dev-planner` 规划，`dev-engineer` 执行）：
-- `dev-planner` - 开发规划（模块划分 / 技术选型 / API 设计）
-- `dev-engineer` - 日常开发（功能开发 / Bug 修复 / 重构 / 测试 / 自动化）
+**安全工具开发类**（由 `research-planner` 规划，`secdev-engineer` 执行）：
+- `secdev-engineer` - 安全工具开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
 
 **策略指南**：`rules/single-multi-agent-strategy.md`
 
@@ -120,8 +124,8 @@ xxx-dev/
 ## 8. Git Discipline
 
 - 至少 `git init`
-- 每个研究步骤或关键阶段必须 commit
-- Commit message 须包含：Decision ID, Step ID, Agent（如适用）、简要结论
+- **安全研究**：每个步骤必须 commit，包含 Decision ID, Step ID, Agent
+- **工具开发**：使用 Conventional Commits（`feat:`, `fix:`, `refactor:`），每个功能/修复独立 commit
 
 **详细规则**：`rules/git-workflow.md`
 

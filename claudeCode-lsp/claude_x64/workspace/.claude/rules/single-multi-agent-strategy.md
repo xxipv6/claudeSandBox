@@ -88,18 +88,18 @@
 
 ---
 
-## 日常开发 Agent 分配
+## 安全工具开发 Agent 分配
 
 | 场景 | Agent 组合 | 原因 |
 |------|-----------|------|
-| 大型功能开发 | dev-engineer x 2+ | 多模块并行 |
-| 前后端协作 | dev-engineer x 2 | 前端 + 后端并行 |
-| 重构 + 测试 | dev-engineer x 2 | 重构 + 测试并行 |
-| Bug 修复 | dev-engineer | 单一目标 |
-| 自动化脚本 | dev-engineer | 单一目标 |
+| 大型工具开发（引擎+插件+UI） | secdev-engineer x 2+ | 核心引擎 / 插件系统 / UI 并行 |
+| 引擎 + 插件并行 | secdev-engineer x 2 | 引擎 + 插件并行 |
+| 重构 + 测试 | secdev-engineer x 2 | 重构 + 测试并行 |
+| 单模块开发 | secdev-engineer | 单一目标 |
+| 工具 Bug 修复 | secdev-engineer | 单一目标 |
 
 **Specialist Agents**：
-- `dev-engineer` - 日常开发（功能 / Bug / 重构 / 测试 / 自动化）
+- `secdev-engineer` - 安全工具开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
 
 ---
 
