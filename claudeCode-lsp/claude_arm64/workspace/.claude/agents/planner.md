@@ -161,7 +161,7 @@ web-app-audit-research/docs/plans/2026-03-25-web-audit.md
 **Specialist Agents 分配**（如 Multi）：
 - **Reverse Analyst**：[任务]
 - **Code Audit**：[任务]
-- **PoC Engineer**：[任务]
+- **Coder Engineer**：[任务]
 - **Skeptic**：[任务]
 
 ### 📝 研究步骤
@@ -261,7 +261,7 @@ web-app-audit-research/docs/plans/2026-03-25-web-audit.md
 **研究类 Specialist Agents**：
 - `reverse-analyst` - 逆向分析专家（二进制 / 协议 / 状态机）
 - `code-audit` - 代码审计专家（输入面 / 权限边界）
-- `poc-engineer` - PoC 开发专家（验证 / exploit）
+- `coder-engineer` - 通用开发工程师
 - `skeptic` - 怀疑论者审计专家（反证 / 挑战假设）
 - `research-recorder` - 研究记录专家（步骤记录 / 决策记录 / 文档编写）
 
@@ -335,7 +335,7 @@ web-app-audit-research/docs/plans/2026-03-25-web-audit.md
 **Specialist Agents 分配**：
 - **Reverse Analyst**：固件解包、二进制分析、协议逆向、状态机还原
 - **Code Audit**：代码审计（网络接口、串口、存储）
-- **PoC Engineer**：漏洞验证、PoC 编写、exploit 开发
+- **Coder Engineer**：漏洞验证、PoC 编写、exploit 开发
 - **Skeptic**：反证初步假设、挑战结论、识别异常
 
 ### 📝 研究步骤
@@ -346,7 +346,7 @@ web-app-audit-research/docs/plans/2026-03-25-web-audit.md
 - [ ] T5 - 二进制漏洞分析（并发）
 - [ ] T6 - 攻击面测试（并发）
 - [ ] T7 - 假设验证与反证（Skeptic）
-- [ ] T8 - PoC 编写与验证（PoC Engineer）
+- [ ] T8 - PoC 编写与验证（Coder Engineer）
 - [ ] T9 - 生成审计报告
 
 **Checklist 维护规则**：
@@ -368,7 +368,7 @@ web-app-audit-research/docs/plans/2026-03-25-web-audit.md
 | T5 | Reverse Analyst | 二进制漏洞分析 |
 | T6 | Code Audit | 攻击面测试 |
 | T7 | Skeptic | 假设验证与反证 |
-| T8 | PoC Engineer | PoC 编写与验证 |
+| T8 | Coder Engineer | PoC 编写与验证 |
 
 ### 🔗 依赖
 - 目标固件文件

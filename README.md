@@ -72,7 +72,7 @@ claudeSandBox 是一个基于 Docker 的隔离安全分析环境，预配置了 
   - **Specialist Agents**：
     - `reverse-analyst` - 逆向分析专家（二进制 / JS / Android / iOS）
     - `code-audit` - 代码审计专家（移动应用 / 桌面应用 / 固件）
-    - `poc-engineer` - 安全脚本开发专家（PoC / Frida / GDB / IDA / Burp 等）
+    - `coder-engineer` - 通用开发工程师（功能开发 / Bug 修复 / 重构 / 测试 / 安全脚本 / 自动化）
     - `skeptic` - 怀疑论者审计专家（反证 / 挑战假设）
     - `research-recorder` - 研究记录专家（步骤记录 / 决策记录 / 文档编写）
   - **多 Agent 用于加速分析，不改变职责定位**
@@ -388,7 +388,7 @@ Claude：[评估：固件分析、需要逆向]
   → Observation：发现硬编码密钥
   → 记录：agents/reverse/firmware_analysis.md
 
-→ poc-engineer：编写验证脚本
+→ coder-engineer：编写验证脚本
   → Action：使用发现的密钥解密数据
   → Observation：解密成功
   → 记录：poc/decrypt_firmware.py

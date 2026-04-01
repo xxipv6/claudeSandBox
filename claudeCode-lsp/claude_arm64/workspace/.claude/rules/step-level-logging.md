@@ -302,7 +302,7 @@ ls -la _firmware.bin.extracted/
 - **Step ID**: step-5
 - **Decision ID**: 2026-03-25-002
 - **时间**: 2026-03-25 16:50:00
-- **执行者**: poc-engineer
+- **执行者**: coder-engineer
 
 ## 研究目标
 验证固件更新签名验证绕过漏洞
