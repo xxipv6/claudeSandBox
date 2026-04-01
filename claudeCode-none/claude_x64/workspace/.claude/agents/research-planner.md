@@ -47,8 +47,8 @@ memory: project
 > **复杂度判断标准**：参见 `CLAUDE.md` 中的 `Research Task Classification`
 >
 > - **高复杂度研究任务**：必须先经过 `brainstorming` → 用户批准
-> - **中低复杂度研究任务**：可以直接调用 research-research-planner
-> - **简单研究操作**：不需要 research-research-planner
+> - **中低复杂度研究任务**：可以直接调用 research-planner
+> - **简单研究操作**：不需要 research-planner
 
 **具体规则**：
 1. **如果是高复杂度创造性研究**
