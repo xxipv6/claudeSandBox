@@ -64,7 +64,7 @@ Research Lead AI（你）
 │ 高复杂度     │ 中低复杂度     │ 简单操作      │
 │ ↓           │ ↓             │ ↓            │
 │ brainstorming→ │ 直接决策      │ 直接执行      │
-│ planner      │               │              │
+│ research-planner      │               │              │
 │ Multi-Agent  │ Single-Agent  │              │
 └─────────────┴───────────────┴──────────────┘
     ↓
@@ -108,7 +108,7 @@ Research Lead AI（你）
 2. 生成 Decision Record（2026-03-25-001）
    - Agent Strategy: Multi
    - 分配: reverse-analyst, code-audit, skeptic
-3. 调用 planner 生成研究计划
+3. 调用 research-planner 生成研究计划
 4. 执行研究步骤
    - 每完成一步 → 调用 research-recorder 记录
 5. 汇总 Evidence → 做出结论

@@ -92,7 +92,7 @@ brainstorming {
   approve [label="使用 AskUserQuestion 等待用户批准\n⚠️ 呈现方案后必须立即停止！", shape=diamond, style=filled, fillcolor=yellow]
   modify [label="根据用户反馈修改", shape=ellipse]
   write_doc [label="撰写设计文档\n保存到 docs/specs/"]
-  call_planner [label="调用 planner agent\n生成执行计划", shape=ellipse, style=filled, fillcolor=lightgreen]
+  call_planner [label="调用 research-planner agent\n生成执行计划", shape=ellipse, style=filled, fillcolor=lightgreen]
 
   start -> explore
   explore -> clarify
@@ -232,7 +232,7 @@ A: [用户回答]
   "options": [
     {
       "label": "批准并开始规划",
-      "description": "批准设计方案，进入 planner 任务规划阶段"
+      "description": "批准设计方案，进入 research-planner 任务规划阶段"
     },
     {
       "label": "需要修改方案",
@@ -262,9 +262,9 @@ A: [用户回答]
 系统会显示 UI 让用户选择，然后将用户选择返回给你。
 
 **收到用户选择后**：
-- 如果选择"批准并开始规划" → 撰写设计文档 → 调用 planner
+- 如果选择"批准并开始规划" → 撰写设计文档 → 调用 research-planner
 - 如果选择"需要修改方案" → 根据意见修改 → 再次调用 AskUserQuestion
-- 如果选择"跳过设计阶段" → 直接调用 planner
+- 如果选择"跳过设计阶段" → 直接调用 research-planner
 
 **示例对话**：
 ```
@@ -283,7 +283,7 @@ AI: [设计方案输出完成]
 
 AI: 收到用户批准。
     ↓
-    撰写设计文档 → 调用 planner...
+    撰写设计文档 → 调用 research-planner...
 ```
 
 ---
@@ -341,20 +341,20 @@ AI: 收到用户批准。
 
 ---
 
-### 6. 调用 planner agent
+### 6. 调用 research-planner agent
 
-**撰写设计文档后**，调用 planner agent 生成执行计划：
+**撰写设计文档后**，调用 research-planner agent 生成执行计划：
 
 ```
 设计方案已获得用户批准，设计文档已保存到 xxx-project/docs/specs/。
 
-现在调用 planner agent 生成执行计划...
+现在调用 research-planner agent 生成执行计划...
 ```
 
-> **brainstorming vs planner 的区别**：
+> **brainstorming vs research-planner 的区别**：
 > - **brainstorming（设计阶段）**：探索多种技术方案、架构设计、组件设计
-> - **planner（规划阶段）**：拆解任务、制定执行计划、识别风险和依赖
-> - **流程**：brainstorming → 用户批准 → planner → 执行
+> - **research-planner（规划阶段）**：拆解任务、制定执行计划、识别风险和依赖
+> - **流程**：brainstorming → 用户批准 → research-planner → 执行
 
 ---
 
@@ -418,7 +418,7 @@ AI: 收到用户批准。
 - [ ] 呈现设计（架构、组件、数据流、错误处理、测试）
 - [ ] 使用 AskUserQuestion 等待用户批准
 - [ ] 撰写设计文档（用户批准后）
-- [ ] 调用 planner agent
+- [ ] 调用 research-planner agent
 
 ---
 
@@ -461,9 +461,9 @@ A: 暂时不需要
 # 6. 撰写设计文档
 保存到 login-project/docs/specs/2026-03-16-login-design.md
 
-# 7. 调用 planner
+# 7. 调用 research-planner
 设计方案已获得用户批准，设计文档已保存。
-现在调用 planner agent 生成执行计划...
+现在调用 research-planner agent 生成执行计划...
 ```
 
 ---

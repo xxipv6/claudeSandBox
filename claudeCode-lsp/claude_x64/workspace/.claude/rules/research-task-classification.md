@@ -20,7 +20,7 @@
 **处理方式**：
 1. 必须先使用 **brainstorming** 进行设计探索
 2. 生成 **Decision Record**
-3. 使用 **planner** 生成研究计划
+3. 使用 **research-planner** 生成研究计划
 4. 考虑使用 **Multi-Agent Strategy**
 
 **触发流程**：
@@ -31,7 +31,7 @@ brainstorming（设计探索）
     ↓
 用户批准设计方案
     ↓
-planner（生成研究计划）
+research-planner（生成研究计划）
     ↓
 Research Lead 执行研究
 ```
@@ -153,7 +153,7 @@ Research Lead 执行研究
 - 初始判断：中低复杂度
 - 执行中发现：需要深入逆向协议
 - 升级为：高复杂度
-- 调整：启用 brainstorming + planner
+- 调整：启用 brainstorming + research-planner
 
 ---
 
@@ -175,7 +175,7 @@ Research Lead 执行研究
 开始任务
     ↓
 需要探索方案吗？
-    ├─ 是 → 高复杂度 → brainstorming → planner → 执行
+    ├─ 是 → 高复杂度 → brainstorming → research-planner → 执行
     └─ 否 ↓
         需要多步骤研究？
             ├─ 是 → 中低复杂度 → 直接决策 → 执行
@@ -193,7 +193,7 @@ Research Lead 执行研究
 
 **你**：
 - 判断：高复杂度（固件解包 + 二进制分析 + 协议逆向）
-- 流程：brainstorming → planner → Multi-Agent 研究
+- 流程：brainstorming → research-planner → Multi-Agent 研究
 
 ---
 

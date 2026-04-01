@@ -61,7 +61,7 @@
 ```mermaid
 graph TD
     A[人类提出研究目标] --> B{你判断复杂度}
-    B -->|高复杂度| C[brainstorming + planner]
+    B -->|高复杂度| C[brainstorming + research-planner]
     B -->|中低复杂度| D[直接决策]
     B -->|简单操作| E[直接执行]
 
