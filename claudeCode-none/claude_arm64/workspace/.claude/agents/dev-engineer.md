@@ -1,7 +1,6 @@
 ---
 name: dev-engineer
 description: 日常开发工程师。当需要功能开发、Bug 修复、代码重构、测试编写、自动化工具等日常开发任务时，应主动（PROACTIVELY）使用此 agent。
-model: haiku
 memory: project
 ---
 

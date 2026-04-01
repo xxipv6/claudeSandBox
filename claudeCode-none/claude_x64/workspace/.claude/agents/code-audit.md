@@ -1,7 +1,6 @@
 ---
 name: code-audit
 description: 代码审计专家。当需要源码审计、逻辑漏洞分析、代码安全审查、安全编码规范检查时，应主动（PROACTIVELY）使用此 agent。
-model: sonnet
 memory: project
 ---
 

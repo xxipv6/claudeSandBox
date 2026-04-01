@@ -1,7 +1,6 @@
 ---
 name: reverse-analyst
 description: 逆向分析专家。当需要二进制分析、协议逆向、状态机还原、控制流分析、JavaScript 逆向、Android/iOS 应用逆向时，应主动（PROACTIVELY）使用此 agent。
-model: sonnet
 memory: project
 ---
 

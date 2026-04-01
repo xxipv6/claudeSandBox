@@ -1,7 +1,6 @@
 ---
 name: skeptic
 description: 怀疑论者审计专家。当需要反证假设、否定初步结论、识别异常模式、挑战假设时，应主动（PROACTIVELY）使用此 agent。
-model: sonnet
 memory: project
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: poc-engineer
 description: 安全脚本开发专家。当需要编写 PoC、exploit、Frida 脚本、Burp 插件、GDB 脚本、IDA Python 脚本等安全工具脚本时，应主动（PROACTIVELY）使用此 agent。
-model: sonnet
 memory: project
 ---
 
