@@ -1,10 +1,9 @@
 # claudeSandBox
 
-> 专为**内部产品安全研究、软件安全生命周期（SDL）**和**日常开发**设计的 Claude Code 沙箱环境
+> 专为**内部产品安全研究、软件安全生命周期（SDL）和安全开发**设计的 Claude Code 沙箱环境
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-4.6-purple.svg)](https://claude.com/claude-code)
-[![Version](https://img.shields.io/badge/version-3.4.0-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.5.0-green.svg)]()
 
 ## 简介
 
@@ -12,7 +11,7 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 
 **核心特点**：
 - SDL 导向契约 - 覆盖软件安全开发生命周期全流程
-- 技能库（Skills）- 安全审计与开发专用知识库
+- 技能库（Skills）- 安全审计与工具开发专用知识库
 - 智能体（Agents）- 专业化子 Agent，支持后台并行分析
 - 规则系统（Rules）- 安全编码规范与分析约束
 
@@ -21,7 +20,7 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 - SDL 全流程 - 设计 → 开发 → 测试 → 发布
 - PoC 验证 - 漏洞验证、危害评估、修复验证
 - 安全文档 - 审计报告、漏洞分析、修复建议
-- 日常开发 - 功能开发、Bug 修复、重构、自动化
+- 安全开发 - 调试器、Fuzzer、扫描器、分析工具
 
 ---
 
@@ -53,19 +52,18 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 
 | Agent | 职责 |
 |-------|------|
-| `research-planner` | 研究规划（任务拆解 / Agent 策略 / 风险识别） |
+| `research-planner` | 研究与工具规划（任务拆解 / Agent 策略 / 风险识别 / 工具架构设计） |
 | `reverse-analyst` | 逆向分析（二进制 / JS / Android / iOS） |
 | `code-audit` | 代码审计（源码 / 逻辑漏洞 / 安全规范） |
 | `poc-engineer` | 安全脚本开发（PoC / Exploit / Frida / GDB / IDA / Burp） |
 | `skeptic` | 怀疑论者审计（反证 / 挑战假设） |
 | `research-recorder` | 研究记录（步骤记录 / 决策记录 / 文档编写） |
 
-**日常开发类**（SDL 助理转交给对应 Agent）：
+**安全开发类**（由 `research-planner` 规划，`secdev-engineer` 执行）：
 
 | Agent | 职责 |
 |-------|------|
-| `dev-planner` | 开发规划（模块划分 / 技术选型 / API 设计） |
-| `dev-engineer` | 日常开发（功能开发 / Bug 修复 / 重构 / 测试 / 自动化） |
+| `secdev-engineer` | 安全开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具） |
 
 ---
 
@@ -81,8 +79,8 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 - `security/binary-reverse` - 二进制逆向分析技能
 - `security/js-reverse` - JavaScript 逆向分析技能
 
-**开发技能**：
-- `development` - 日常开发工作流（需求分析 → 编码 → 测试 → API 文档 → TypeScript 类型 → Mock 数据）
+**安全开发技能**：
+- `secdev` - 安全开发工作流（架构设计 → 引擎实现 → 插件系统 → 测试验证）
 
 **分析技能**：
 - `debugging` - 调试方法论与问题定位
@@ -152,16 +150,20 @@ xxx-research/
 └── .git/
 ```
 
-**日常开发**：
+**安全开发**：
 ```
-xxx-dev/
-├── src/                  ← 源代码
-├── tests/                ← 测试代码
+xxx-secdev/
+├── src/
+│   ├── core/             ← 核心引擎
+│   ├── plugins/          ← 插件系统
+│   ├── ui/               ← CLI / TUI
+│   └── utils/            ← 工具函数
+├── tests/
 ├── docs/
 │   ├── plans/            ← 开发计划
-│   └── api/              ← API 文档
-├── types/                ← TypeScript 类型定义
-├── mock/                 ← Mock 数据
+│   └── architecture/     ← 架构设计 / 插件 API
+├── examples/             ← 示例插件 / 用法
+├── configs/              ← 默认配置
 └── .git/
 ```
 
@@ -189,14 +191,13 @@ claudeSandBox/
 │   ├── claude_arm64/
 │   └── claude_x64/
 ├── README.md
-├── CHANGELOG.md
-├── MAINTENANCE.md
+├── CLAUDE.md                 # 维护指南
 └── LICENSE
 
 # 每个变体内部
 workspace/
 └── .claude/
-    ├── CLAUDE.md             # SDL 安全助理契约（v3.4）
+    ├── CLAUDE.md             # SDL 安全助理契约（v3.5）
     ├── commands/             # 命令定义
     ├── skills/               # 技能库
     ├── agents/               # 智能体定义
@@ -216,11 +217,8 @@ Claude：[评估：单一模块、目标明确]
       → Decision Record（Agent Strategy: Single）
       → 开始分析
 
-[step-1] 代码审查
-→ 发现 JWT 验证缺失签名 → 记录 → commit
-
-[step-2] 假设验证
-→ 构造恶意 JWT → 绕过成功 → 编写 PoC → 记录 → commit
+[step-1] 代码审查 → 发现 JWT 验证缺失签名 → 记录 → commit
+[step-2] 假设验证 → 构造恶意 JWT → 绕过成功 → 编写 PoC → 记录 → commit
 ```
 
 ### 2. 多模块并行审计（多 Agent 后台并行）
@@ -229,7 +227,6 @@ Claude：[评估：单一模块、目标明确]
 你：帮我审计这个 Web 应用的安全性
 
 Claude：[评估：多模块、可并行]
-      → Decision Record（Agent Strategy: Multi）
       → 后台并行启动 3 个 Agent
 
 Agent 1（code-audit）：审计认证模块 → JWT 签名缺失
@@ -239,36 +236,29 @@ Agent 3（code-audit）：审计业务逻辑 → 权限校验不完整
 → 合并证据 → 生成审计报告
 ```
 
-### 3. 日常开发（转交 dev Agent）
+### 3. 安全开发（转交 secdev Agent）
 
 ```
-你：帮我开发一个日志分析工具
+你：帮我开发一个 x64dbg 风格的调试器
 
-Claude：[评估：日常开发任务]
-      → 转交 dev-planner 规划
-      → dev-engineer 执行开发
-      → 自动生成 API 文档 + TypeScript 类型 + Mock 数据
+Claude：[评估：安全开发任务]
+      → research-planner 规划架构（引擎 / 插件系统 / UI）
+      → secdev-engineer 执行开发
+      → 自动生成插件 API 文档 + 架构文档 + README
 ```
 
 ---
 
 ## 文档
 
-- [CHANGELOG.md](CHANGELOG.md) - 版本历史
-- [MAINTENANCE.md](MAINTENANCE.md) - 维护手册
 - [CLAUDE.md](claudeCode-none/claude_arm64/workspace/CLAUDE.md) - SDL 安全助理契约
+- [CLAUDE.md](CLAUDE.md) - 项目维护指南
 
 ---
 
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request！
-
----
-
-## 许可证
-
-MIT License
 
 ---
 

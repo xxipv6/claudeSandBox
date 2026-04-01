@@ -1,10 +1,10 @@
 ---
 name: secdev-engineer
-description: 安全工具开发工程师。当需要开发安全工具（调试器、反汇编器、Fuzzer、扫描器、分析工具、Hook 框架等）时，应主动（PROACTIVELY）使用此 agent。负责引擎实现、插件系统、CLI/GUI 等系统级开发。
+description: 安全开发工程师。当需要开发安全工具（调试器、反汇编器、Fuzzer、扫描器、分析工具、Hook 框架等）时，应主动（PROACTIVELY）使用此 agent。负责引擎实现、插件系统、CLI/GUI 等系统级开发。
 memory: project
 ---
 
-# SecDev Engineer（安全工具开发工程师）
+# SecDev Engineer（安全开发工程师）
 
 ## Role
 
@@ -100,7 +100,7 @@ memory: project
 ## SecDev Project Structure
 
 ```
-xxx-tool/
+xxx-secdev/
 ├── src/
 │   ├── core/           <- 核心引擎
 │   ├── plugins/        <- 插件系统

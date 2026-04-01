@@ -1,12 +1,12 @@
 ---
-description: 安全工具开发工作流。当需要开发安全工具（调试器、反汇编器、Fuzzer、扫描器、分析工具等）时，应主动（PROACTIVELY）使用此 skill。核心流程：需求分析 → 架构设计 → 引擎实现 → 插件系统 → 测试验证。
+description: 安全开发工作流。当需要开发安全工具（调试器、反汇编器、Fuzzer、扫描器、分析工具等）时，应主动（PROACTIVELY）使用此 skill。核心流程：需求分析 → 架构设计 → 引擎实现 → 插件系统 → 测试验证。
 ---
 
-# SecDev Workflow（安全工具开发工作流）
+# SecDev Workflow（安全开发工作流）
 
 ## 适用场景
 
-- 安全工具开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
+- 安全开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
 - 安全工具核心功能扩展
 - 插件系统开发
 - 工具 CLI / GUI 界面开发
@@ -150,7 +150,7 @@ docs(api): update plugin hook reference
 ## 文件输出结构
 
 ```
-xxx-tool/
+xxx-secdev/
 ├── src/
 │   ├── core/           ← 核心引擎
 │   │   ├── engine.py   ← 引擎主体

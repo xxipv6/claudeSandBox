@@ -85,9 +85,9 @@ xxx-research/
 └── .git/
 ```
 
-**安全工具开发**：
+**安全开发**：
 ```
-xxx-tool/
+xxx-secdev/
 ├── src/
 │   ├── core/           ← 核心引擎
 │   ├── plugins/        ← 插件系统
@@ -114,8 +114,8 @@ xxx-tool/
 - `skeptic` - 怀疑论者审计
 - `research-recorder` - 研究记录（步骤记录 / 决策记录 / 文档编写）
 
-**安全工具开发类**（由 `research-planner` 规划，`secdev-engineer` 执行）：
-- `secdev-engineer` - 安全工具开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
+**安全开发类**（由 `research-planner` 规划，`secdev-engineer` 执行）：
+- `secdev-engineer` - 安全开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
 
 **策略指南**：`rules/single-multi-agent-strategy.md`
 

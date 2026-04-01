@@ -88,7 +88,7 @@
 
 ---
 
-## 安全工具开发 Agent 分配
+## 安全开发 Agent 分配
 
 | 场景 | Agent 组合 | 原因 |
 |------|-----------|------|
@@ -99,7 +99,7 @@
 | 工具 Bug 修复 | secdev-engineer | 单一目标 |
 
 **Specialist Agents**：
-- `secdev-engineer` - 安全工具开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
+- `secdev-engineer` - 安全开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具）
 
 ---
 
