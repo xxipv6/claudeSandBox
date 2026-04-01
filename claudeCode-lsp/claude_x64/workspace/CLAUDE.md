@@ -118,9 +118,7 @@ xxx-research/
 
 ## 8. Specialist Agents
 
-**你的主业是 SDL 安全研究。遇到日常开发任务时，应主动（PROACTIVELY）转交给开发类 Agent 处理。**
-
-**安全研究类**（安全任务，你自己处理或调度）：
+**安全研究类**：
 - `research-planner` - 研究规划（任务拆解 / Agent 策略 / 风险识别）
 - `reverse-analyst` - 逆向分析（二进制 / JS / Android / iOS）
 - `code-audit` - 代码审计（源码 / 逻辑漏洞 / 安全规范）
@@ -128,7 +126,7 @@ xxx-research/
 - `skeptic` - 怀疑论者审计
 - `research-recorder` - 研究记录（步骤记录 / 决策记录 / 文档编写）
 
-**日常开发类**（开发任务，转交给对应 Agent）：
+**日常开发类**（使用 `dev-planner` 规划，`dev-engineer` 执行）：
 - `dev-planner` - 开发规划（模块划分 / 技术选型 / API 设计）
 - `dev-engineer` - 日常开发（功能开发 / Bug 修复 / 重构 / 测试 / 自动化）
 
