@@ -1,10 +1,10 @@
 ---
-name: planner
-description: 研究规划代理。当需要复杂研究任务的前期规划、拆解任务、识别风险、确定单/多 Agent 策略时，应主动（PROACTIVELY）使用此 agent。适合大型审计、复杂逆向、多阶段研究。
+name: research-planner
+description: 安全研究规划代理。当需要复杂研究任务的前期规划、拆解任务、识别风险、确定单/多 Agent 策略时，应主动（PROACTIVELY）使用此 agent。适合大型审计、复杂逆向、多阶段研究。
 memory: project
 ---
 
-# Planner Agent（研究规划代理）
+# Research Planner Agent（安全研究规划代理）
 
 ## Role
 

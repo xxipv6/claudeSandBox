@@ -210,11 +210,18 @@ xxx-research/
 ## 8. Specialist Agents
 
 **Specialist Agents 类型**：
+
+**安全研究类**：
+- `research-planner` - 研究规划（任务拆解 / Agent 策略 / 风险识别）
 - `reverse-analyst` - 逆向分析（二进制 / JS / Android / iOS）
 - `code-audit` - 代码审计（源码 / 逻辑漏洞 / 安全规范）
-- `poc-engineer` - 通用开发（PoC / Frida / GDB / IDA / Burp 等）
+- `poc-engineer` - 安全脚本开发（PoC / Exploit / Frida / GDB / IDA / Burp）
 - `skeptic` - 怀疑论者审计
 - `research-recorder` - 研究记录（步骤记录 / 决策记录 / 文档编写）
+
+**日常开发类**：
+- `dev-planner` - 开发规划（模块划分 / 技术选型 / API 设计）
+- `dev-engineer` - 日常开发（功能开发 / Bug 修复 / 重构 / 测试 / 自动化）
 
 **完整指南**：参见 `rules/single-multi-agent-strategy.md`
 

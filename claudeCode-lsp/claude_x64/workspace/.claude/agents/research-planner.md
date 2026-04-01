@@ -1,10 +1,10 @@
 ---
-name: planner
-description: 研究规划代理。当需要复杂研究任务的前期规划、拆解任务、识别风险、确定单/多 Agent 策略时，应主动（PROACTIVELY）使用此 agent。适合大型审计、复杂逆向、多阶段研究。
+name: research-planner
+description: 安全研究规划代理。当需要复杂研究任务的前期规划、拆解任务、识别风险、确定单/多 Agent 策略时，应主动（PROACTIVELY）使用此 agent。适合大型审计、复杂逆向、多阶段研究。
 memory: project
 ---
 
-# Planner Agent（研究规划代理）
+# Research Planner Agent（安全研究规划代理）
 
 ## Role
 
@@ -260,7 +260,7 @@ web-app-audit-research/docs/plans/2026-03-25-web-audit.md
 **研究类 Specialist Agents**：
 - `reverse-analyst` - 逆向分析专家（二进制 / 协议 / 状态机）
 - `code-audit` - 代码审计专家（输入面 / 权限边界）
-- `poc-engineer` - 通用开发工程师
+- `poc-engineer` - PoC 开发专家（验证 / exploit）
 - `skeptic` - 怀疑论者审计专家（反证 / 挑战假设）
 - `research-recorder` - 研究记录专家（步骤记录 / 决策记录 / 文档编写）
 
