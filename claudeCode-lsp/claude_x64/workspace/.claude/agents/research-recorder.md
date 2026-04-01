@@ -38,7 +38,7 @@ memory: project
 
 ## When to Invoke
 
-**由 Research Lead 调用**，当需要：
+**由 SDL 助理调用**，当需要：
 
 ### 记录场景
 - 每完成一个研究步骤
@@ -73,10 +73,23 @@ memory: project
 ### Step Record 格式
 
 ```markdown
-# Step Record: [YYYY-MM-DD-XXX]
+# Step Record: step-N
+
+## 当前状态（Context Recovery）
+
+**研究目标**：[总体研究目标]
+**当前阶段**：[当前处于哪个阶段]
+**已完成**：
+- [已完成的步骤]
+**进行中**：[正在进行的任务]
+**下一步**：[下一步要做什么]
+**关键发现**：
+- [关键发现]
+
+---
 
 ## 基本信息
-- **Step ID**: [YYYY-MM-DD-XXX-YY]
+- **Step ID**: step-N
 - **Decision ID**: [YYYY-MM-DD-XXX]（如适用）
 - **时间**: [YYYY-MM-DD HH:MM:SS]
 - **执行者**: [Research Lead / Specialist Agent Name]
@@ -131,7 +144,7 @@ memory: project
 ## 基本信息
 - **Decision ID**: [YYYY-MM-DD-XXX]
 - **时间**: [YYYY-MM-DD HH:MM:SS]
-- **决策者**: Research Lead AI
+- **决策者**: SDL 助理
 
 ## 研究目标
 [要达成什么]
@@ -268,7 +281,7 @@ memory: project
 
 ### Step Records
 ```
-xxx-research/notes/steps/YYYY-MM-DD-step-description.md
+xxx-research/notes/steps/step-N.md
 ```
 
 ### Decision Records

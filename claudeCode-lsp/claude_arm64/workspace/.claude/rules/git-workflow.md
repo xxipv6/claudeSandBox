@@ -26,7 +26,7 @@ research: identify JWT signature verification bypass
 发现登录模块 JWT 验证缺少签名检查，可以伪造 token 绕过认证。
 
 Decision: 2026-03-25-001
-Step: 2026-03-25-001-02
+Step: step-2
 Agent: Research Lead
 
 - 定位验证函数
@@ -65,7 +65,7 @@ Research Lead: Claude Sonnet"
 git commit -m "evidence: reverse-analyst identifies AES-256 in firmware
 
 Decision: 2026-03-25-002
-Step: 2026-03-25-002-03
+Step: step-3
 Agent: Reverse Analyst
 Finding: Encryption algorithm at 0x401234"
 ```
@@ -74,7 +74,7 @@ Finding: Encryption algorithm at 0x401234"
 git commit -m "poc: JWT forgery exploit verified
 
 Decision: 2026-03-25-001
-Step: 2026-03-25-001-05
+Step: step-5
 Agent: PoC Engineer
 Result: Exploit works with 100% success rate"
 ```
