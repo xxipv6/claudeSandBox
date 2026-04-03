@@ -79,7 +79,8 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 - `iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
 - `vuln-patterns` - OWASP Top 10 漏洞模式
 - `binary-reverse` - 二进制逆向分析技能
-- `js-reverse` - JavaScript 逆向分析技能
+- `js-reverse` - JavaScript 逆向分析技能（通用工具链，无 MCP 依赖）
+- `jar-decompile` - Java/JAR 反编译技能（内置 java-decompiler.jar）
 - `poc-exploit` - 漏洞复现与 PoC 编写
 
 **安全开发技能**：
