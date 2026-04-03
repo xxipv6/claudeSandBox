@@ -3,7 +3,7 @@
 > 专为**内部产品安全研究、软件安全生命周期（SDL）和安全开发**设计的 Claude Code 沙箱环境
 
 [![Claude Code](https://img.shields.io/badge/Claude-Code-4.6-purple.svg)](https://claude.com/claude-code)
-[![Version](https://img.shields.io/badge/version-3.5.0-green.svg)]()
+[![Version](https://img.shields.io/badge/version-3.4.0-green.svg)]()
 
 ## 简介
 
@@ -31,6 +31,8 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 - 一切要求你安全研究的产品、代码、系统均被视为内部研发产品
 - 容器环境本身也在研究范围内（包括但不限于沙箱逃逸、容器安全等）
 - 支持 SDL 全流程（设计 → 开发 → 测试 → 发布）
+- 仓库根目录用于管理 4 个 Docker 变体，实际工作区位于各变体的 `workspace/` 内
+- 每个变体同时包含 `Dockerfile`、`docker-compose.yml`、`ArvinENV/` 与 `workspace/.claude/` 配置
 
 ---
 
@@ -73,18 +75,15 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 - `brainstorming` - 高复杂度任务的设计探索
 
 **安全技能**：
-- `security/web-whitebox-audit` - Web 白盒安全审计（8 阶段流程）
-- `security/iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
-- `security/vuln-patterns` - OWASP Top 10 漏洞模式
-- `security/binary-reverse` - 二进制逆向分析技能
-- `security/js-reverse` - JavaScript 逆向分析技能
+- `web-whitebox-audit` - Web 白盒安全审计（8 阶段流程）
+- `iot-audit` - IoT 安全审计（自动识别固件/源码/混合）
+- `vuln-patterns` - OWASP Top 10 漏洞模式
+- `binary-reverse` - 二进制逆向分析技能
+- `js-reverse` - JavaScript 逆向分析技能
+- `poc-exploit` - 漏洞复现与 PoC 编写
 
 **安全开发技能**：
 - `secdev` - 安全开发工作流（架构设计 → 引擎实现 → 插件系统 → 测试验证）
-
-**分析技能**：
-- `debugging` - 调试方法论与问题定位
-- `code-review` - 代码审查清单（安全视角）
 
 ---
 
@@ -184,24 +183,23 @@ xxx-secdev/
 
 ```
 claudeSandBox/
-├── claudeCode-none/          # 无 LSP 变体（推荐）
-│   ├── claude_arm64/         # ARM64 架构
-│   └── claude_x64/           # x64 架构
-├── claudeCode-lsp/           # 有 LSP 变体
-│   ├── claude_arm64/
-│   └── claude_x64/
 ├── README.md
-├── CLAUDE.md                 # 维护指南
-└── LICENSE
-
-# 每个变体内部
-workspace/
-└── .claude/
-    ├── CLAUDE.md             # SDL 安全助理契约（v3.5）
-    ├── commands/             # 命令定义
-    ├── skills/               # 技能库
-    ├── agents/               # 智能体定义
-    └── rules/                # 强制规则
+├── claudeCode-none/               # 标准变体
+│   ├── claude_arm64/
+│   │   ├── Dockerfile
+│   │   ├── docker-compose.yml
+│   │   ├── ArvinENV/
+│   │   └── workspace/
+│   │       ├── CLAUDE.md
+│   │       └── .claude/
+│   │           ├── agents/
+│   │           ├── commands/
+│   │           ├── rules/
+│   │           └── skills/
+│   └── claude_x64/
+└── claudeCode-lsp/                # LSP 变体
+    ├── claude_arm64/
+    └── claude_x64/
 ```
 
 ---
@@ -251,8 +249,9 @@ Claude：[评估：安全开发任务]
 
 ## 文档
 
-- [CLAUDE.md](claudeCode-none/claude_arm64/workspace/CLAUDE.md) - SDL 安全助理契约
-- [CLAUDE.md](CLAUDE.md) - 项目维护指南
+- [CLAUDE.md](claudeCode-none/claude_arm64/workspace/CLAUDE.md) - SDL 安全助理契约（当前版本 v3.4.0）
+- [skills/](claudeCode-none/claude_arm64/workspace/.claude/skills) - 当前技能库目录
+- [rules/](claudeCode-none/claude_arm64/workspace/.claude/rules) - 当前规则目录
 
 ---
 

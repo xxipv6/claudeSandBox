@@ -92,38 +92,14 @@ RUN mkdir -p /root/ENV/go && \
 COPY ArvinENV/key /root/ENV/ArvinENV/key
 COPY ArvinENV/rms /root/ENV/ArvinENV/rms
 COPY ArvinENV/config /root/ENV/ArvinENV/config
+COPY ArvinENV/fk /root/ENV/ArvinENV/fk
 RUN chmod +x /root/ENV/ArvinENV/key && \
     chmod +x /root/ENV/ArvinENV/rms && \
-    chmod +x /root/ENV/ArvinENV/config
+    chmod +x /root/ENV/ArvinENV/config && \
+    chmod +x /root/ENV/ArvinENV/fk
 
 # tmux 配置 - 启用鼠标滚动和复制
 RUN printf 'set -g mouse on\nsetw -g mode-keys emacs\n' > /root/.tmux.conf
-# ============================================
-# Chromium 浏览器安装（用于 JavaScript 逆向和 MCP 工具）
-# ============================================
-# 安装 Chromium 及其依赖（ARM64 架构使用 Chromium）
-RUN apt-get update && apt-get install -y \
-    chromium-browser \
-    chromium-chromedriver \
-    fonts-liberation \
-    libappindicator3-1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libgbm1 \
-    libgtk-3-0 \
-    libnss3 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libxss1 \
-    xdg-utils \
-    && rm -rf /var/lib/apt/lists/*
-
-# 设置 Chromium 可执行路径
-ENV CHROME_BIN=/usr/bin/chromium-browser \
-    CHROME_PATH=/usr/bin/chromium-browser
 
 # ============================================
 # Node.js 和 Go 配置
@@ -142,13 +118,7 @@ RUN git config --global http.proxy http://${PROXY_HOST}:${PROXY_PORT} && \
 # 安装 Claude Code CLI
 # ============================================
 # 下载安装脚本并执行
-RUN HTTP_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
-    HTTPS_PROXY=http://${PROXY_HOST}:${PROXY_PORT} \
-    http_proxy=http://${PROXY_HOST}:${PROXY_PORT} \
-    https_proxy=http://${PROXY_HOST}:${PROXY_PORT} \
-    curl -fsSL https://claude.ai/install.sh -o /tmp/install.sh && \
-    bash /tmp/install.sh && \
-    rm /tmp/install.sh
+RUN npm install -g @anthropic-ai/claude-code
 
 # ============================================
 # 复制配置文件
@@ -160,8 +130,8 @@ COPY ./.claude /root/.claude
 # ============================================
 RUN cd /workspace && \
     git init && \
-    git config user.email "claude@claude.ai" && \
-    git config user.name "Claude AI" && \
+    git config user.email "Arvin@Arvin.ai" && \
+    git config user.name "Arvin AI" && \
     echo ".claude/" > .gitignore && \
     echo "CLAUDE.md" >> .gitignore && \
     git add .gitignore && \
