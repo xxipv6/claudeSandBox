@@ -1,4 +1,4 @@
-# ARM64 平台 - Claude Code 开发环境
+# AMD64 (x64) 平台 - Claude Code 开发环境
 FROM ubuntu:22.04
 
 # ============================================
@@ -18,9 +18,8 @@ RUN sysctl -w net.ipv6.conf.all.disable_ipv6=1 && \
 # ============================================
 # 系统依赖安装
 # ============================================
-# 配置清华源 (ARM64 使用 ubuntu-ports)
+# 配置清华源 (AMD64 使用标准 ubuntu)
 RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list && \
-    sed -i 's@//.*ports.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn/ubuntu-ports@g' /etc/apt/sources.list && \
     sed -i 's@//.*security.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list
 
 # 安装基础工具和 VS Code 依赖
@@ -57,15 +56,15 @@ RUN mkdir -p /etc/xdg/pip && \
 
 # Go - 使用多个镜像源尝试
 ARG GO_VERSION=1.25.4
-RUN wget -4 https://mirrors.aliyun.com/golang/go${GO_VERSION}.linux-arm64.tar.gz && \
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-arm64.tar.gz && \
-    rm go${GO_VERSION}.linux-arm64.tar.gz
+RUN wget -4 https://mirrors.aliyun.com/golang/go${GO_VERSION}.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
+    rm go${GO_VERSION}.linux-amd64.tar.gz
 
 # Node.js
 ARG NODE_VERSION=24.1.0
-RUN wget https://mirrors.aliyun.com/nodejs-release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.gz && \
-    tar -xzf node-v${NODE_VERSION}-linux-arm64.tar.gz -C /usr/local --strip-components=1 && \
-    rm node-v${NODE_VERSION}-linux-arm64.tar.gz
+RUN wget https://mirrors.aliyun.com/nodejs-release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz && \
+    tar -xzf node-v${NODE_VERSION}-linux-x64.tar.gz -C /usr/local --strip-components=1 && \
+    rm node-v${NODE_VERSION}-linux-x64.tar.gz
 
 # ============================================
 # 工作目录和环境变量
