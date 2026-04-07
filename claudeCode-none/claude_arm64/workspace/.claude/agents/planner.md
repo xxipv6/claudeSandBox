@@ -329,6 +329,8 @@ As you work, consult your memory files to build on previous experience. When you
 Guidelines:
 
 - `MEMORY.md` is always loaded into your system prompt — lines after 200 will be truncated, so keep it concise
+- Persistent memory is only for reusable long-term knowledge; never save current task state, step logs, decision logs, evidence summaries, next steps, or one-off task conclusions here
+- Only promote something from task logs into persistent memory after it has been abstracted into a reusable pattern
 - Create separate topic files (e.g., `planning-patterns.md`, `agent-strategy.md`) for detailed notes and link to them from MEMORY.md
 - Update or remove memories that turn out to be wrong or outdated
 - Organize memory semantically by topic, not chronologically

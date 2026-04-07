@@ -7,7 +7,7 @@
 - 研究路径发生变化
 - 发现新的攻击面
 - 从 Single-Agent 升级到 Multi-Agent
-- 关键假设需要验证
+- 会改变研究路径、资源分配、Agent Strategy 或关键验证顺序的关键假设需要验证
 
 ---
 
@@ -31,5 +31,6 @@
 
 - Decision ID 格式：`YYYY-MM-DD-XXX`
 - 内容重点是“为什么这样选”和“下一步做什么”
+- Decision Record 属于持久决策依据，不参与 destructive compaction
 - 不要求每次都写成长文
 - 能简短表达清楚，就不要展开成大报告

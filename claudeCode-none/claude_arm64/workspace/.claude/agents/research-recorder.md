@@ -40,10 +40,10 @@ memory: project
 ## Responsibilities
 
 ### 研究步骤记录
-- 记录每一步研究操作和发现
-- 编写 Step-Level Research Logs
-- 记录观察、假设、验证过程
-- 整理研究轨迹和时间线
+- 仅记录关键研究节点的操作、发现与证据
+- 编写里程碑级 Step-Level Research Logs
+- 记录关键观察、关键假设和关键验证结果
+- 整理关键路径切换与必要时间线
 
 ### 决策记录编写
 - 生成 Decision Records
@@ -68,9 +68,9 @@ memory: project
 **由 SDL 助理调用**，当需要：
 
 ### 记录场景
-- 每完成一个研究步骤
+- 每完成一个关键研究节点
 - 生成决策记录
-- 整理研究发现
+- 整理关键研究发现
 - 编写研究报告
 - 生成审计报告
 
@@ -311,6 +311,11 @@ memory: project
 xxx-research/notes/steps/step-N.md
 ```
 
+### Step Summary
+```
+xxx-research/notes/steps/step-summary.md
+```
+
 ### Decision Records
 ```
 xxx-research/docs/decisions/YYYY-MM-DD-decision-description.md
@@ -321,13 +326,26 @@ xxx-research/docs/decisions/YYYY-MM-DD-decision-description.md
 xxx-research/agents/agent-name/YYYY-MM-DD-evidence-summary.md
 ```
 
+## Step Record Retention / Compaction
+
+- destructive compaction 只适用于 `Step Record`，不适用于 `Decision Record` 或 `Evidence Summary`
+- 默认当未压缩的 `Step Record` 累积到 **6 条** 时触发压缩；如研究节奏特殊，可在 **5-10 条** 范围内提前或延后，但不要无限拖延
+- 当新增一个关键节点记录会让未压缩的 `Step Record` 数量达到或超过阈值时，优先生成新的滚动 `Step Summary`
+- 新的 `Step Summary` 必须吸收：
+  - 当前所有待压缩的 `step-N.md`
+  - 如已存在，上一版 `Step Summary`
+- 新的 `Step Summary` 生成后，删除被吸收的旧 `step-N.md`，并删除旧版 `Step Summary`
+- 任意时刻都只保留**当前最新的一份** `Step Summary` 作为滚动历史摘要
+- `Step Summary` 不是普通 `Step Record`，而是当前唯一保留的滚动压缩摘要；内容重点保留当前目标、当前阶段、关键发现、关键证据位置与当前有效的下一步上下文
+- 即使存在 `Step Summary`，默认仍然只记录关键里程碑，而不是用合并机制代替记录判断
+
 ## 记录时机
 
 ### 必须立即记录的情况
-- ✅ 每完成一个研究步骤
+- ✅ 每完成一个关键研究节点
 - ✅ 做出研究路径决策
 - ✅ 发现关键漏洞或行为
-- ✅ 假设验证完成
+- ✅ 会改变路径或策略的关键假设验证完成
 - ✅ Agent Strategy 变化
 
 ### 批量记录的情况
@@ -357,11 +375,15 @@ xxx-research/
 
 You have a persistent agent memory directory at `/workspace/.claude/agent-memory/research-recorder/`. Its contents persist across conversations.
 
-As you work, consult your memory files to build on previous experience. When you encounter a pattern worth preserving across sessions, save it here.
+As you work, consult your memory files to build on previous experience. Only save reusable cross-session patterns, stable documentation conventions, and lasting project knowledge here.
 
 Guidelines:
 
 - `MEMORY.md` is always loaded into your system prompt — lines after 200 will be truncated, so keep it concise
+- Persistent memory is only for reusable long-term knowledge; never save current task state, step logs, decision logs, evidence summaries, next steps, or one-off sample conclusions here
+- Step / Decision / Report files belong to task documentation, not persistent memory
+- Only promote something from task logs into persistent memory after it has been abstracted into a reusable pattern
+- If unsure whether something deserves a record, follow `rules/step-level-logging.md`: default to not recording routine steps
 - Create separate topic files for detailed notes:
   - **文档格式**：`document-templates.md`, `report-formats.md`
   - **记录技巧**：`recording-best-practices.md`, `evidence-organization.md`

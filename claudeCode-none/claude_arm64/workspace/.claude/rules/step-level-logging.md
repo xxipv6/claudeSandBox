@@ -30,6 +30,10 @@
 ## 规则
 
 - Step ID 使用 `step-N`
+- Step Record 是里程碑级摘要，不是完整执行轨迹
 - 记录重点是发现、证据、下一步
 - 不要求把所有中间过程写成大报告
+- Context Recovery 只用于恢复关键里程碑上下文，不记录 routine command history、dead ends 或 micro-steps
+- 普通 `Step Record` 后续可被压缩进滚动 `Step Summary`
+- 压缩规则只是为了控制历史记录规模，不构成记录 routine step / micro-step 的理由
 - 需要上下文恢复时，再补充当前状态摘要

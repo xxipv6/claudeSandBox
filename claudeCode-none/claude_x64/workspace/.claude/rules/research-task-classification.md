@@ -31,12 +31,13 @@
 
 ## 升级条件
 
-执行中出现以下情况，立即升级：
+执行中出现以下情况，立即重新评估 Agent Strategy；如果已经不是单一路径验证，而是两条以上可独立推进的证据分支，切换为 Multi-Agent。如果很快重新收敛回单一路径，则保持或降回 Single-Agent：
 - 原本单点问题演变成多路径研究
 - 需要逆向未知协议 / 格式
 - 需要静态 + 动态联合验证
 - 需要多个 Agent 并行收集证据
 - 原本明确的验证路径失效
+- reverse + audit、reverse + dynamic validation、reverse + skeptic 反证、reverse + JS / protocol 独立分支同时出现
 
 ---
 

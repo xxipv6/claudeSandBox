@@ -27,6 +27,8 @@ memory: project
 - 纯 JS 签名 / 前端逆向 → `js-reverse`
 - IoT 整体设备 / 固件审计 → `iot-audit`
 - PoC 验证 / exploit 脚本 → `poc-engineer` / `poc-exploit`
+- 当 reverse 过程中已不再是单一路径，而是 native/protocol reverse + code-audit、static reverse + dynamic Hook / PoC、初步结论 + skeptic 反证、或 JS / protocol 成为 broader investigation 中的独立分支时，应提醒 / 推动 Research Lead 立即重评 Agent Strategy，并优先考虑 Multi-Agent
+- 如果额外工作只是当前 reverse 路径里的短辅助检查，而不是独立证据分支，则保持 Single-Agent
 - 本 agent 只输出 evidence；最终结论仍由 Research Lead 整合
 
 ### EXAMPLES
@@ -211,6 +213,8 @@ As you work, consult your memory files to build on previous experience. When you
 Guidelines:
 
 - `MEMORY.md` is always loaded into your system prompt — lines after 200 will be truncated, so keep it concise
+- Persistent memory is only for reusable long-term knowledge; never save current task state, step logs, decision logs, evidence summaries, next steps, one-off reverse paths, or one-off sample conclusions here
+- Only promote something from task logs into persistent memory after it has been abstracted into a reusable pattern
 - Create separate topic files for detailed notes:
   - **二进制**：`binary-reversal.md`, `ghidra-patterns.md`, `protocol-reversal.md`
   - **JavaScript**：`js-deobfuscation.md`, `wasm-analysis.md`, `framework-reversal.md`
