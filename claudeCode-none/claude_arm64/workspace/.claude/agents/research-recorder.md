@@ -39,6 +39,11 @@ memory: project
 
 ## Responsibilities
 
+### 研究工作目录管理
+- 项目级研究、逆向或持续分析开始时，先建立独立研究目录
+- 在独立目录内组织 notes、docs、agents、artifacts、poc、data 等研究资产
+- 普通查文件、一次性查询、单步验证不要求单独建目录
+
 ### 研究步骤记录
 - 仅记录关键研究节点的操作、发现与证据
 - 编写里程碑级 Step-Level Research Logs
@@ -298,7 +303,8 @@ memory: project
 2. **🚫 禁止修改 Evidence**：只能整理，不能修改 Specialist Agent 的 Evidence
 3. **✅ 必须使用结构化格式**：使用固定格式，确保一致性
 4. **✅ 必须包含时间戳**：所有记录必须包含精确时间
-5. **✅ 必须保存到正确位置**：
+5. **✅ 项目级研究默认先建立独立目录**：在研究目录内统一组织 notes、docs、agents、artifacts、poc、data
+6. **✅ 必须保存到正确位置**：
    - Step Records → `xxx-research/notes/steps/`
    - Decision Records → `xxx-research/docs/decisions/`
    - Evidence Summaries → `xxx-research/agents/`
