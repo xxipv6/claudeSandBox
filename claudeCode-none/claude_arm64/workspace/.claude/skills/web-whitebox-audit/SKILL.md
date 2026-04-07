@@ -1,18 +1,36 @@
 ---
 name: web-whitebox-audit
-description: Web 白盒安全审计。当审计 Web 应用代码、识别漏洞（注入/越权/逻辑缺陷）、分析安全风险时，应主动（PROACTIVELY）使用此 skill。
+description: 触发于 Web 应用源码白盒审计、路由/控制器/中间件/权限模型分析，以及 IDOR、越权、业务逻辑缺陷、注入链路排查。不要用于通用源码审计、PoC 编写或二进制逆向。
 disable-model-invocation: false
 ---
 
 # Web 白盒安全审计
 
-## 何时启用
+## Trigger
 
-- 用户请求 Web 应用安全审计
-- 检测到 Web 应用代码（Spring / Django / Express / Gin 等）
-- 需要识别注入漏洞、越权、逻辑缺陷
-- 需要分析跨接口、跨状态联动风险
-- 代码审查涉及安全问题
+### TRIGGER WHEN
+- 用户请求审计 Web 应用、API、后台系统、BFF 或微服务接口代码
+- 检测到 Spring / Django / Flask / Express / Gin / FastAPI / Laravel 等 Web 框架
+- 需要分析路由、控制器、中间件、过滤器、拦截器、服务层权限校验
+- 需要排查 IDOR、越权、认证绕过、业务逻辑缺陷、跨接口状态联动风险
+- 需要还原真实请求执行链，而不是只看单点漏洞
+
+### DO NOT TRIGGER WHEN
+- 只是普通源码安全审计，且不涉及完整 Web 请求流或业务流
+- 只需要编写 PoC、exploit 或复现脚本
+- 任务是二进制、固件或协议逆向
+- 任务重点是 CWE/OWASP 映射或修复建议总结
+
+### USE WITH
+- 需要漏洞模式归类或修复建议时配合 `vuln-patterns`
+- 需要复现和验证可利用性时配合 `poc-exploit`
+- 非 Web 源码审计优先交给 `code-audit`
+
+### EXAMPLE PROMPTS
+- “白盒审计这个 Django 应用的 IDOR 和 auth bypass”
+- “帮我审查这些 Express routes 和 middleware 的权限边界”
+- “看看这个 Spring Boot 后台有没有跨接口业务逻辑漏洞”
+- “分析这个 Web 管理系统的请求链和越权风险”
 
 ---
 

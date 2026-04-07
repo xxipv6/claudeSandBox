@@ -1,22 +1,40 @@
 ---
 name: js-reverse
-description: JavaScript 逆向工程与签名还原。当需要分析 JS 混淆、提取签名算法、还原加密逻辑、动态 Cookie/WASM 逆向、接口自动化时，应主动（PROACTIVELY）使用此 skill。
+description: 触发于需要分析 JavaScript 混淆、签名算法、动态 Cookie、浏览器侧加密逻辑、WASM-in-JS 或将前端算法还原为可复用代码的任务。不要用于 native 二进制、JAR/class、普通源码审计或通用 PoC 复现。
 disable-model-invocation: false
 ---
 
 # JavaScript 逆向工程与签名还原
 
-## 何时启用
+## Trigger
 
-- 用户请求分析 JS 混淆代码、还原签名算法
-- 需要提取请求参数签名（sign/m/token）
+### TRIGGER WHEN
+- 用户请求分析 JS 混淆代码、还原签名算法或定位前端加密逻辑
+- 需要提取请求参数签名（sign / m / token）
 - 需要还原动态 Cookie 生成逻辑
-- 需要分析响应数据加密/解密
-- 需要逆向 WASM 加密算法
-- 需要处理 TLS 指纹/协议对抗
-- 需要实现 Node.js 接口自动化
-- 需要处理 WebSocket 通信签名
-- 需要字体映射还原
+- 需要分析响应数据加密 / 解密流程
+- 需要逆向浏览器上下文中的 WASM、WebSocket 签名或前端加密调用链
+- 需要把浏览器侧算法还原为 Node.js 可复用代码
+
+### DO NOT TRIGGER WHEN
+- 目标是 ELF / PE / Mach-O / so / dll / APK / IPA 等 native 或移动端 reverse
+- 目标是 `.jar`、`.class`、`classes.jar` 反编译
+- 任务本质上是普通源码审计、漏洞分类、修复建议总结
+- 任务本质上是 PoC 验证、漏洞利用复现，而不是算法还原
+- 任务已经扩展成 broader protocol / mobile / binary reverse 调查
+
+### USE WITH
+- broader reverse / mobile / protocol / native 场景交给 `reverse-analyst`
+- 纯 JS 签名、Cookie、前端 crypto、WASM-in-JS 场景优先使用本 skill
+- 漏洞验证与复现交给 `poc-exploit`
+- 如果任务从 JS 逆向扩展成安全工具开发，交给 `secdev`
+- 本 skill 不覆盖 `workspace/CLAUDE.md` 的顶层路由规则
+
+### EXAMPLE PROMPTS
+- “分析这个站的 sign 和动态 cookie”
+- “把这个前端加密逻辑还原成 Node.js”
+- “看看这个 webpack 包里的签名算法在哪里”
+- “逆向这个页面里的 wasm 加密流程”
 
 ---
 

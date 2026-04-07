@@ -1,79 +1,37 @@
 ---
 name: brainstorming
-description: 设计探索技能。在进行任何创造性工作之前必须使用此技能——包括创建功能、构建组件、添加行为、修改行为等。仅在用户明确要求时使用。
+description: 触发于用户明确要求先做设计探索、比较多个方案或发散实现方向的任务。不要把它当成所有创造性工作的全局前置入口；顶层路由仍由 workspace/CLAUDE.md 决定。
 disable-model-invocation: false
 ---
 
 # 设计探索技能（Brainstorming）
 
-## 何时激活
+## Trigger
 
-### 自动识别与触发
+### TRIGGER WHEN
+- 用户明确要求“先 brainstorm / 先发散方案 / 先比较设计方向 / 先做设计探索”
+- 任务已经确定需要先做方案探索，但目标是比较 2–3 个设计方向，而不是直接进入实现规划
+- 需要先讨论架构取舍、组件划分、交互方案或实现方向，再决定后续计划
+- 需要把多个可行方案整理成用户可选择的设计选项
 
-**触发条件（自动识别）**：
+### DO NOT TRIGGER WHEN
+- `workspace/CLAUDE.md` 已经可以直接判定为 direct execution 的小任务
+- 任务只是常规 Plan Mode 规划，不需要额外的发散式设计探索
+- 任务本质上是安全研究、漏洞审计、PoC 验证、逆向分析或漏洞分类
+- 用户已经给出了明确实施路径，只需要执行或拆解计划
+- 任务只是查询、读文件、简单修复、文档修改或配置调整
 
-当识别到以下**高复杂度**任务类型时，**自动启用** brainstorming：
+### USE WITH
+- 顶层路由以 `workspace/CLAUDE.md` 为准；本 skill 不覆盖 direct execution / must plan first / must use agent 规则
+- 设计方向确定后，再交给 `planner`、Plan Mode 或对应实现 agent / skill
+- 安全研究场景优先交给 `web-whitebox-audit`、`poc-exploit`、`js-reverse`、`binary-reverse`、`iot-audit` 等专用 skill
+- 安全工具开发场景在需要先比较设计方向时可短暂配合 `secdev`
 
-- 系统架构设计或重构
-- 跨多个模块/组件的集成
-- 需要探索多种技术方案的选择
-- 影响系统核心逻辑的变更
-
-**不触发的情况**：
-
-- 单文件、单函数的简单修改
-- 明确的实现任务（方案已确定）
-- 文件操作、查询、信息查看
-- **安全研究和 PoC 开发**（使用相应的 security skills）
-
-### 用户主动要求
-
-当用户明确说以下内容时，直接启用：
-
-- "使用 brainstorming"
-- "先进行设计探索"
-- "帮我设计方案"
-- "探索一下方案"
-
-**询问方式**：
-```xml
-<tool_calls>
-<invoke name="AskUserQuestion">
-<parameter name="questions">[{
-  "question": "检测到这是一个[高/中低]复杂度任务：[任务描述]。是否需要使用 brainstorming 进行设计探索？",
-  "header": "设计探索",
-  "options": [
-    {
-      "label": "需要 brainstorming",
-      "description": "进行设计探索，探索多种方案后再实现"
-    },
-    {
-      "label": "不需要，直接规划",
-      "description": "跳过设计探索，直接进入任务规划阶段"
-    }
-  ],
-  "multiSelect": false
-}]</parameter>
-</invoke>
-</tool_calls>
-```
-
-### 用户明确要求使用
-
-当用户明确说以下内容时，直接使用（无需询问）：
-
-- "使用 brainstorming"
-- "先进行设计探索"
-- "帮我设计方案"
-- "探索一下方案"
-
-### 不需要使用（直接执行）
-
-- 文件操作：解压、复制、移动、删除
-- 查询操作：查看文件、搜索代码、查看日志
-- 简单命令：ls, cat, grep, find
-- 信息查看：git status, git log, ps aux
-- **安全研究**：PoC 编写、漏洞验证（直接使用 poc-exploit skill）
+### EXAMPLE PROMPTS
+- “先帮我发散几个设计方向，再决定怎么做”
+- “这个功能先别写，先给我 3 个方案比较一下”
+- “帮我设计一下这个系统该怎么拆模块”
+- “先 brainstorm 一下实现路径”
 
 ---
 
@@ -92,7 +50,7 @@ brainstorming {
   approve [label="使用 AskUserQuestion 等待用户批准\n⚠️ 呈现方案后必须立即停止！", shape=diamond, style=filled, fillcolor=yellow]
   modify [label="根据用户反馈修改", shape=ellipse]
   write_doc [label="撰写设计文档\n保存到 docs/specs/"]
-  call_planner [label="调用 research-planner agent\n生成执行计划", shape=ellipse, style=filled, fillcolor=lightgreen]
+  call_planner [label="调用 planner agent\n生成执行计划", shape=ellipse, style=filled, fillcolor=lightgreen]
 
   start -> explore
   explore -> clarify
@@ -232,7 +190,7 @@ A: [用户回答]
   "options": [
     {
       "label": "批准并开始规划",
-      "description": "批准设计方案，进入 research-planner 任务规划阶段"
+      "description": "批准设计方案，进入 planner 任务规划阶段"
     },
     {
       "label": "需要修改方案",
@@ -262,9 +220,9 @@ A: [用户回答]
 系统会显示 UI 让用户选择，然后将用户选择返回给你。
 
 **收到用户选择后**：
-- 如果选择"批准并开始规划" → 撰写设计文档 → 调用 research-planner
+- 如果选择"批准并开始规划" → 撰写设计文档 → 调用 planner
 - 如果选择"需要修改方案" → 根据意见修改 → 再次调用 AskUserQuestion
-- 如果选择"跳过设计阶段" → 直接调用 research-planner
+- 如果选择"跳过设计阶段" → 直接调用 planner
 
 **示例对话**：
 ```
@@ -283,7 +241,7 @@ AI: [设计方案输出完成]
 
 AI: 收到用户批准。
     ↓
-    撰写设计文档 → 调用 research-planner...
+    撰写设计文档 → 调用 planner...
 ```
 
 ---
@@ -341,20 +299,20 @@ AI: 收到用户批准。
 
 ---
 
-### 6. 调用 research-planner agent
+### 6. 调用 planner agent
 
-**撰写设计文档后**，调用 research-planner agent 生成执行计划：
+**撰写设计文档后**，调用 planner agent 生成执行计划：
 
 ```
 设计方案已获得用户批准，设计文档已保存到 xxx-project/docs/specs/。
 
-现在调用 research-planner agent 生成执行计划...
+现在调用 planner agent 生成执行计划...
 ```
 
-> **brainstorming vs research-planner 的区别**：
+> **brainstorming vs planner 的区别**：
 > - **brainstorming（设计阶段）**：探索多种技术方案、架构设计、组件设计
-> - **research-planner（规划阶段）**：拆解任务、制定执行计划、识别风险和依赖
-> - **流程**：brainstorming → 用户批准 → research-planner → 执行
+> - **planner（规划阶段）**：拆解任务、制定执行计划、识别风险和依赖
+> - **流程**：brainstorming → 用户批准 → planner → 执行
 
 ---
 
@@ -418,7 +376,7 @@ AI: 收到用户批准。
 - [ ] 呈现设计（架构、组件、数据流、错误处理、测试）
 - [ ] 使用 AskUserQuestion 等待用户批准
 - [ ] 撰写设计文档（用户批准后）
-- [ ] 调用 research-planner agent
+- [ ] 调用 planner agent
 
 ---
 
@@ -461,9 +419,9 @@ A: 暂时不需要
 # 6. 撰写设计文档
 保存到 login-project/docs/specs/2026-03-16-login-design.md
 
-# 7. 调用 research-planner
+# 7. 调用 planner
 设计方案已获得用户批准，设计文档已保存。
-现在调用 research-planner agent 生成执行计划...
+现在调用 planner agent 生成执行计划...
 ```
 
 ---

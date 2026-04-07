@@ -1,18 +1,37 @@
 ---
 name: vuln-patterns
-description: OWASP Top 10 和常见 CWE 漏洞模式、识别方法、利用场景和修复方案。进行安全代码审计、编写安全测试或修复漏洞时，应主动（PROACTIVELY）使用此 skill。
+description: 触发于需要进行漏洞模式识别、CWE/OWASP 映射、成因解释或修复建议总结的任务。不要把它当成通用审计主入口；优先让具体 workflow skill 先处理具体场景。
 disable-model-invocation: false
 ---
 
 # 漏洞模式 (Vulnerability Patterns)
 
-## 何时激活 (When to Activate)
+## Trigger
 
-- 进行安全代码审计时
-- 编写安全测试用例时
-- 进行渗透测试时
-- 设计安全架构时
-- 修复安全漏洞时
+### TRIGGER WHEN
+- 需要判断某段代码或发现属于什么漏洞模式
+- 需要做 CWE / OWASP Top 10 映射
+- 需要总结漏洞成因、利用条件或修复建议
+- 需要编写安全测试点、审计 checklist 或 remediation guidance
+- 用户明确询问 “这属于什么漏洞 / 怎么修 / 对应哪个 CWE”
+
+### DO NOT TRIGGER WHEN
+- 已经明确是 Web 白盒、IoT 审计、二进制逆向、JAR 反编译等具体 workflow 任务
+- 任务重点是开放式发现攻击面，而不是模式分类
+- 只需要 PoC、exploit 或复现脚本
+- 只需要具体实现，不需要漏洞模式归纳
+
+### USE WITH
+- Web 场景配合 `web-whitebox-audit`
+- 复现验证配合 `poc-exploit`
+- 通用源码审计配合 `code-audit`
+- IoT / binary / jar 等具体流程结束后再用来映射与总结
+
+### EXAMPLE PROMPTS
+- “这个代码模式属于哪类漏洞？”
+- “把这几个发现映射到 CWE 和 OWASP Top 10”
+- “给我这个越权问题的修复建议和 checklist”
+- “总结这类注入问题的识别方法和 remediation”
 
 ---
 

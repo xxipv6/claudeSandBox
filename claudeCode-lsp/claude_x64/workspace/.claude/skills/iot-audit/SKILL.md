@@ -1,18 +1,36 @@
 ---
 name: iot-audit
-description: IoT 安全审计（自动识别版）。当审计 IoT 设备、固件、嵌入式系统时，应主动（PROACTIVELY）使用此 skill。可自动识别资产形态（固件/源码/混合），系统性识别远程攻击、局域网攻击、物理攻击与长期控制风险。
+description: 触发于需要审计路由器、摄像头、嵌入式设备、固件镜像、rootfs、bootloader、升级链或设备源码的场景。不要用于普通 Web 审计、通用源码审计或单个二进制的局部逆向。
 disable-model-invocation: false
 ---
 
 # IoT 安全审计（自动识别版）
 
-## 何时启用
+## Trigger
 
-- 用户请求 IoT 设备安全审计
-- 检测到固件文件（.bin / .img / .trx / .fw）
-- 检测到嵌入式系统源码（含 bootloader / kernel / rootfs）
-- 分析路由器、摄像头、IoT 设备等嵌入式设备
-- 审计固件升级链、默认凭证、后门
+### TRIGGER WHEN
+- 用户请求审计路由器、摄像头、智能家居、工控或其他嵌入式设备
+- 检测到 `.bin` / `.img` / `.trx` / `.fw` / rootfs / squashfs / cramfs / jffs2 等固件资产
+- 需要分析 bootloader、kernel、rootfs、升级机制、默认凭证、后门或持久化风险
+- 需要在 “仅固件 / 仅源码 / 固件+源码” 三类 IoT 资产间自动判断路径
+- 需要从远程、局域网、物理接触三个攻击者模型审计设备
+
+### DO NOT TRIGGER WHEN
+- 只是普通 Web 应用或后台系统白盒审计
+- 只是某个单独二进制文件的逆向分析
+- 只是普通源码安全审计，没有设备/固件/嵌入式上下文
+- 只需要 `.jar` / `.class` 反编译或一次性 PoC 复现
+
+### USE WITH
+- 固件中的单个 native 组件深挖可配合 `binary-reverse`
+- 需要 Web 管理后台白盒时可配合 `web-whitebox-audit`
+- 需要验证设备漏洞可利用性时可配合 `poc-exploit`
+
+### EXAMPLE PROMPTS
+- “审计这个路由器固件升级链有没有签名绕过”
+- “分析这个摄像头 rootfs 里的默认凭证和后门”
+- “这个嵌入式设备源码+固件一起看，给我完整审计路径”
+- “检查这个 IoT 设备有没有长期持久化风险”
 
 ---
 

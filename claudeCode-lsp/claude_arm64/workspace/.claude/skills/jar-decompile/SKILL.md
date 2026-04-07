@@ -1,17 +1,34 @@
 ---
 name: jar-decompile
-description: Java/JAR 反编译工具使用说明。当需要使用内置 decompiler 处理 JAR、class、classes.jar 时，应主动（PROACTIVELY）使用此 skill。
+description: 触发于需要反编译 `.jar`、`.class`、`classes.jar` 或使用内置 Java decompiler 还原可读源码的任务。不要用于普通 Java 源码审计、native 二进制逆向或通用漏洞分析。
 disable-model-invocation: false
 ---
 
 # Java/JAR 反编译工具使用说明
 
-## 何时启用
+## Trigger
 
-- 用户要反编译 `.jar`
-- 用户要处理 `classes.jar`
-- 用户要把 `.class` / Java 归档还原成可读源码
-- 用户要知道这个内置反编译工具怎么运行
+### TRIGGER WHEN
+- 用户要反编译 `.jar`、`.class`、`classes.jar`
+- 用户要把 Java 归档还原成可读源码
+- 用户明确询问内置 decompiler 怎么运行
+- 输入资产本身就是 Java 编译产物而不是源代码
+
+### DO NOT TRIGGER WHEN
+- 已经有 Java 源代码，只需要做安全审计
+- 目标是 native 可执行文件、`.so`、ELF、PE 等二进制
+- 任务是 Android / IoT / Web 的整体审计，而非 Java 归档反编译本身
+- 只需要做漏洞分类、修复建议或 PoC 复现
+
+### USE WITH
+- 反编译完成后做源码安全审计可交给 `code-audit`
+- 如果是 Android / 混合样本中的其他组件分析，再按场景选择对应 skill
+
+### EXAMPLE PROMPTS
+- “把这个 classes.jar 反编译出来”
+- “这个 .class 文件怎么还原成 Java 源码？”
+- “告诉我内置 jar decompiler 的标准命令”
+- “先把这个 jar 解出来再给我看源码”
 
 ---
 

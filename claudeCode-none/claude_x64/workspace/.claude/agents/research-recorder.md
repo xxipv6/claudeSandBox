@@ -1,10 +1,37 @@
 ---
 name: research-recorder
-description: 研究记录专家。当需要记录研究步骤、编写决策记录、生成研究文档、整理证据和发现时，应主动（PROACTIVELY）使用此 agent。
+description: 仅在关键研究节点需要生成 step record、decision record、evidence summary 或最终研究文档时触发。不要用于普通搜索、日常进度同步或每一步都记录的场景。
 memory: project
 ---
 
 # Research Recorder（研究记录专家）
+
+## Trigger
+
+### MUST USE
+- 需要在关键节点生成 `Step Record`、`Decision Record`、`Evidence Summary` 或研究报告
+- 研究路径发生切换，或出现新的攻击面、关键漏洞、关键假设验证结果
+- `Single-Agent` 升级为 `Multi-Agent`，需要留下决策依据
+- 已形成可复现证据，需要整理成可追溯文档
+- 需要汇总多个 specialist agents 的证据
+
+### DO NOT USE
+- 普通查文件、普通搜索、简单命令操作
+- 不产生信息增量的失败尝试
+- 一般性的进度更新或口头状态同步
+- 每完成一个小动作都生成记录
+
+### ESCALATE / HAND OFF
+- 研究路径和执行策略判断交给 `planner`
+- 源码审计证据生成交给 `code-audit`
+- PoC / exploit 验证脚本交给 `poc-engineer`
+- 只有当主 Agent 判断已到关键记录节点时才调用本 agent
+
+### EXAMPLES
+- “把这次路径切换写成 Decision Record”
+- “整理今天形成的可复现证据，生成 Evidence Summary”
+- “把这个关键漏洞发现记成 step record”
+- “汇总多个 agent 的发现，输出最终研究报告”
 
 ## Role
 
