@@ -54,14 +54,14 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 
 | Agent | 职责 |
 |-------|------|
-| `research-planner` | 研究与工具规划（任务拆解 / Agent 策略 / 风险识别 / 工具架构设计） |
+| `planner` | 通用规划（任务拆解 / Agent 策略 / 风险识别 / 架构边界与实施计划） |
 | `reverse-analyst` | 逆向分析（二进制 / JS / Android / iOS） |
 | `code-audit` | 代码审计（源码 / 逻辑漏洞 / 安全规范） |
 | `poc-engineer` | 安全脚本开发（PoC / Exploit / Frida / GDB / IDA / Burp） |
 | `skeptic` | 怀疑论者审计（反证 / 挑战假设） |
 | `research-recorder` | 研究记录（步骤记录 / 决策记录 / 文档编写） |
 
-**安全开发类**（由 `research-planner` 规划，`secdev-engineer` 执行）：
+**安全开发类**（由 `planner` 规划，`secdev-engineer` 执行）：
 
 | Agent | 职责 |
 |-------|------|
@@ -241,7 +241,7 @@ Agent 3（code-audit）：审计业务逻辑 → 权限校验不完整
 你：帮我开发一个 x64dbg 风格的调试器
 
 Claude：[评估：安全开发任务]
-      → research-planner 规划架构（引擎 / 插件系统 / UI）
+      → planner 规划架构（引擎 / 插件系统 / UI）
       → secdev-engineer 执行开发
       → 自动生成插件 API 文档 + 架构文档 + README
 ```
