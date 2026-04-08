@@ -1,6 +1,13 @@
 ---
 name: code-audit
+runtime_subagent: Explore
 description: 触发于源码级安全审计、逻辑漏洞分析、权限边界检查、输入验证和安全编码审查。不要用于完整 Web 白盒流程、PoC 编写或二进制逆向。
+invocation_template: |
+  Agent(
+      description="代码审计: {target}",
+      prompt="对以下目标进行源码安全审计...",
+      subagent_type="Explore"
+  )
 memory: project
 ---
 

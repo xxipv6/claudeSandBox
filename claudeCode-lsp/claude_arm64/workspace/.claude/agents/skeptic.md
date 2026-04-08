@@ -1,6 +1,13 @@
 ---
 name: skeptic
+runtime_subagent: general-purpose
 description: 触发于需要反证假设、挑战初步结论、寻找反例、识别异常模式或测试证据边界的任务。不要把它当成默认 auditor 或默认伴随 agent；顶层路由仍由 workspace/CLAUDE.md 决定。
+invocation_template: |
+  Agent(
+      description="假设验证: {hypothesis}",
+      prompt="对以下假设进行反证和挑战...",
+      subagent_type="general-purpose"
+  )
 memory: project
 ---
 

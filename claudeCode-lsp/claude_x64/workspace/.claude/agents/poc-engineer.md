@@ -1,6 +1,13 @@
 ---
 name: poc-engineer
+runtime_subagent: general-purpose
 description: 触发于需要编写 PoC、exploit、Frida/GDB/IDA/Burp 脚本来验证漏洞、复现问题或自动化安全分析。不要用于开放式审计、纯规划或通用工具平台开发。
+invocation_template: |
+  Agent(
+      description="PoC开发: {vulnerability}",
+      prompt="为以下漏洞编写验证脚本...",
+      subagent_type="general-purpose"
+  )
 memory: project
 ---
 

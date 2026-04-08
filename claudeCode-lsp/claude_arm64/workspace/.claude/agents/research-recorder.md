@@ -1,6 +1,13 @@
 ---
 name: research-recorder
+runtime_subagent: general-purpose
 description: 仅在关键研究节点需要生成 step record、decision record、evidence summary 或最终研究文档时触发。不要用于普通搜索、日常进度同步或每一步都记录的场景。
+invocation_template: |
+  Agent(
+      description="研究记录: {record_type}",
+      prompt="生成以下类型的研究记录...",
+      subagent_type="general-purpose"
+  )
 memory: project
 ---
 

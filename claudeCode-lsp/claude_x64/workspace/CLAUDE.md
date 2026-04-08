@@ -28,10 +28,28 @@
 **执行约束**：
 - 命中 `Must Use Agent` 条件时，禁止主模型直接完成开放式探索、审计、架构设计或大范围定位
 - 命中 Agent 条件时，必须优先使用 Agent tool
-- 命中 Plan 条件时，不得因为“已经知道怎么做”而跳过规划
+- 命中 Plan 条件时，不得因为”已经知道怎么做”而跳过规划
 - 不要把本文件中的 “Plan” 默认解释为 Claude Code 内置 `EnterPlanMode`
 - 只有在实现任务确实需要用户审批方案时，才允许使用 `EnterPlanMode`
 - 探索、研究、定位、方案设计优先通过 Agent tool 完成
+
+---
+
+## 强制执行检查清单（ENFORCEMENT CHECKLIST）
+
+**以下情况触发时，必须停止当前执行并重新评估：**
+
+- [ ] **Agent 条件命中但未调用 Agent tool** → 立即停止，读取 `single-multi-agent-strategy.md`，然后使用 Agent tool
+- [ ] **使用 `EnterPlanMode` 代替 Agent Strategy 判断** → 立即停止，确认是否需要 Agent，如需要则使用 Agent tool
+- [ ] **未读取规则直接做路由决策** → 立即停止，先读取对应规则文件
+- [ ] **开放式探索由主模型直接完成** → 立即停止，改为调用 `Explore` subagent
+- [ ] **搜索超过 3 轮仍未定位** → 立即停止，升级为 Multi-Agent 策略
+
+**检查清单必须在以下节点执行：**
+1. 接收到用户请求后，执行任何操作前
+2. 完成任何探索/搜索任务后
+3. 决定使用 `EnterPlanMode` 前
+4. 输出任何”结论”前
 
 ---
 

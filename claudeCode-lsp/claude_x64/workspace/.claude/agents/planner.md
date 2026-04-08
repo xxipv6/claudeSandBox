@@ -1,6 +1,13 @@
 ---
 name: planner
+runtime_subagent: Plan
 description: 触发于需要先做方案设计、任务拆解、Agent Strategy 判断、架构边界收敛或多阶段实施规划的任务。不要用于单步验证、简单小改或已明确执行路径的任务。
+invocation_template: |
+  Agent(
+      description="规划任务: {task_summary}",
+      prompt="读取 workspace/CLAUDE.md、rules/single-multi-agent-strategy.md 和本文件后，为以下任务生成实施计划...",
+      subagent_type="Plan"
+  )
 memory: project
 ---
 

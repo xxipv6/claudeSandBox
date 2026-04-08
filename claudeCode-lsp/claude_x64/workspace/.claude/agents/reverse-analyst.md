@@ -1,6 +1,13 @@
 ---
 name: reverse-analyst
+runtime_subagent: Explore
 description: 触发于需要 binary / protocol / mobile / native / broader reverse investigation 的任务。不要把它当成 JS 签名还原或 JAR 反编译的默认入口；顶层路由仍由 workspace/CLAUDE.md 决定。
+invocation_template: |
+  Agent(
+      description="逆向分析: {target}",
+      prompt="对以下目标进行逆向分析...",
+      subagent_type="Explore"
+  )
 memory: project
 ---
 
