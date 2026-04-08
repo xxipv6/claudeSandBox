@@ -36,9 +36,7 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 
 ---
 
-## SDL 安全助理
-
-**角色定位**：内部产品安全研究 SDL 助理
+## 工作模式
 
 **权限边界**：
 
@@ -48,30 +46,31 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 
 **核心工作原则**：遇到流程分支时，主动使用多个子 Agent 后台并行分析（`run_in_background=true`）。
 
-### Specialist Agents
+### Agent 映射
 
-> **角色说明**：下表中的 Agent 名称为**逻辑角色**，实际运行时通过 Claude Code Agent tool 的 subagent 调用。逻辑角色与运行时 subagent 的映射关系：
+> **说明**：下表中的 Agent 名称为**逻辑功能**，实际运行时通过 Claude Code Agent tool 的 subagent 调用。
+> **逻辑功能到运行时 subagent 的映射**：
 > - `planner` / `system-architect` → `Plan` subagent
 > - `research` / `reverse-analyst` / `code-audit` → `Explore` 或 `general-purpose`
 > - `dev` / `reviewer` / `doc-updater` / `poc-engineer` / `secdev-engineer` → `general-purpose`
 > - Claude Code / Claude API / Agent SDK 问题 → `claude-code-guide`
 
-**安全研究类**（SDL 助理自己调度）：
+**安全研究类**：
 
-| Agent | 职责 |
+| Agent | 功能 |
 |-------|------|
 | `planner` | 通用规划（任务拆解 / Agent 策略 / 风险识别 / 架构边界与实施计划） |
 | `reverse-analyst` | 逆向分析（二进制 / JS / Android / iOS） |
 | `code-audit` | 代码审计（源码 / 逻辑漏洞 / 安全规范） |
 | `poc-engineer` | 安全脚本开发（PoC / Exploit / Frida / GDB / IDA / Burp） |
-| `skeptic` | 怀疑论者审计（反证 / 挑战假设） |
+| `skeptic` | 怀疑论审计（反证 / 挑战假设） |
 | `research-recorder` | 研究记录（步骤记录 / 决策记录 / 文档编写） |
 
-**安全开发类**（由 `planner` 规划，`secdev-engineer` 执行）：
+**安全开发类**：
 
 | Agent | 职责 |
 |-------|------|
-| `secdev-engineer` | 安全开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具） |
+| `secdev-engineer` | 安全工具开发（调试器 / 反汇编器 / Fuzzer / 扫描器 / 分析工具） |
 
 ---
 
@@ -101,8 +100,8 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 - `git-workflow.md` - Git 工作流（提交格式、审计跟踪）
 
 **分析规则**：
-- `research-lead-role.md` - SDL 安全助理角色定义
-- `research-lead-authority.md` - SDL 安全助理权限授权
+- `research-lead-role.md` - 研究任务责任范围定义
+- `research-lead-authority.md` - 决策权限边界定义
 - `decision-record-format.md` - 决策记录格式
 - `step-level-logging.md` - 逐步分析记录规范（Step ID: `step-N`）
 - `research-task-classification.md` - 分析任务复杂度分类
@@ -256,7 +255,7 @@ Claude：[评估：安全开发任务]
 
 ## 文档
 
-- [CLAUDE.md](claudeCode-none/claude_arm64/workspace/CLAUDE.md) - SDL 安全助理契约（当前版本 v3.4.0）
+- [CLAUDE.md](claudeCode-none/claude_arm64/workspace/CLAUDE.md) - 工作契约（当前版本 v3.4.0）
 - [skills/](claudeCode-none/claude_arm64/workspace/.claude/skills) - 当前技能库目录
 - [rules/](claudeCode-none/claude_arm64/workspace/.claude/rules) - 当前规则目录
 
