@@ -15,13 +15,23 @@
 默认直接执行。
 
 命中以下条件时，必须升级：
-- **Plan Mode**：任务涉及方案选择、行为变更、重构、多文件修改或影响范围不清
+- **Plan**：任务涉及方案选择、行为变更、重构、多文件修改或影响范围不清
 - **Agent**：任务涉及开放式探索、大范围定位、安全审计、逆向、PoC、架构设计或可并行子任务
 
 **优先级**：
-1. 同时命中 Plan 和 Agent 条件时，先 Plan
+1. 同时命中 Plan 和 Agent 条件时，先读取相关规则，再 Plan
 2. 规划完成后，再调用需要的 Agent
 3. 不命中升级条件时，直接执行
+4. 不要依赖 Claude Code 默认路由替代本文件中的路由规则
+5. 路由判断不得只凭记忆，必须先读取对应规则文件
+
+**执行约束**：
+- 命中 `Must Use Agent` 条件时，禁止主模型直接完成开放式探索、审计、架构设计或大范围定位
+- 命中 Agent 条件时，必须优先使用 Agent tool
+- 命中 Plan 条件时，不得因为“已经知道怎么做”而跳过规划
+- 不要把本文件中的 “Plan” 默认解释为 Claude Code 内置 `EnterPlanMode`
+- 只有在实现任务确实需要用户审批方案时，才允许使用 `EnterPlanMode`
+- 探索、研究、定位、方案设计优先通过 Agent tool 完成
 
 ---
 
@@ -64,9 +74,23 @@
 
 Agent 选择：
 - `Explore`：开放式搜索、代码库理解、大范围定位
-- `planner` / `system-architect`：方案设计、架构边界、实施拆解
-- `research`：安全审计、PoC、漏洞验证、逆向、攻击链分析
-- `doc-updater`：README、CHANGELOG、架构文档、命令/技能说明更新
+- `Plan`：实现方案设计、架构边界、实施拆解
+- `general-purpose`：通用多步任务、实现、审查、文档更新
+- `claude-code-guide`：Claude Code / Claude API / Agent SDK 相关问题
+
+项目角色到运行时 Agent 的映射：
+- `planner` -> `Plan`
+- `system-architect` -> `Plan`
+- `research` -> `Explore` 或 `general-purpose`
+- `dev` -> `general-purpose`
+- `reviewer` -> `general-purpose`
+- `doc-updater` -> `general-purpose`
+
+使用约束：
+- 开放式代码库探索，优先使用 `Explore`
+- 方案设计、实现拆解，优先使用 `Plan` Agent，不要默认改用 `EnterPlanMode`
+- 普通实现、审查、文档修改，使用 `general-purpose`
+- 只有用户明确在问 Claude Code / Claude API / Agent SDK 时，才使用 `claude-code-guide`
 
 并行 Agent 只在以下条件同时满足时使用：
 - 无依赖
@@ -118,6 +142,9 @@ Agent 选择：
 ---
 
 ## 8. Required Rule Loading
+
+在做出任何路由决策（direct execution / plan / agent / multi-agent）之前，必须先读取对应规则文件。
+不要只凭记忆判断，不要用 Claude Code 默认行为替代本项目规则。
 
 遇到以下情况，必须先读取对应规则文件：
 

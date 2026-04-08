@@ -1,5 +1,12 @@
 # Research Task Classification
 
+## 前置规则
+
+在做任务分类决策前，必须先读取本文件；不要只凭记忆判断任务复杂度。
+
+- 高复杂度任务必须先读本文件，再决定 `Plan` / `Agent` / `Multi-Agent` 策略
+- 不要跳过本文件直接用 Claude Code 默认路由或 EnterPlanMode
+
 ## 快速分类
 
 ### 简单任务
@@ -19,13 +26,23 @@
 - PoC 路径明确
 
 ### 高复杂度任务
-满足任一条件，先 Plan，再决定 Agent Strategy：
+
+**必须先读本文件，再决定 `Plan` / `Agent` / `Multi-Agent` 策略。**
+
+满足任一条件，先读本文件，再决定路由策略：
 - 系统级审计
 - 深度逆向
 - 攻击链构建
 - 多攻击面分析
 - 研究路径明显不确定
 - 预计涉及大量文件或多阶段验证
+
+**高复杂度任务处理流程**：
+1. 读取本文件（`rules/research-task-classification.md`）
+2. 读取 `rules/single-multi-agent-strategy.md`
+3. 决定 `Plan` 策略：先用 `Plan` Agent 拆解，再用 `EnterPlanMode` 仅用于需要用户审批的实现方案
+4. 决定 Agent Strategy：Single-Agent vs Multi-Agent
+5. 按映射表选择运行时 subagent，然后执行
 
 ---
 

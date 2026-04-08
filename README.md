@@ -50,6 +50,12 @@ claudeSandBox 是一个基于 Docker 的隔离环境，预配置了 Claude Code 
 
 ### Specialist Agents
 
+> **角色说明**：下表中的 Agent 名称为**逻辑角色**，实际运行时通过 Claude Code Agent tool 的 subagent 调用。逻辑角色与运行时 subagent 的映射关系：
+> - `planner` / `system-architect` → `Plan` subagent
+> - `research` / `reverse-analyst` / `code-audit` → `Explore` 或 `general-purpose`
+> - `dev` / `reviewer` / `doc-updater` / `poc-engineer` / `secdev-engineer` → `general-purpose`
+> - Claude Code / Claude API / Agent SDK 问题 → `claude-code-guide`
+
 **安全研究类**（SDL 助理自己调度）：
 
 | Agent | 职责 |
