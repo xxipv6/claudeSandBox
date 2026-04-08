@@ -103,6 +103,8 @@ Agent 选择：
 - 关键假设验证成功或失败
 - 可复现证据形成
 
+当关键节点需要写 `Step Record` 时，必须先执行 step compaction 检查；若写入后会达到或超过阈值，则先按 `rules/step-level-logging.md` 完成 compaction，再写新 step。
+
 不要把研究治理流程施加到普通查文件、普通搜索、简单命令操作和小型实现任务上。
 
 ---

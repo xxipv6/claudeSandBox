@@ -335,14 +335,17 @@ xxx-research/agents/agent-name/YYYY-MM-DD-evidence-summary.md
 ## Step Record Retention / Compaction
 
 - destructive compaction 只适用于 `Step Record`，不适用于 `Decision Record` 或 `Evidence Summary`
-- 默认当未压缩的 `Step Record` 累积到 **6 条** 时触发压缩；如研究节奏特殊，可在 **5-10 条** 范围内提前或延后，但不要无限拖延
-- 当新增一个关键节点记录会让未压缩的 `Step Record` 数量达到或超过阈值时，优先生成新的滚动 `Step Summary`
-- 新的 `Step Summary` 必须吸收：
-  - 当前所有待压缩的 `step-N.md`
-  - 如已存在，上一版 `Step Summary`
-- 新的 `Step Summary` 生成后，删除被吸收的旧 `step-N.md`，并删除旧版 `Step Summary`
-- 任意时刻都只保留**当前最新的一份** `Step Summary` 作为滚动历史摘要
-- `Step Summary` 不是普通 `Step Record`，而是当前唯一保留的滚动压缩摘要；内容重点保留当前目标、当前阶段、关键发现、关键证据位置与当前有效的下一步上下文
+- 默认阈值是 **6 条**；如研究节奏特殊，可在 **5-10 条** 范围内调整，但一旦当前规则判断写入后会达到或超过阈值，compaction 必须立即执行，不能跳过或推迟
+- 写入任何新的 `step-N.md` 前，必须先检查 `notes/steps/`，并统计当前未压缩 `step-N.md` 的数量
+- 如果 `existing_uncompressed_steps + 1 >= threshold`，必须先执行 compaction，再写新的 `step-N.md`
+- compaction 时必须吸收：
+  - 当前所有未压缩的 `step-N.md`
+  - 如已存在，当前的 `step-summary.md`
+- compaction 必须重新生成当前最新的 `step-summary.md`，其内容吸收 prior history 中仍值得保留的目标、阶段、关键发现、关键证据位置与当前有效的下一步上下文
+- 新的 `step-summary.md` 生成后，必须删除所有被吸收的旧 `step-N.md`，并删除旧版 `step-summary.md`
+- compaction 完成后的硬结果是：prior history 只能由当前最新的一份 `step-summary.md` 表示，不能保留被吸收的旧 step 或旧 summary
+- 只有在上述 compaction 全部完成后，才允许写入新的 `step-N.md`
+- `Step Summary` 不是普通 `Step Record`，而是当前唯一保留的滚动压缩摘要
 - 即使存在 `Step Summary`，默认仍然只记录关键里程碑，而不是用合并机制代替记录判断
 
 ## 记录时机

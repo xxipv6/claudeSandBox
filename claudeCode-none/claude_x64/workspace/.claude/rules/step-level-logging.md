@@ -34,6 +34,10 @@
 - 记录重点是发现、证据、下一步
 - 不要求把所有中间过程写成大报告
 - Context Recovery 只用于恢复关键里程碑上下文，不记录 routine command history、dead ends 或 micro-steps
-- 普通 `Step Record` 后续可被压缩进滚动 `Step Summary`
+- 写入新的 `Step Record` 前，必须先检查 `notes/steps/`
+- 若写入后会达到或超过阈值，必须先执行 compaction
+- compaction 必须合并全部现存 `step-N.md` 和已有 `step-summary.md`
+- compaction 完成后必须删除被吸收的旧 `step-N.md` 与旧 `step-summary.md`，使 prior history 只由当前最新的 `step-summary.md` 表示
+- 完成 compaction 后，才允许写入新的 `step-N.md`
 - 压缩规则只是为了控制历史记录规模，不构成记录 routine step / micro-step 的理由
 - 需要上下文恢复时，再补充当前状态摘要
